@@ -38,9 +38,32 @@ def plan_task(
 
 def route_after_planning(
     state: AgentState,
-) -> Literal["tool_executor", "answer_generator"]:
+) -> Literal["risk_checker", "answer_generator"]:
     """Skip execution when no valid step was planned."""
-    return "tool_executor" if state.get("plan") else "answer_generator"
+    return "risk_checker" if state.get("plan") else "answer_generator"
+
+
+def check_risk(
+    state: AgentState, runtime: Runtime[AgentContext],
+) -> dict[str, object]:
+    """Classify the complete plan before any tool is allowed to execute."""
+    assessment = runtime.context.risk_checker.assess(
+        state["intent"],
+        state["plan"],
+        runtime.context.registry,
+    )
+    return {
+        "risk_level": assessment.risk_level.value,
+        "requires_approval": assessment.requires_approval,
+        "risk_reasons": assessment.reasons,
+    }
+
+
+def route_after_risk(
+    state: AgentState,
+) -> Literal["tool_executor", "answer_generator"]:
+    """Block HIGH-risk plans until Phase 11 supplies an approval workflow."""
+    return "answer_generator" if state.get("requires_approval") else "tool_executor"
 
 
 def tool_executor(
@@ -129,15 +152,27 @@ def answer_generator(state: AgentState) -> dict[str, object]:
         return {
             "final_answer": "当前 Agent 无法为该问题生成可执行的工具计划。",
         }
+    if state.get("requires_approval"):
+        return {
+            "final_answer": "风险等级为 HIGH，计划需要人工审批，本次未执行工具。",
+        }
     if not results:
         return {"final_answer": "计划执行完成，但没有获得可用结果。"}
     if state.get("analysis"):
         analysis = IncidentAnalysis.model_validate(state["analysis"])
-        return {"final_answer": _format_incident_analysis(analysis)}
+        return {
+            "final_answer": _with_risk_notice(
+                _format_incident_analysis(analysis),
+                state,
+            ),
+        }
     return {
-        "final_answer": (
-            f"计划执行完成，共完成 {len(results)} 个步骤："
-            + json.dumps(results, ensure_ascii=False)
+        "final_answer": _with_risk_notice(
+            (
+                f"计划执行完成，共完成 {len(results)} 个步骤："
+                + json.dumps(results, ensure_ascii=False)
+            ),
+            state,
         ),
     }
 
@@ -158,3 +193,10 @@ def _format_incident_analysis(analysis: IncidentAnalysis) -> str:
         "引用证据步骤：" + ", ".join(str(step) for step in analysis.evidence_steps)
     )
     return "\n\n".join(sections)
+
+
+def _with_risk_notice(answer: str, state: AgentState) -> str:
+    if state.get("risk_level") != "MEDIUM":
+        return answer
+    reasons = "；".join(state.get("risk_reasons", []))
+    return f"风险提示：{reasons}\n\n{answer}"

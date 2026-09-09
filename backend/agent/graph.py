@@ -5,10 +5,12 @@ from langgraph.graph import END, START, StateGraph
 from backend.agent.nodes import (
     analyze_incident,
     answer_generator,
+    check_risk,
     intent_router,
     plan_task,
     route_after_execution,
     route_after_planning,
+    route_after_risk,
     tool_executor,
 )
 from backend.agent.state import AgentContext, AgentState
@@ -19,6 +21,7 @@ def build_agent_graph():
     builder = StateGraph(AgentState, context_schema=AgentContext)
     builder.add_node("intent_router", intent_router)
     builder.add_node("planner", plan_task)
+    builder.add_node("risk_checker", check_risk)
     builder.add_node("tool_executor", tool_executor)
     builder.add_node("incident_analyzer", analyze_incident)
     builder.add_node("answer_generator", answer_generator)
@@ -28,6 +31,14 @@ def build_agent_graph():
     builder.add_conditional_edges(
         "planner",
         route_after_planning,
+        {
+            "risk_checker": "risk_checker",
+            "answer_generator": "answer_generator",
+        },
+    )
+    builder.add_conditional_edges(
+        "risk_checker",
+        route_after_risk,
         {
             "tool_executor": "tool_executor",
             "answer_generator": "answer_generator",

@@ -42,6 +42,8 @@ class ToolDefinition:
             raise ValueError("Tool name must use lowercase letters, digits, and underscores.")
         if not self.description.strip():
             raise ValueError("Tool description must not be empty.")
+        if not isinstance(self.risk_level, RiskLevel):
+            raise ValueError("Tool risk_level must be a RiskLevel value.")
 
 
 class BaseTool(ABC, Generic[InputT, OutputT]):

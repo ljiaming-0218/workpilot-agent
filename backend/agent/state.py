@@ -12,6 +12,7 @@ from backend.tools.registry import ToolRegistry
 if TYPE_CHECKING:
     from backend.agent.analyzer import IncidentAnalyzer
     from backend.agent.planner import Planner
+    from backend.agent.risk import RiskChecker
     from backend.agent.router import IntentRouter
 
 
@@ -34,6 +35,7 @@ class AgentState(TypedDict, total=False):
     analysis_source: str
     risk_level: str
     requires_approval: bool
+    risk_reasons: list[str]
     final_answer: str
     error: str | None
 
@@ -48,3 +50,4 @@ class AgentContext:
     intent_router: IntentRouter
     planner: Planner
     incident_analyzer: IncidentAnalyzer
+    risk_checker: RiskChecker

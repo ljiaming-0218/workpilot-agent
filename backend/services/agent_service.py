@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from backend.agent.analyzer import IncidentAnalyzer
 from backend.agent.planner import Planner
+from backend.agent.risk import RiskChecker
 from backend.agent.router import IntentRouter
 from backend.agent.state import AgentContext, AgentState
 from backend.models.agent_run import AgentRun
@@ -29,6 +30,7 @@ def run_agent(
     intent_router: IntentRouter,
     planner: Planner,
     incident_analyzer: IncidentAnalyzer,
+    risk_checker: RiskChecker,
     query: str,
 ) -> AgentResult:
     """Create AgentRun, invoke the graph, then persist one terminal run status."""
@@ -53,6 +55,7 @@ def run_agent(
         "evidence": [],
         "risk_level": "LOW",
         "requires_approval": False,
+        "risk_reasons": [],
         "error": None,
     }
     try:
@@ -65,6 +68,7 @@ def run_agent(
                 intent_router=intent_router,
                 planner=planner,
                 incident_analyzer=incident_analyzer,
+                risk_checker=risk_checker,
             ),
         )
     except Exception as exc:
@@ -104,6 +108,9 @@ def run_agent(
         evidence=final_state.get("evidence", []),
         analysis=final_state.get("analysis"),
         analysis_source=final_state.get("analysis_source"),
+        risk_level=final_state.get("risk_level", "LOW"),
+        requires_approval=final_state.get("requires_approval", False),
+        risk_reasons=final_state.get("risk_reasons", []),
         error=error,
     )
 

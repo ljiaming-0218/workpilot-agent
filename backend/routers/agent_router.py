@@ -36,6 +36,7 @@ def create_agent_run(
         request.app.state.intent_router,
         request.app.state.planner,
         request.app.state.incident_analyzer,
+        request.app.state.risk_checker,
         payload.query,
     )
     return SuccessResponse(data=result)

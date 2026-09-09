@@ -4,6 +4,8 @@ from typing import Any, Literal, TypeAlias
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from backend.models.enums import RiskLevel
+
 
 AgentIntent: TypeAlias = Literal[
     "ticket_search",
@@ -87,4 +89,7 @@ class AgentResult(BaseModel):
     evidence: list[dict[str, Any]]
     analysis: IncidentAnalysis | None
     analysis_source: Literal["llm", "fallback"] | None
+    risk_level: RiskLevel
+    requires_approval: bool
+    risk_reasons: list[str]
     error: str | None

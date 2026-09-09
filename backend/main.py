@@ -10,6 +10,7 @@ from backend.agent import build_agent_graph
 from backend.agent.analyzer import IncidentAnalyzer
 from backend.agent.router import IntentRouter
 from backend.agent.planner import Planner
+from backend.agent.risk import RiskChecker
 from backend.config import Settings
 from backend.database import build_engine
 from backend.errors import register_error_handlers
@@ -36,6 +37,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.intent_router = IntentRouter(llm_service)
         app.state.planner = Planner(llm_service, max_steps=5)
         app.state.incident_analyzer = IncidentAnalyzer(llm_service)
+        app.state.risk_checker = RiskChecker()
         app.state.agent_graph = build_agent_graph()
         try:
             yield

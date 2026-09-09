@@ -7,7 +7,9 @@ from fastapi import FastAPI
 from sqlalchemy.orm import sessionmaker
 
 from backend.agent import build_agent_graph
+from backend.agent.analyzer import IncidentAnalyzer
 from backend.agent.router import IntentRouter
+from backend.agent.planner import Planner
 from backend.config import Settings
 from backend.database import build_engine
 from backend.errors import register_error_handlers
@@ -32,6 +34,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.session_factory = sessionmaker(bind=engine, autoflush=False)
         app.state.tool_registry = create_default_registry(text2sql_service)
         app.state.intent_router = IntentRouter(llm_service)
+        app.state.planner = Planner(llm_service, max_steps=5)
+        app.state.incident_analyzer = IncidentAnalyzer(llm_service)
         app.state.agent_graph = build_agent_graph()
         try:
             yield

@@ -10,6 +10,8 @@ from sqlalchemy.orm import Session
 from backend.tools.registry import ToolRegistry
 
 if TYPE_CHECKING:
+    from backend.agent.analyzer import IncidentAnalyzer
+    from backend.agent.planner import Planner
     from backend.agent.router import IntentRouter
 
 
@@ -22,10 +24,14 @@ class AgentState(TypedDict, total=False):
     routing_confidence: float
     plan: list[dict[str, Any]]
     current_step: int
+    max_steps: int
+    planner_source: str
     selected_tool: str
     tool_inputs: dict[str, Any]
     tool_results: list[dict[str, Any]]
     evidence: list[dict[str, Any]]
+    analysis: dict[str, Any]
+    analysis_source: str
     risk_level: str
     requires_approval: bool
     final_answer: str
@@ -40,3 +46,5 @@ class AgentContext:
     registry: ToolRegistry
     agent_run_id: int
     intent_router: IntentRouter
+    planner: Planner
+    incident_analyzer: IncidentAnalyzer

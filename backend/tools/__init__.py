@@ -1,8 +1,9 @@
-"""Default Phase 3 Tool Registry assembly."""
+"""Default Tool Registry assembly."""
 
 from typing import TYPE_CHECKING
 
 from backend.tools.log_tools import QueryErrorLogsTool
+from backend.tools.knowledge_tools import SearchKnowledgeTool
 from backend.tools.registry import ToolRegistry
 from backend.tools.sql_tools import QueryDatabaseTool
 from backend.tools.ticket_tools import GetTicketDetailTool, SearchTicketsTool
@@ -18,6 +19,7 @@ def create_default_registry(
         SearchTicketsTool(),
         GetTicketDetailTool(),
         QueryErrorLogsTool(),
+        SearchKnowledgeTool(),
     ]
     if text2sql_service is not None:
         tools.append(QueryDatabaseTool(text2sql_service))

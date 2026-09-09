@@ -1,6 +1,6 @@
 # WorkPilot Agent
 
-面向企业工单、故障分析和研发效能的智能 Agent 平台。本项目分阶段开发；当前推进到 **Phase 6：Router**，已实现基础后端、数据模型、业务接口、受控工具注册表、只读自然语言查询链路和基础 LangGraph Agent。
+面向企业工单、故障分析和研发效能的智能 Agent 平台。本项目分阶段开发；当前推进到 **Phase 9：Incident Analysis Agent**，已实现基础后端、数据模型、业务接口、受控工具注册表、只读自然语言查询链路和基础 LangGraph Agent。
 
 基础 Agent 已实现；MCP 和前端仍是占位。项目协作规范见 [AGENTS.md](AGENTS.md)。
 
@@ -18,10 +18,13 @@
 - Phase 4：已实现统一 LLMService、结构化 SQL 生成、SQLGlot AST Guard、安全查询执行和 query_database 工具装配；真实 OpenRouter、SQL Guard 和 MySQL 只读链路已验证。
 - Phase 5：已实现 AgentState、基础规则路由、单工具执行、最终回答节点、Basic StateGraph 和 `POST /agent/runs`。
 - Phase 6：已实现高确定性规则路由、结构化 LLM fallback、受限 Intent、路由来源和置信度输出。
+- Phase 7：已实现最多 5 步的结构化计划、顺序多工具执行、错误终止和循环上限。
+- Phase 8：已实现中英文混合分词、BM25 排序、Top-K、MySQL 知识文档读取及 `search_knowledge` Agent 工具。
+- Phase 9：已形成日志、工单、知识库三类证据收集、结构化 LLM 故障分析和引用证据步骤的完整闭环。
 
 ## 整体架构
 
-当前分层：HTTP Router → Agent Service → LangGraph → Tool Registry → Service → ORM / MySQL；后续逐步加入 Planner、BM25、MCP、Trace 和前端调试台。
+当前分层：HTTP Router → Agent Service → LangGraph → Tool Registry → Retrieval / Service → ORM / MySQL；后续逐步加入 MCP、Trace 和前端调试台。
 
 Phase 0 提供配置、数据库连接和请求生命周期管理。Phase 1 使用 `python -m scripts.init_db` 显式创建缺失的业务表；应用启动不会自动建库或改表。
 
@@ -189,11 +192,11 @@ mysql -h 127.0.0.1 -P 3306 -u your_mysql_user -p -D workpilot_agent -e 'SELECT 1
 
 ## 当前限制与下一阶段
 
-当前已实现六个数据库模型、四个工单/日志接口、Tool Registry、三个固定查询工具、SQL Guard、Text2SQL 编排、`query_database` 工具、同步 Basic Agent API 及 Rule Router + LLM fallback；尚未实现 Planner、BM25、MCP、前端或部署验证。当前 Agent 每次最多执行一个工具，最终回答使用确定性格式化，免费模型路由可能较慢。当前索引尚未进行业务负载性能测试，也尚无认证、幂等键或限流，仅用于本地开发阶段。
+当前已实现六个数据库模型、四个工单/日志接口、Tool Registry、SQL Guard、Text2SQL 编排、同步 Agent API、Rule Router + LLM fallback、最多 5 步的 Planner 执行循环、BM25 Top-K 检索工具及基于证据的故障分析闭环；尚未实现 Risk Checker、MCP、前端或部署验证。故障分析会区分确认事实和模型推断，并校验引用步骤；模型不可用或结构校验失败时返回基于工具结果的 fallback。BM25 当前会在每次查询时从数据库读取文档并重建内存索引，尚未进行业务负载性能测试；系统也尚无认证、幂等键或限流，仅用于本地开发阶段。
 
 Phase 4 已增加 `sqlglot>=30.18,<31` 和 `openai>=3,<4`。SQL Guard 只允许 MySQL 单条 SELECT、三张业务表的白名单列和有限函数，禁止通配列、跨库名、子查询、CTE、UNION、锁、变量及写操作，并把 LIMIT 限制到 100、OFFSET 限制到 10000。已通过真实 OpenRouter 结构化输出完成 `LLMService → Text2SQLService → SQLGuard → MySQL` 手动 smoke check；免费路由可能发生重试，且模糊问题可能返回安全零行兜底 SQL。
 
-本次止于 Phase 6。当前阶段只升级 Intent Router，不包含 Planner、多工具循环、BM25 或 MCP。
+本次止于 Phase 9。当前阶段完成只读故障分析闭环，不包含 Risk Checker、Human-in-the-loop 或 MCP。
 
 ## 原理参考
 

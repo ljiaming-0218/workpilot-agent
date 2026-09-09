@@ -90,6 +90,8 @@ def match_rule(query: str) -> RoutingDecision | None:
 
 def select_tool(query: str, intent: str) -> tuple[str, dict[str, Any]]:
     """Map one intent to at most one existing read-only tool."""
+    if intent == INTENT_KNOWLEDGE_SEARCH:
+        return "search_knowledge", {"query": query, "limit": 5}
     if intent == INTENT_TICKET_SEARCH:
         match = _TICKET_ID_PATTERN.search(query)
         if match is not None:

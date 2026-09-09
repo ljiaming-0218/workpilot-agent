@@ -1,4 +1,4 @@
-"""Plain-text knowledge documents; retrieval is implemented in a later phase."""
+"""Plain-text knowledge documents used by the BM25 retrieval pipeline."""
 
 from sqlalchemy import String
 from sqlalchemy.dialects.mysql import LONGTEXT

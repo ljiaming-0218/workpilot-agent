@@ -13,6 +13,13 @@ AgentIntent: TypeAlias = Literal[
     "incident_analysis",
     "general",
 ]
+AgentToolName: TypeAlias = Literal[
+    "search_tickets",
+    "get_ticket_detail",
+    "query_error_logs",
+    "query_database",
+    "search_knowledge",
+]
 
 
 class LLMRoutingDecision(BaseModel):
@@ -24,6 +31,39 @@ class LLMRoutingDecision(BaseModel):
 
 class RoutingDecision(LLMRoutingDecision):
     source: Literal["rule", "llm", "fallback"]
+
+
+class PlanStep(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    tool: AgentToolName
+    inputs: dict[str, Any]
+
+
+class GeneratedPlan(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    steps: list[PlanStep] = Field(min_length=1, max_length=5)
+
+
+class PlannerDecision(BaseModel):
+    steps: list[PlanStep] = Field(max_length=5)
+    source: Literal["rule", "llm", "fallback"]
+
+
+class IncidentAnalysis(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    summary: str = Field(min_length=1, max_length=2_000)
+    confirmed_facts: list[str] = Field(min_length=1, max_length=10)
+    hypotheses: list[str] = Field(max_length=5)
+    recommended_actions: list[str] = Field(min_length=1, max_length=8)
+    evidence_steps: list[int] = Field(max_length=5)
+
+
+class IncidentAnalysisDecision(BaseModel):
+    analysis: IncidentAnalysis
+    source: Literal["llm", "fallback"]
 
 
 class AgentRequest(BaseModel):
@@ -38,7 +78,13 @@ class AgentResult(BaseModel):
     intent: AgentIntent
     routing_source: Literal["rule", "llm", "fallback"]
     routing_confidence: float
+    plan: list[PlanStep]
+    planner_source: Literal["rule", "llm", "fallback"]
+    steps_executed: int
     selected_tool: str | None
     final_answer: str
     tool_results: list[dict[str, Any]]
+    evidence: list[dict[str, Any]]
+    analysis: IncidentAnalysis | None
+    analysis_source: Literal["llm", "fallback"] | None
     error: str | None

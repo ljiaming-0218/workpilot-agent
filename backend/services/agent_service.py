@@ -1,4 +1,4 @@
-"""Persist and execute one synchronous Phase 5 Agent run."""
+"""Persist and execute one synchronous Agent run."""
 
 from time import perf_counter_ns
 from uuid import uuid4
@@ -7,6 +7,8 @@ from langgraph.graph.state import CompiledStateGraph
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from backend.agent.analyzer import IncidentAnalyzer
+from backend.agent.planner import Planner
 from backend.agent.router import IntentRouter
 from backend.agent.state import AgentContext, AgentState
 from backend.models.agent_run import AgentRun
@@ -25,6 +27,8 @@ def run_agent(
     graph: CompiledStateGraph,
     registry: ToolRegistry,
     intent_router: IntentRouter,
+    planner: Planner,
+    incident_analyzer: IncidentAnalyzer,
     query: str,
 ) -> AgentResult:
     """Create AgentRun, invoke the graph, then persist one terminal run status."""
@@ -44,6 +48,7 @@ def run_agent(
         "query": query,
         "plan": [],
         "current_step": 0,
+        "max_steps": planner.max_steps,
         "tool_results": [],
         "evidence": [],
         "risk_level": "LOW",
@@ -58,6 +63,8 @@ def run_agent(
                 registry=registry,
                 agent_run_id=run_id,
                 intent_router=intent_router,
+                planner=planner,
+                incident_analyzer=incident_analyzer,
             ),
         )
     except Exception as exc:
@@ -88,9 +95,15 @@ def run_agent(
         intent=final_state.get("intent", "general"),
         routing_source=final_state.get("routing_source", "fallback"),
         routing_confidence=final_state.get("routing_confidence", 0),
+        plan=final_state.get("plan", []),
+        planner_source=final_state.get("planner_source", "fallback"),
+        steps_executed=final_state.get("current_step", 0),
         selected_tool=final_state.get("selected_tool") or None,
         final_answer=final_answer,
         tool_results=final_state.get("tool_results", []),
+        evidence=final_state.get("evidence", []),
+        analysis=final_state.get("analysis"),
+        analysis_source=final_state.get("analysis_source"),
         error=error,
     )
 

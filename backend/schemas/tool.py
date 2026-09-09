@@ -2,6 +2,7 @@
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from backend.schemas.knowledge import KnowledgeSearchHit
 from backend.schemas.log import LogRead
 from backend.schemas.text2sql import Text2SQLResult
 from backend.schemas.ticket import TicketRead
@@ -48,3 +49,14 @@ class QueryDatabaseInput(ToolInput):
 
 class QueryDatabaseOutput(Text2SQLResult):
     pass
+
+
+class SearchKnowledgeInput(ToolInput):
+    query: str = Field(min_length=1, max_length=500)
+    category: str | None = Field(default=None, min_length=1, max_length=64)
+    limit: int = Field(default=5, ge=1, le=20)
+
+
+class SearchKnowledgeOutput(BaseModel):
+    items: list[KnowledgeSearchHit]
+    total: int

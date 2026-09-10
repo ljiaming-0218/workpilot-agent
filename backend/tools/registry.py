@@ -74,6 +74,8 @@ class ToolRegistry:
     def call_tool(
         self, name: str, raw_input: Any, context: ToolContext,
     ) -> BaseModel:
+        if context.agent_run_id is None:
+            raise ToolExecutionError("Agent tool calls require an AgentRun ID.")
         definition = self.get_tool(name)
         if not definition.enabled:
             self._persist_terminal_log(

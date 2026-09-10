@@ -1,8 +1,8 @@
 # WorkPilot Agent
 
-面向企业工单、故障分析和研发效能的智能 Agent 平台。本项目分阶段开发；当前推进到 **Phase 11：Human-in-the-loop**，已实现基础后端、数据模型、业务接口、受控工具注册表、只读自然语言查询链路和基础 LangGraph Agent。
+面向企业工单、故障分析和研发效能的智能 Agent 平台。本项目分阶段开发；当前推进到 **Phase 12：MCP Python SDK**，已实现基础后端、数据模型、业务接口、受控工具注册表、只读自然语言查询链路和基础 LangGraph Agent。
 
-基础 Agent 已实现；MCP 和前端仍是占位。项目协作规范见 [AGENTS.md](AGENTS.md)。
+基础 Agent 和本地 MCP stdio 链路已实现；前端仍是占位。项目协作规范见 [AGENTS.md](AGENTS.md)。
 
 ## 当前阶段与验收
 
@@ -23,10 +23,11 @@
 - Phase 9：已形成日志、工单、知识库三类证据收集、结构化 LLM 故障分析和引用证据步骤的完整闭环。
 - Phase 10：已实现执行前 LOW/MEDIUM/HIGH 风险分类、最高风险合并、MEDIUM 提示和 HIGH 工具阻断。
 - Phase 11：已实现 LangGraph interrupt、人工批准/拒绝/取消、同 thread_id 恢复、防重复审批与模拟 HIGH 风险工具；未操作真实生产系统。
+- Phase 12：已实现 MCP Python SDK v2 Server、持久 stdio Client 和三个只读 MCP Tools，并接入 Agent Tool Registry。
 
 ## 整体架构
 
-当前分层：HTTP Router → Agent Service → LangGraph → Tool Registry → Retrieval / Service → ORM / MySQL；后续逐步加入 MCP、Trace 和前端调试台。
+当前分层：HTTP Router → Agent Service → LangGraph → Tool Registry → MCP Client → MCP Server → Retrieval / Service → ORM / MySQL；后续逐步加入 Trace 和前端调试台。
 
 Phase 0 提供配置、数据库连接和请求生命周期管理。Phase 1 使用 `python -m scripts.init_db` 显式创建缺失的业务表；应用启动不会自动建库或改表。
 
@@ -194,11 +195,11 @@ mysql -h 127.0.0.1 -P 3306 -u your_mysql_user -p -D workpilot_agent -e 'SELECT 1
 
 ## 当前限制与下一阶段
 
-当前已实现六个数据库模型、四个工单/日志接口、Tool Registry、SQL Guard、Text2SQL 编排、同步 Agent API、Rule Router + LLM fallback、最多 5 步的 Planner 执行循环、BM25 Top-K 检索工具、基于证据的故障分析闭环及执行前 Risk Checker；尚未实现 MCP、前端或部署验证。故障分析会区分确认事实和模型推断，并校验引用步骤；模型不可用或结构校验失败时返回基于工具结果的 fallback。BM25 当前会在每次查询时从数据库读取文档并重建内存索引，尚未进行业务负载性能测试；系统也尚无认证、幂等键或限流，仅用于本地开发阶段。
+当前已实现六个数据库模型、四个工单/日志接口、Tool Registry、SQL Guard、Text2SQL 编排、同步 Agent API、Rule Router + LLM fallback、最多 5 步的 Planner 执行循环、BM25 Top-K 检索工具、基于证据的故障分析闭环、Risk Checker、Human-in-the-loop 和本地 MCP stdio 链路；尚未实现前端或部署验证。故障分析会区分确认事实和模型推断，并校验引用步骤；模型不可用或结构校验失败时返回基于工具结果的 fallback。BM25 当前会在每次查询时从数据库读取文档并重建内存索引，尚未进行业务负载性能测试；系统也尚无认证、幂等键或限流，仅用于本地开发阶段。
 
 Phase 4 已增加 `sqlglot>=30.18,<31` 和 `openai>=3,<4`。SQL Guard 只允许 MySQL 单条 SELECT、三张业务表的白名单列和有限函数，禁止通配列、跨库名、子查询、CTE、UNION、锁、变量及写操作，并把 LIMIT 限制到 100、OFFSET 限制到 10000。已通过真实 OpenRouter 结构化输出完成 `LLMService → Text2SQLService → SQLGuard → MySQL` 手动 smoke check；免费路由可能发生重试，且模糊问题可能返回安全零行兜底 SQL。
 
-本次止于 Phase 11。HIGH 风险计划会通过 LangGraph interrupt 停在 `waiting_approval`；批准后仅恢复执行模拟工具，拒绝或取消不执行工具。当前 InMemorySaver 仅适合单进程本地演示，应用重启后无法恢复待审批检查点。
+本次止于 Phase 12。Agent 的 `search_tickets`、`query_error_logs` 和 `search_knowledge` 通过持久 stdio Client 调用独立 MCP Server；MCP Server 每次调用创建独立数据库 Session。当前客户端在单进程内串行处理 MCP 调用，尚未实现远程 Streamable HTTP、认证或多实例扩展。
 
 ## 原理参考
 

@@ -22,7 +22,7 @@ class ToolContext:
     """Resources and trace identity available to one tool invocation."""
 
     session: Session
-    agent_run_id: int
+    agent_run_id: int | None
 
 
 @dataclass(frozen=True, slots=True)

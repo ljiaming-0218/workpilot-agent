@@ -15,6 +15,7 @@ from backend.agent.risk import RiskChecker
 from backend.config import Settings
 from backend.database import build_engine
 from backend.errors import register_error_handlers
+from backend.mcp import WorkPilotMCPClient
 from backend.routers.agent_router import router as agent_router
 from backend.routers.health_router import router as health_router
 from backend.routers.log_router import router as log_router
@@ -30,23 +31,39 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         runtime_settings = settings if settings is not None else Settings()
         engine = build_engine(runtime_settings)
         llm_service = None
-        if runtime_settings.llm_api_key is not None and runtime_settings.llm_model is not None:
-            llm_service = LLMService(runtime_settings)
-        text2sql_service = Text2SQLService(llm_service) if llm_service is not None else None
-        app.state.session_factory = sessionmaker(bind=engine, autoflush=False)
-        app.state.tool_registry = create_default_registry(text2sql_service)
-        app.state.intent_router = IntentRouter(llm_service)
-        app.state.planner = Planner(llm_service, max_steps=5)
-        app.state.incident_analyzer = IncidentAnalyzer(llm_service)
-        app.state.risk_checker = RiskChecker()
-        app.state.agent_checkpointer = InMemorySaver()
-        app.state.agent_graph = build_agent_graph(app.state.agent_checkpointer)
+        mcp_client = WorkPilotMCPClient()
         try:
+            if (
+                runtime_settings.llm_api_key is not None
+                and runtime_settings.llm_model is not None
+            ):
+                llm_service = LLMService(runtime_settings)
+            text2sql_service = (
+                Text2SQLService(llm_service) if llm_service is not None else None
+            )
+            mcp_client.connect()
+            app.state.session_factory = sessionmaker(bind=engine, autoflush=False)
+            app.state.mcp_client = mcp_client
+            app.state.tool_registry = create_default_registry(
+                text2sql_service,
+                mcp_client,
+            )
+            app.state.intent_router = IntentRouter(llm_service)
+            app.state.planner = Planner(llm_service, max_steps=5)
+            app.state.incident_analyzer = IncidentAnalyzer(llm_service)
+            app.state.risk_checker = RiskChecker()
+            app.state.agent_checkpointer = InMemorySaver()
+            app.state.agent_graph = build_agent_graph(app.state.agent_checkpointer)
             yield
         finally:
-            if llm_service is not None:
-                llm_service.close()
-            engine.dispose()
+            try:
+                mcp_client.close()
+            finally:
+                try:
+                    if llm_service is not None:
+                        llm_service.close()
+                finally:
+                    engine.dispose()
 
     application = FastAPI(title="WorkPilot Agent", version="0.1.0", lifespan=lifespan)
     register_error_handlers(application)

@@ -4,10 +4,11 @@ from typing import Any, Literal, TypeAlias
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from backend.models.enums import RiskLevel
+from backend.models.enums import AgentRunStatus, RiskLevel
 
 
 AgentIntent: TypeAlias = Literal[
+    "operation",
     "ticket_search",
     "log_analysis",
     "knowledge_search",
@@ -16,6 +17,7 @@ AgentIntent: TypeAlias = Literal[
     "general",
 ]
 AgentToolName: TypeAlias = Literal[
+    "simulate_high_risk_operation",
     "search_tickets",
     "get_ticket_detail",
     "query_error_logs",
@@ -74,6 +76,16 @@ class AgentRequest(BaseModel):
     query: str = Field(min_length=1, max_length=2_000)
 
 
+ApprovalAction: TypeAlias = Literal["approve", "reject", "cancel"]
+ApprovalStatus: TypeAlias = Literal["pending", "approved", "rejected", "cancelled"]
+
+
+class AgentApprovalRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    action: ApprovalAction
+
+
 class AgentResult(BaseModel):
     run_id: int
     request_id: str
@@ -92,4 +104,6 @@ class AgentResult(BaseModel):
     risk_level: RiskLevel
     requires_approval: bool
     risk_reasons: list[str]
+    status: AgentRunStatus
+    approval_status: ApprovalStatus | None
     error: str | None

@@ -1,13 +1,16 @@
-"""Build and compile the Phase 5 basic LangGraph state machine."""
+"""Build the bounded Agent graph with Phase 11 approval interrupts."""
 
+from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, START, StateGraph
 
 from backend.agent.nodes import (
     analyze_incident,
+    approval_gate,
     answer_generator,
     check_risk,
     intent_router,
     plan_task,
+    route_after_approval,
     route_after_execution,
     route_after_planning,
     route_after_risk,
@@ -16,12 +19,13 @@ from backend.agent.nodes import (
 from backend.agent.state import AgentContext, AgentState
 
 
-def build_agent_graph():
+def build_agent_graph(checkpointer: InMemorySaver | None = None):
     """Compile a reusable graph; request resources arrive through AgentContext."""
     builder = StateGraph(AgentState, context_schema=AgentContext)
     builder.add_node("intent_router", intent_router)
     builder.add_node("planner", plan_task)
     builder.add_node("risk_checker", check_risk)
+    builder.add_node("approval_gate", approval_gate)
     builder.add_node("tool_executor", tool_executor)
     builder.add_node("incident_analyzer", analyze_incident)
     builder.add_node("answer_generator", answer_generator)
@@ -40,6 +44,14 @@ def build_agent_graph():
         "risk_checker",
         route_after_risk,
         {
+            "approval_gate": "approval_gate",
+            "tool_executor": "tool_executor",
+        },
+    )
+    builder.add_conditional_edges(
+        "approval_gate",
+        route_after_approval,
+        {
             "tool_executor": "tool_executor",
             "answer_generator": "answer_generator",
         },
@@ -55,4 +67,5 @@ def build_agent_graph():
         },
     )
     builder.add_edge("answer_generator", END)
-    return builder.compile()
+    active_checkpointer = checkpointer if checkpointer is not None else InMemorySaver()
+    return builder.compile(checkpointer=active_checkpointer)

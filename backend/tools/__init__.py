@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from backend.tools.log_tools import QueryErrorLogsTool
 from backend.tools.knowledge_tools import SearchKnowledgeTool
 from backend.tools.registry import ToolRegistry
+from backend.tools.simulation_tools import SimulateHighRiskOperationTool
 from backend.tools.sql_tools import QueryDatabaseTool
 from backend.tools.ticket_tools import GetTicketDetailTool, SearchTicketsTool
 
@@ -20,6 +21,7 @@ def create_default_registry(
         GetTicketDetailTool(),
         QueryErrorLogsTool(),
         SearchKnowledgeTool(),
+        SimulateHighRiskOperationTool(),
     ]
     if text2sql_service is not None:
         tools.append(QueryDatabaseTool(text2sql_service))

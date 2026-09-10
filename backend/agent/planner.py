@@ -20,7 +20,7 @@ SERVICE_NAME_PATTERN = re.compile(
 
 
 class Planner:
-    """Create an ordered, read-only plan capped by max_steps."""
+    """Create an ordered plan capped by max_steps."""
 
     def __init__(self, llm: StructuredLLM | None, max_steps: int = 5) -> None:
         if not 1 <= max_steps <= 5:

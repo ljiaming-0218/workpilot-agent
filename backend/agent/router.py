@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 INTENT_GENERAL = "general"
+INTENT_OPERATION = "operation"
 INTENT_TICKET_SEARCH = "ticket_search"
 INTENT_LOG_ANALYSIS = "log_analysis"
 INTENT_KNOWLEDGE_SEARCH = "knowledge_search"
@@ -29,6 +30,10 @@ _LOG_WORDS = ("日志", "error log", "错误记录", "报错记录")
 _KNOWLEDGE_WORDS = ("知识库", "文档", "操作手册", "解决方案")
 _TICKET_WORDS = ("工单", "ticket")
 _DATA_WORDS = ("统计", "数量", "多少", "总数", "趋势", "分布")
+_SIMULATION_WORDS = ("模拟", "simulate")
+_HIGH_RISK_ACTION_WORDS = (
+    "重启", "删除", "修改配置", "shell", "restart", "delete", "update config",
+)
 _TICKET_ID_PATTERN = re.compile(
     r"(?:工单|ticket)\s*(?:id|编号|#|：|:)?\s*(\d+)", re.IGNORECASE,
 )
@@ -69,6 +74,10 @@ class IntentRouter:
 def match_rule(query: str) -> RoutingDecision | None:
     """Return only high-confidence matches so ambiguous queries can reach the LLM."""
     normalized = query.casefold()
+    if any(word in normalized for word in _SIMULATION_WORDS) and any(
+        word in normalized for word in _HIGH_RISK_ACTION_WORDS
+    ):
+        return RoutingDecision(intent=INTENT_OPERATION, confidence=0.99, source="rule")
     if any(word in normalized for word in _INCIDENT_WORDS) and any(
         word in normalized for word in _ANALYSIS_WORDS
     ):
@@ -89,7 +98,9 @@ def match_rule(query: str) -> RoutingDecision | None:
 
 
 def select_tool(query: str, intent: str) -> tuple[str, dict[str, Any]]:
-    """Map one intent to at most one existing read-only tool."""
+    """Map one intent to at most one registered tool."""
+    if intent == INTENT_OPERATION:
+        return "simulate_high_risk_operation", {"request": query}
     if intent == INTENT_KNOWLEDGE_SEARCH:
         return "search_knowledge", {"query": query, "limit": 5}
     if intent == INTENT_TICKET_SEARCH:

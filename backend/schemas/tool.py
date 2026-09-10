@@ -60,3 +60,12 @@ class SearchKnowledgeInput(ToolInput):
 class SearchKnowledgeOutput(BaseModel):
     items: list[KnowledgeSearchHit]
     total: int
+
+
+class SimulateHighRiskOperationInput(ToolInput):
+    request: str = Field(min_length=1, max_length=500)
+
+
+class SimulateHighRiskOperationOutput(BaseModel):
+    simulated: bool
+    message: str

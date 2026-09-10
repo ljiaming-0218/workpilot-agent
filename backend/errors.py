@@ -10,7 +10,11 @@ from sqlalchemy.exc import (
 )
 from starlette.exceptions import HTTPException
 
-from backend.services.agent_service import AgentExecutionError
+from backend.services.agent_service import (
+    AgentExecutionError,
+    AgentRunNotFoundError,
+    AgentRunStateError,
+)
 from backend.schemas.common import ErrorDetail, ErrorResponse, ValidationIssue
 
 
@@ -30,6 +34,18 @@ def error_response(
 
 
 def register_error_handlers(app: FastAPI) -> None:
+    @app.exception_handler(AgentRunNotFoundError)
+    async def agent_run_not_found(
+        request: Request, exc: AgentRunNotFoundError,
+    ) -> JSONResponse:
+        return error_response(404, exc.code, "Agent run was not found.")
+
+    @app.exception_handler(AgentRunStateError)
+    async def agent_run_state_error(
+        request: Request, exc: AgentRunStateError,
+    ) -> JSONResponse:
+        return error_response(409, exc.code, "Agent run cannot accept this action.")
+
     @app.exception_handler(AgentExecutionError)
     async def agent_execution_error(request: Request, exc: AgentExecutionError) -> JSONResponse:
         logger.warning("AGENT_ERROR: request failed (%s)", type(exc.__cause__).__name__)

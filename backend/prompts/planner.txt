@@ -11,6 +11,8 @@ Available tools and inputs:
 - query_database: {"question": string}
 - search_knowledge: {"query": string, "category"?: string,
   "limit"?: integer 1..20}
+- simulate_high_risk_operation: {"request": string}; this tool never changes a
+  real system but must still pass HIGH-risk approval.
 
 Rules:
 - Use only the available tools and exact input field names.

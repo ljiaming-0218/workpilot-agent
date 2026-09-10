@@ -4,6 +4,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from langgraph.checkpoint.memory import InMemorySaver
 from sqlalchemy.orm import sessionmaker
 
 from backend.agent import build_agent_graph
@@ -38,7 +39,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.planner = Planner(llm_service, max_steps=5)
         app.state.incident_analyzer = IncidentAnalyzer(llm_service)
         app.state.risk_checker = RiskChecker()
-        app.state.agent_graph = build_agent_graph()
+        app.state.agent_checkpointer = InMemorySaver()
+        app.state.agent_graph = build_agent_graph(app.state.agent_checkpointer)
         try:
             yield
         finally:

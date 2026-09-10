@@ -4,6 +4,7 @@ import json
 from typing import Literal
 
 from langgraph.runtime import Runtime
+from langgraph.types import interrupt
 
 from backend.agent.state import AgentContext, AgentState
 from backend.schemas.agent import IncidentAnalysis
@@ -56,14 +57,51 @@ def check_risk(
         "risk_level": assessment.risk_level.value,
         "requires_approval": assessment.requires_approval,
         "risk_reasons": assessment.reasons,
+        "approval_status": "pending" if assessment.requires_approval else None,
     }
 
 
 def route_after_risk(
     state: AgentState,
+) -> Literal["approval_gate", "tool_executor"]:
+    """Pause HIGH-risk plans and allow other plans to execute."""
+    return "approval_gate" if state.get("requires_approval") else "tool_executor"
+
+
+def approval_gate(state: AgentState) -> dict[str, object]:
+    """Interrupt once and convert the resumed human decision into graph state."""
+    decision = interrupt(
+        {
+            "question": (
+                "\u662f\u5426\u6279\u51c6\u6267\u884c\u8fd9\u4e2a"
+                "\u6a21\u62df\u9ad8\u98ce\u9669\u8ba1\u5212\uff1f"
+            ),
+            "risk_level": state["risk_level"],
+            "risk_reasons": state.get("risk_reasons", []),
+            "plan": state["plan"],
+        }
+    )
+    action = decision.get("action") if isinstance(decision, dict) else None
+    if action == "approve":
+        return {
+            "requires_approval": False,
+            "approval_status": "approved",
+            "error": None,
+        }
+    if action in {"reject", "cancel"}:
+        return {
+            "requires_approval": False,
+            "approval_status": "rejected" if action == "reject" else "cancelled",
+            "error": "APPROVAL_REJECTED" if action == "reject" else "APPROVAL_CANCELLED",
+        }
+    raise ValueError("Unsupported approval action.")
+
+
+def route_after_approval(
+    state: AgentState,
 ) -> Literal["tool_executor", "answer_generator"]:
-    """Block HIGH-risk plans until Phase 11 supplies an approval workflow."""
-    return "answer_generator" if state.get("requires_approval") else "tool_executor"
+    """Resume execution only after explicit approval."""
+    return "answer_generator" if state.get("error") else "tool_executor"
 
 
 def tool_executor(
@@ -142,6 +180,10 @@ def analyze_incident(
 def answer_generator(state: AgentState) -> dict[str, object]:
     """Build a deterministic answer from all completed plan observations."""
     results = state.get("tool_results", [])
+    if state.get("error") == "APPROVAL_REJECTED":
+        return {"final_answer": "高风险计划已被拒绝，未执行任何工具。"}
+    if state.get("error") == "APPROVAL_CANCELLED":
+        return {"final_answer": "高风险计划已取消，未执行任何工具。"}
     if state.get("error"):
         return {
             "final_answer": (
@@ -151,10 +193,6 @@ def answer_generator(state: AgentState) -> dict[str, object]:
     if not state.get("plan"):
         return {
             "final_answer": "当前 Agent 无法为该问题生成可执行的工具计划。",
-        }
-    if state.get("requires_approval"):
-        return {
-            "final_answer": "风险等级为 HIGH，计划需要人工审批，本次未执行工具。",
         }
     if not results:
         return {"final_answer": "计划执行完成，但没有获得可用结果。"}

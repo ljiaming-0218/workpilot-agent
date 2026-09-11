@@ -57,3 +57,9 @@ class ToolCallStatus(StrEnum):
     COMPLETED = "completed"
     FAILED = "failed"
     REJECTED = "rejected"
+
+
+class TraceStatus(StrEnum):
+    SUCCESS = "success"
+    FAILED = "failed"
+    INTERRUPTED = "interrupted"

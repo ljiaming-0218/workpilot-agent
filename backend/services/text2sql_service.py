@@ -6,14 +6,16 @@ from decimal import Decimal
 from enum import Enum
 import json
 from pathlib import Path
+from time import perf_counter_ns
 from typing import Any
 
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from backend.schemas.text2sql import GeneratedSQL, Text2SQLRequest, Text2SQLResult
-from backend.security.sql_guard import GuardedSQL, SQLGuard, TABLE_SCHEMAS
+from backend.security.sql_guard import GuardedSQL, SQLGuard, SQLGuardError, TABLE_SCHEMAS
 from backend.services.llm_service import StructuredLLM
+from backend.utils.trace_context import emit_sql_trace
 
 
 PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts" / "text2sql.txt"
@@ -40,7 +42,30 @@ class Text2SQLService:
             self._build_user_prompt(request.question),
             GeneratedSQL,
         )
-        return self._guard.validate(generated.sql)
+        started_ns = perf_counter_ns()
+        try:
+            guarded = self._guard.validate(generated.sql)
+        except SQLGuardError as exc:
+            emit_sql_trace(
+                sql=generated.sql,
+                guard_result={"allowed": False, "code": exc.code},
+                latency_ms=_latency_ms(started_ns),
+                status="failed",
+                error=str(exc),
+            )
+            raise
+        emit_sql_trace(
+            sql=guarded.sql,
+            guard_result={
+                "allowed": True,
+                "tables": list(guarded.tables),
+                "limit": guarded.limit,
+            },
+            latency_ms=_latency_ms(started_ns),
+            status="success",
+            error=None,
+        )
+        return guarded
 
     def query(self, session: Session, question: str) -> Text2SQLResult:
         guarded = self.generate_sql(question)
@@ -94,3 +119,7 @@ class Text2SQLService:
         if isinstance(value, bytes):
             return value.hex()
         return str(value)
+
+
+def _latency_ms(started_ns: int) -> int:
+    return max(0, (perf_counter_ns() - started_ns) // 1_000_000)

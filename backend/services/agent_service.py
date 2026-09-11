@@ -15,11 +15,13 @@ from backend.agent.planner import Planner
 from backend.agent.risk import RiskChecker
 from backend.agent.router import IntentRouter
 from backend.agent.state import AgentContext, AgentState
+from backend.agent.trace import TraceRecorder
 from backend.models.agent_run import AgentRun
 from backend.models.common import utc_now
 from backend.models.enums import AgentRunStatus
 from backend.schemas.agent import AgentResult, ApprovalAction
 from backend.tools.registry import ToolRegistry
+from backend.utils.trace_context import bind_trace_sink
 
 
 logger = logging.getLogger(__name__)
@@ -77,6 +79,7 @@ def run_agent(
         "error": None,
     }
     config = _graph_config(request_id)
+    trace_recorder = TraceRecorder(session, run_id)
     context = _graph_context(
         session,
         registry,
@@ -85,9 +88,11 @@ def run_agent(
         planner,
         incident_analyzer,
         risk_checker,
+        trace_recorder,
     )
     try:
-        final_state = graph.invoke(initial_state, config=config, context=context)
+        with bind_trace_sink(trace_recorder):
+            final_state = graph.invoke(initial_state, config=config, context=context)
     except Exception as exc:
         _finish_run(
             session,
@@ -96,6 +101,7 @@ def run_agent(
             intent=None,
             final_answer=None,
             latency_ms=_latency_ms(started_ns),
+            trace_recorder=trace_recorder,
         )
         _delete_checkpoint(graph, request_id)
         raise AgentExecutionError("Agent graph execution failed.") from exc
@@ -106,6 +112,7 @@ def run_agent(
             run_id,
             intent=final_state.get("intent"),
             latency_ms=_latency_ms(started_ns),
+            trace_recorder=trace_recorder,
         )
         return _build_result(
             run_id,
@@ -124,6 +131,7 @@ def run_agent(
         intent=final_state.get("intent"),
         final_answer=final_answer,
         latency_ms=_latency_ms(started_ns),
+        trace_recorder=trace_recorder,
     )
     _delete_checkpoint(graph, request_id)
     return _build_result(
@@ -174,6 +182,7 @@ def resume_agent(
     session.commit()
 
     started_ns = perf_counter_ns()
+    trace_recorder = TraceRecorder(session, run_id)
     context = _graph_context(
         session,
         registry,
@@ -182,13 +191,15 @@ def resume_agent(
         planner,
         incident_analyzer,
         risk_checker,
+        trace_recorder,
     )
     try:
-        final_state = graph.invoke(
-            Command(resume={"action": action}),
-            config=config,
-            context=context,
-        )
+        with bind_trace_sink(trace_recorder):
+            final_state = graph.invoke(
+                Command(resume={"action": action}),
+                config=config,
+                context=context,
+            )
     except Exception as exc:
         _finish_run(
             session,
@@ -197,6 +208,7 @@ def resume_agent(
             intent=run.intent,
             final_answer=None,
             latency_ms=(run.latency_ms or 0) + _latency_ms(started_ns),
+            trace_recorder=trace_recorder,
         )
         _delete_checkpoint(graph, request_id)
         raise AgentExecutionError("Agent graph resume failed.") from exc
@@ -207,6 +219,7 @@ def resume_agent(
             run_id,
             intent=final_state.get("intent"),
             latency_ms=(run.latency_ms or 0) + _latency_ms(started_ns),
+            trace_recorder=trace_recorder,
         )
         return _build_result(
             run_id,
@@ -225,6 +238,7 @@ def resume_agent(
         intent=final_state.get("intent"),
         final_answer=final_answer,
         latency_ms=(run.latency_ms or 0) + _latency_ms(started_ns),
+        trace_recorder=trace_recorder,
     )
     _delete_checkpoint(graph, request_id)
     return _build_result(
@@ -244,6 +258,7 @@ def _graph_context(
     planner: Planner,
     incident_analyzer: IncidentAnalyzer,
     risk_checker: RiskChecker,
+    trace_recorder: TraceRecorder,
 ) -> AgentContext:
     return AgentContext(
         session=session,
@@ -253,6 +268,7 @@ def _graph_context(
         planner=planner,
         incident_analyzer=incident_analyzer,
         risk_checker=risk_checker,
+        trace_recorder=trace_recorder,
     )
 
 
@@ -306,6 +322,7 @@ def _mark_waiting(
     *,
     intent: str | None,
     latency_ms: int,
+    trace_recorder: TraceRecorder,
 ) -> None:
     run = session.get(AgentRun, run_id)
     if run is None:
@@ -315,6 +332,7 @@ def _mark_waiting(
     run.final_answer = WAITING_MESSAGE
     run.finished_at = None
     run.latency_ms = latency_ms
+    trace_recorder.persist(session)
     session.commit()
 
 
@@ -326,6 +344,7 @@ def _finish_run(
     intent: str | None,
     final_answer: str | None,
     latency_ms: int,
+    trace_recorder: TraceRecorder,
 ) -> None:
     run = session.get(AgentRun, run_id)
     if run is None:
@@ -335,6 +354,7 @@ def _finish_run(
     run.final_answer = final_answer
     run.finished_at = utc_now()
     run.latency_ms = latency_ms
+    trace_recorder.persist(session)
     try:
         session.commit()
     except SQLAlchemyError:

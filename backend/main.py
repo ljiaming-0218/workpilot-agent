@@ -20,6 +20,7 @@ from backend.routers.agent_router import router as agent_router
 from backend.routers.health_router import router as health_router
 from backend.routers.log_router import router as log_router
 from backend.routers.ticket_router import router as ticket_router
+from backend.routers.trace_router import router as trace_router
 from backend.services.llm_service import LLMService
 from backend.services.text2sql_service import Text2SQLService
 from backend.tools import create_default_registry
@@ -71,6 +72,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(ticket_router)
     application.include_router(log_router)
     application.include_router(agent_router)
+    application.include_router(trace_router)
     return application
 
 

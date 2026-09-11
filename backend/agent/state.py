@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from backend.agent.planner import Planner
     from backend.agent.risk import RiskChecker
     from backend.agent.router import IntentRouter
+    from backend.agent.trace import TraceRecorder
 
 
 class AgentState(TypedDict, total=False):
@@ -52,3 +53,4 @@ class AgentContext:
     planner: Planner
     incident_analyzer: IncidentAnalyzer
     risk_checker: RiskChecker
+    trace_recorder: TraceRecorder

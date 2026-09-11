@@ -17,18 +17,25 @@ from backend.agent.nodes import (
     tool_executor,
 )
 from backend.agent.state import AgentContext, AgentState
+from backend.agent.trace import trace_node
 
 
 def build_agent_graph(checkpointer: InMemorySaver | None = None):
     """Compile a reusable graph; request resources arrive through AgentContext."""
     builder = StateGraph(AgentState, context_schema=AgentContext)
-    builder.add_node("intent_router", intent_router)
-    builder.add_node("planner", plan_task)
-    builder.add_node("risk_checker", check_risk)
-    builder.add_node("approval_gate", approval_gate)
-    builder.add_node("tool_executor", tool_executor)
-    builder.add_node("incident_analyzer", analyze_incident)
-    builder.add_node("answer_generator", answer_generator)
+    builder.add_node("intent_router", trace_node("intent_router", intent_router))
+    builder.add_node("planner", trace_node("planner", plan_task))
+    builder.add_node("risk_checker", trace_node("risk_checker", check_risk))
+    builder.add_node("approval_gate", trace_node("approval_gate", approval_gate))
+    builder.add_node("tool_executor", trace_node("tool_executor", tool_executor))
+    builder.add_node(
+        "incident_analyzer",
+        trace_node("incident_analyzer", analyze_incident),
+    )
+    builder.add_node(
+        "answer_generator",
+        trace_node("answer_generator", answer_generator),
+    )
 
     builder.add_edge(START, "intent_router")
     builder.add_edge("intent_router", "planner")

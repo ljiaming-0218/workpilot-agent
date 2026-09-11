@@ -14,6 +14,7 @@ from backend.models.common import TABLE_OPTIONS, enum_type, utc_now
 from backend.models.enums import AgentRunStatus
 
 if TYPE_CHECKING:
+    from backend.models.trace_event import AgentTraceEvent
     from backend.models.tool_call import ToolCallLog
 
 
@@ -38,5 +39,8 @@ class AgentRun(Base):
 
     # Retain audit history: deleting a run with tool calls must be rejected by MySQL.
     tool_calls: Mapped[list[ToolCallLog]] = relationship(
+        back_populates="agent_run", passive_deletes="all"
+    )
+    trace_events: Mapped[list[AgentTraceEvent]] = relationship(
         back_populates="agent_run", passive_deletes="all"
     )

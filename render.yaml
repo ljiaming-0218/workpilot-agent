@@ -22,7 +22,9 @@ services:
       - key: MYSQL_DATABASE
         sync: false
       - key: MYSQL_CONNECT_TIMEOUT
-        value: "10"
+        value: "30"
+      - key: MYSQL_SSL_CA
+        value: /etc/ssl/certs/ca-certificates.crt
       - key: LLM_API_KEY
         sync: false
       - key: LLM_BASE_URL

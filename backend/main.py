@@ -2,8 +2,10 @@
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from langgraph.checkpoint.memory import InMemorySaver
 from sqlalchemy.orm import sessionmaker
 
@@ -24,6 +26,9 @@ from backend.routers.trace_router import router as trace_router
 from backend.services.llm_service import LLMService
 from backend.services.text2sql_service import Text2SQLService
 from backend.tools import create_default_registry
+
+
+FRONTEND_DIR = Path(__file__).resolve().parents[1] / "frontend"
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -73,6 +78,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(log_router)
     application.include_router(agent_router)
     application.include_router(trace_router)
+    application.mount(
+        "/console",
+        StaticFiles(directory=FRONTEND_DIR, html=True),
+        name="agent-console",
+    )
     return application
 
 

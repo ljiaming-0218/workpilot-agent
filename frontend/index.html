@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="WorkPilot Agent 执行与追踪调试台">
+  <title>WorkPilot · Agent Trace Console</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <svg class="icon-defs" aria-hidden="true">
+    <symbol id="icon-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></symbol>
+    <symbol id="icon-data" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7"/></symbol>
+    <symbol id="icon-trace" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3" cy="6" r="1"/><circle cx="3" cy="12" r="1"/><circle cx="3" cy="18" r="1"/></symbol>
+    <symbol id="icon-work" viewBox="0 0 24 24"><path d="m4 17 5-5-5-5M11 19h9"/></symbol>
+    <symbol id="icon-ticket" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></symbol>
+    <symbol id="icon-log" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM7 9h3M7 13h10M7 16h7"/></symbol>
+    <symbol id="icon-book" viewBox="0 0 24 24"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H11v17H7.5A3.5 3.5 0 0 0 4 22V5.5ZM20 5.5A3.5 3.5 0 0 0 16.5 2H13v17h3.5A3.5 3.5 0 0 1 20 22V5.5Z"/></symbol>
+    <symbol id="icon-service" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></symbol>
+    <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  </svg>
+
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="WorkPilot 首页">
+      <span class="brand-mark">W</span>
+      <span>WorkPilot</span>
+    </a>
+    <span class="product-name">Agent Trace Console</span>
+    <div class="system-state" id="system-state" role="status">
+      <span class="status-dot"></span>
+      <span id="system-state-label">正在连接</span>
+    </div>
+    <a class="docs-link" href="/docs" target="_blank" rel="noreferrer">API Docs</a>
+  </header>
+
+  <nav class="mobile-nav" aria-label="移动端工作区">
+    <button class="mobile-tab active" data-mobile-view="workspace"><svg><use href="#icon-work"/></svg>Workspace</button>
+    <button class="mobile-tab" data-mobile-view="trace"><svg><use href="#icon-trace"/></svg>Trace</button>
+    <button class="mobile-tab" data-mobile-view="data"><svg><use href="#icon-data"/></svg>Data</button>
+  </nav>
+
+  <main class="app-shell" data-mobile-active="workspace">
+    <aside class="panel business-panel" data-panel="data">
+      <div class="panel-heading">
+        <div><span class="eyebrow">OPERATIONS</span><h1>Business Data</h1></div>
+        <button class="icon-button" id="refresh-data" type="button" aria-label="刷新业务数据">↻</button>
+      </div>
+      <div class="data-tabs" role="tablist" aria-label="业务数据类型">
+        <button class="data-tab active" data-data-type="tickets" role="tab">
+          <svg><use href="#icon-ticket"/></svg><span>Tickets</span><b id="ticket-count">—</b>
+        </button>
+        <button class="data-tab" data-data-type="logs" role="tab">
+          <svg><use href="#icon-log"/></svg><span>Logs</span><b id="log-count">—</b>
+        </button>
+        <button class="data-tab" data-data-type="knowledge" role="tab">
+          <svg><use href="#icon-book"/></svg><span>Knowledge</span><b>Agent</b>
+        </button>
+        <button class="data-tab" data-data-type="services" role="tab">
+          <svg><use href="#icon-service"/></svg><span>Services</span><b id="service-count">—</b>
+        </button>
+      </div>
+      <div class="section-label"><span id="data-list-title">最近工单</span><span id="data-list-meta"></span></div>
+      <div class="data-list" id="data-list" aria-live="polite"></div>
+      <div class="recent-section">
+        <div class="section-label"><span>本次会话运行</span><span id="run-count">0</span></div>
+        <div class="recent-runs" id="recent-runs">
+          <p class="empty-copy">运行任务后，这里会保留本次页面会话中的记录。</p>
+        </div>
+      </div>
+    </aside>
+
+    <section class="workspace" data-panel="workspace">
+      <form class="composer panel" id="agent-form">
+        <div class="panel-heading compact">
+          <div><span class="eyebrow">AGENT WORKSPACE</span><h2>向 WorkPilot 描述任务</h2></div>
+          <span class="keyboard-hint">Ctrl ↵</span>
+        </div>
+        <label class="sr-only" for="agent-query">Agent 任务</label>
+        <textarea id="agent-query" maxlength="2000" rows="4">分析 payment-service 最近的 500 错误，结合日志、工单和知识库给出可能原因与排查方案。</textarea>
+        <div class="composer-footer">
+          <span class="input-meta"><span id="query-count">0</span>/2000 · 结果将保留完整执行证据</span>
+          <button class="primary-button" id="run-agent" type="submit">
+            <svg><use href="#icon-play"/></svg><span>Run Agent</span>
+          </button>
+        </div>
+      </form>
+
+      <section class="run-panel panel" id="run-panel" aria-live="polite">
+        <div class="run-header">
+          <div>
+            <span class="eyebrow">CURRENT RUN</span>
+            <h2 id="run-title">等待执行任务</h2>
+          </div>
+          <div class="status-cluster">
+            <span class="status-badge idle" id="run-status">IDLE</span>
+            <span class="risk-badge" id="run-risk">—</span>
+          </div>
+        </div>
+        <dl class="run-meta">
+          <div><dt>Run ID</dt><dd><span id="run-id">—</span><button class="copy-button" id="copy-run-id" type="button" aria-label="复制 Run ID"><svg><use href="#icon-copy"/></svg></button></dd></div>
+          <div><dt>Intent</dt><dd id="run-intent">—</dd></div>
+          <div><dt>Routing</dt><dd id="run-routing">—</dd></div>
+          <div><dt>Steps</dt><dd id="run-steps">—</dd></div>
+        </dl>
+
+        <div class="approval-panel" id="approval-panel" hidden>
+          <div><strong>需要人工审批</strong><p id="approval-reason">高风险计划尚未执行任何工具。</p></div>
+          <div class="approval-actions">
+            <button type="button" class="secondary-button" data-approval="cancel">取消</button>
+            <button type="button" class="danger-button" data-approval="reject">拒绝</button>
+            <button type="button" class="approve-button" data-approval="approve">批准并继续</button>
+          </div>
+        </div>
+
+        <div class="content-tabs" role="tablist" aria-label="运行结果">
+          <button class="content-tab active" data-content="plan" role="tab">Plan <span id="plan-count">0</span></button>
+          <button class="content-tab" data-content="evidence" role="tab">Evidence <span id="evidence-count">0</span></button>
+          <button class="content-tab" data-content="answer" role="tab">Final Answer</button>
+        </div>
+        <div class="content-view" id="content-view">
+          <div class="empty-state">
+            <svg><use href="#icon-work"/></svg>
+            <strong>准备调试 Agent</strong>
+            <p>提交任务后，这里会展示计划、证据与最终回答。</p>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <aside class="panel trace-panel" data-panel="trace">
+      <div class="trace-header">
+        <div><span class="eyebrow">OBSERVABILITY</span><h2>Agent Trace</h2></div>
+        <div class="trace-tools">
+          <label class="sr-only" for="trace-filter">筛选 Trace</label>
+          <select id="trace-filter">
+            <option value="all">All Events</option>
+            <option value="failed">Errors</option>
+            <option value="llm_call">LLM</option>
+            <option value="tool">Tools</option>
+            <option value="sql_guard">SQL Guard</option>
+          </select>
+        </div>
+      </div>
+      <div class="trace-summary">
+        <span><b id="trace-count">0</b> events</span>
+        <span><b id="trace-latency">0</b> ms observed</span>
+      </div>
+      <div class="trace-list" id="trace-list">
+        <div class="trace-empty">
+          <svg><use href="#icon-trace"/></svg>
+          <strong>Trace 尚未生成</strong>
+          <p>运行 Agent 后可查看节点、工具、SQL、检索、MCP 与 LLM 事件。</p>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="./app.js" defer></script>
+</body>
+</html>

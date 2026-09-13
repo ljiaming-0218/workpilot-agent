@@ -1,8 +1,8 @@
 # WorkPilot Agent
 
-面向企业工单、故障分析和研发效能的智能 Agent 平台。本项目分阶段开发；当前推进到 **Phase 13：Agent Trace**，已实现基础后端、数据模型、业务接口、受控工具注册表、只读自然语言查询链路和基础 LangGraph Agent。
+面向企业工单、故障分析和研发效能的智能 Agent 平台。本项目分阶段开发；当前推进到 **Phase 14：Frontend Debug Console**，已实现基础后端、数据模型、业务接口、受控工具注册表、只读自然语言查询链路、LangGraph Agent 和执行追踪调试台。
 
-基础 Agent 和本地 MCP stdio 链路已实现；前端仍是占位。项目协作规范见 [AGENTS.md](AGENTS.md)。
+基础 Agent、本地 MCP stdio 链路和响应式 Trace 调试台已实现。项目协作规范见 [AGENTS.md](AGENTS.md)。
 
 ## 当前阶段与验收
 
@@ -25,10 +25,11 @@
 - Phase 11：已实现 LangGraph interrupt、人工批准/拒绝/取消、同 thread_id 恢复、防重复审批与模拟 HIGH 风险工具；未操作真实生产系统。
 - Phase 12：已实现 MCP Python SDK v2 Server、持久 stdio Client 和三个只读 MCP Tools，并接入 Agent Tool Registry。
 - Phase 13：已实现按 Agent Run 持久化的 Node、Tool、SQL Guard、Retrieval、MCP 和 LLM Trace，并提供有序 Trace 查询接口。
+- Phase 14：已实现 Business Data、Agent Workspace 和 Agent Trace 三栏调试台，支持任务执行、人工审批、Trace 筛选及移动端视图。
 
 ## 整体架构
 
-当前分层：HTTP Router → Agent Service → LangGraph → Tool Registry → MCP Client → MCP Server → Retrieval / Service → ORM / MySQL，并由 Agent Trace 记录关键执行事件；下一阶段加入前端调试台。
+当前分层：Frontend Debug Console → HTTP Router → Agent Service → LangGraph → Tool Registry → MCP Client → MCP Server → Retrieval / Service → ORM / MySQL，并由 Agent Trace 记录和展示关键执行事件；下一阶段进入 Evaluation。
 
 Phase 0 提供配置、数据库连接和请求生命周期管理。Phase 1 使用 `python -m scripts.init_db` 显式创建缺失的业务表；应用启动不会自动建库或改表。
 
@@ -112,6 +113,7 @@ python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
 
 - Swagger：<http://127.0.0.1:8000/docs>
 - 健康检查：<http://127.0.0.1:8000/health>
+- Agent Trace Console：<http://127.0.0.1:8000/console/>
 
 ## API 契约
 
@@ -196,11 +198,11 @@ mysql -h 127.0.0.1 -P 3306 -u your_mysql_user -p -D workpilot_agent -e 'SELECT 1
 
 ## 当前限制与下一阶段
 
-当前已实现七个数据库模型、四个工单/日志接口、Tool Registry、SQL Guard、Text2SQL 编排、同步 Agent API、Rule Router + LLM fallback、最多 5 步的 Planner 执行循环、BM25 Top-K 检索工具、基于证据的故障分析闭环、Risk Checker、Human-in-the-loop、本地 MCP stdio 链路和 Agent Trace；尚未实现前端或部署验证。故障分析会区分确认事实和模型推断，并校验引用步骤；模型不可用或结构校验失败时返回基于工具结果的 fallback。BM25 当前会在每次查询时从数据库读取文档并重建内存索引，尚未进行业务负载性能测试；系统也尚无认证、幂等键或限流，仅用于本地开发阶段。
+当前已实现七个数据库模型、四个工单/日志接口、Tool Registry、SQL Guard、Text2SQL 编排、同步 Agent API、Rule Router + LLM fallback、最多 5 步的 Planner 执行循环、BM25 Top-K 检索工具、基于证据的故障分析闭环、Risk Checker、Human-in-the-loop、本地 MCP stdio 链路、Agent Trace 和前端调试台；尚未完成 Evaluation 或部署验证。故障分析会区分确认事实和模型推断，并校验引用步骤；模型不可用或结构校验失败时返回基于工具结果的 fallback。BM25 当前会在每次查询时从数据库读取文档并重建内存索引，尚未进行业务负载性能测试；系统也尚无认证、幂等键或限流，仅用于本地开发阶段。
 
 Phase 4 已增加 `sqlglot>=30.18,<31` 和 `openai>=3,<4`。SQL Guard 只允许 MySQL 单条 SELECT、三张业务表的白名单列和有限函数，禁止通配列、跨库名、子查询、CTE、UNION、锁、变量及写操作，并把 LIMIT 限制到 100、OFFSET 限制到 10000。已通过真实 OpenRouter 结构化输出完成 `LLMService → Text2SQLService → SQLGuard → MySQL` 手动 smoke check；免费路由可能发生重试，且模糊问题可能返回安全零行兜底 SQL。
 
-本次止于 Phase 13。`GET /agent/runs/{run_id}/trace` 按步骤返回 Node、Tool、SQL Guard、Retrieval、MCP 和 LLM 事件；模型响应支持时记录 token usage，当前供应商响应不提供统一费用字段。Trace 随 Agent 终态在同一数据库事务提交，进程被强制终止时，尚在内存缓冲区中的事件可能无法落库。
+本次止于 Phase 14。FastAPI 在 `/console/` 同源托管无构建依赖的 HTML/CSS/JavaScript 调试台；页面读取真实业务接口，支持运行 Agent、处理人工审批、查看计划/证据/回答，并按 Node、Tool、SQL Guard、Retrieval、MCP、LLM 和错误筛选 Trace。最近运行只保留在当前浏览器页面内存中，刷新页面后不会恢复列表。
 
 ## 原理参考
 

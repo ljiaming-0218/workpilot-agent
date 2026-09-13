@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: workpilot-agent
+    runtime: python
+    plan: free
+    region: singapore
+    branch: main
+    autoDeployTrigger: commit
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m scripts.init_db && python -m scripts.seed_data && uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: MYSQL_HOST
+        sync: false
+      - key: MYSQL_PORT
+        sync: false
+      - key: MYSQL_USER
+        sync: false
+      - key: MYSQL_PASSWORD
+        sync: false
+      - key: MYSQL_DATABASE
+        sync: false
+      - key: MYSQL_CONNECT_TIMEOUT
+        value: "10"
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_BASE_URL
+        sync: false
+      - key: LLM_MODEL
+        sync: false
+      - key: LLM_TIMEOUT
+        value: "90"
+      - key: LLM_MAX_RETRIES
+        value: "2"
+      - key: LLM_ENABLE_THINKING
+        value: "false"

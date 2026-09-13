@@ -18,17 +18,26 @@ class Base(DeclarativeBase):
 
 def build_engine(settings: Settings) -> Engine:
     """Create a connection pool; the first query opens the actual connection."""
+    connect_args: dict[str, object] = {
+        "connect_timeout": settings.mysql_connect_timeout,
+        "read_timeout": 5,
+        "write_timeout": 5,
+    }
+    if settings.mysql_ssl_ca is not None:
+        connect_args.update(
+            {
+                "ssl_ca": settings.mysql_ssl_ca,
+                "ssl_verify_cert": True,
+                "ssl_verify_identity": True,
+            }
+        )
     return create_engine(
         settings.database_url,
         pool_pre_ping=True,
         pool_size=5,
         max_overflow=5,
         pool_timeout=5,
-        connect_args={
-            "connect_timeout": settings.mysql_connect_timeout,
-            "read_timeout": 5,
-            "write_timeout": 5,
-        },
+        connect_args=connect_args,
         echo=False,
         hide_parameters=True,
     )

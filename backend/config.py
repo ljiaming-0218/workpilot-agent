@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     mysql_password: SecretStr
     mysql_database: str = Field(default="workpilot_agent", min_length=1)
     mysql_connect_timeout: int = Field(default=5, ge=1, le=30, description="Seconds to wait for a database connection before timing out.")
+    mysql_ssl_ca: str | None = None
 
     llm_api_key: SecretStr | None = None
     llm_base_url: str | None = None
@@ -32,7 +33,7 @@ class Settings(BaseSettings):
     llm_max_retries: int = Field(default=2, ge=0, le=5)
     llm_enable_thinking: bool = True
 
-    @field_validator("llm_base_url", "llm_model", mode="before")
+    @field_validator("mysql_ssl_ca", "llm_base_url", "llm_model", mode="before")
     @classmethod
     def empty_string_as_none(cls, value: object) -> object:
         if isinstance(value, str) and not value.strip():

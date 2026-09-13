@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from langgraph.checkpoint.memory import InMemorySaver
 from sqlalchemy.orm import sessionmaker
@@ -95,6 +96,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(log_router)
     application.include_router(agent_router)
     application.include_router(trace_router)
+
+    @application.get("/", include_in_schema=False)
+    def console_redirect() -> RedirectResponse:
+        return RedirectResponse(url="/console/", status_code=307)
+
     application.mount(
         "/console",
         StaticFiles(directory=FRONTEND_DIR, html=True),

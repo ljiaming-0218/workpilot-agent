@@ -1,6 +1,7 @@
 """Synchronous facade over one persistent async MCP stdio client."""
 
 import asyncio
+from collections.abc import Mapping
 from concurrent.futures import Future
 from dataclasses import dataclass
 from pathlib import Path
@@ -15,8 +16,8 @@ from backend.mcp.tools import MCP_TOOL_NAMES
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-CLIENT_START_TIMEOUT_SECONDS = 15
-CLIENT_CALL_TIMEOUT_SECONDS = 15
+CLIENT_START_TIMEOUT_SECONDS = 45
+CLIENT_CALL_TIMEOUT_SECONDS = 30
 CLIENT_STOP_TIMEOUT_SECONDS = 10
 
 
@@ -39,11 +40,13 @@ class WorkPilotMCPClient:
         self,
         python_executable: str = sys.executable,
         project_root: Path = PROJECT_ROOT,
+        server_environment: Mapping[str, str] | None = None,
     ) -> None:
         self._server = StdioServerParameters(
             command=python_executable,
             args=["-m", "backend.mcp.server"],
             cwd=project_root,
+            env=dict(server_environment) if server_environment is not None else None,
         )
         self._requests: Queue[_ClientRequest | None] = Queue()
         self._ready = Event()

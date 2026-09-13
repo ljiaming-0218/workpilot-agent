@@ -31,13 +31,30 @@ from backend.tools import create_default_registry
 FRONTEND_DIR = Path(__file__).resolve().parents[1] / "frontend"
 
 
+def _mcp_database_environment(settings: Settings) -> dict[str, str]:
+    """Pass only database configuration to the isolated MCP subprocess."""
+    environment = {
+        "MYSQL_HOST": settings.mysql_host,
+        "MYSQL_PORT": str(settings.mysql_port),
+        "MYSQL_USER": settings.mysql_user,
+        "MYSQL_PASSWORD": settings.mysql_password.get_secret_value(),
+        "MYSQL_DATABASE": settings.mysql_database,
+        "MYSQL_CONNECT_TIMEOUT": str(settings.mysql_connect_timeout),
+    }
+    if settings.mysql_ssl_ca is not None:
+        environment["MYSQL_SSL_CA"] = settings.mysql_ssl_ca
+    return environment
+
+
 def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         runtime_settings = settings if settings is not None else Settings()
         engine = build_engine(runtime_settings)
         llm_service = None
-        mcp_client = WorkPilotMCPClient()
+        mcp_client = WorkPilotMCPClient(
+            server_environment=_mcp_database_environment(runtime_settings)
+        )
         try:
             if (
                 runtime_settings.llm_api_key is not None

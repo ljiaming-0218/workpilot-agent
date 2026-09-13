@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     llm_model: str | None = None
     llm_timeout: float = Field(default=30, ge=1, le=120)
     llm_max_retries: int = Field(default=2, ge=0, le=5)
+    llm_enable_thinking: bool = True
 
     @field_validator("llm_base_url", "llm_model", mode="before")
     @classmethod

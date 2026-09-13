@@ -11,7 +11,7 @@ Output:
 
 Constraints:
 - Query only tables and columns present in the schema allowlist.
-- Use explicit column names and unique aliases; never use SELECT *.
+- Use explicit column names and unique aliases; never use a wildcard `*`, including SELECT * and COUNT(*). Use COUNT(id) or another allowed explicit column instead.
 - Do not use CTEs, UNION, derived tables, subqueries, comments, variables, locks, or SELECT INTO.
 - Do not generate INSERT, UPDATE, DELETE, DDL, administrative statements, or multiple statements.
 - Use literal UTC datetime boundaries derived from the supplied current UTC time.

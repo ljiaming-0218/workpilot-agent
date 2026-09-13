@@ -139,7 +139,10 @@ class SQLGuard:
         aliases: set[str] = set()
         for projection in statement.expressions:
             if projection.find(exp.Star) is not None:
-                raise UnsafeSQLError("SELECT * is not allowed; use explicit columns.")
+                raise UnsafeSQLError(
+                    "Wildcard * is not allowed, including COUNT(*); "
+                    "use explicit columns such as COUNT(id)."
+                )
             output_name = projection.alias_or_name.casefold()
             if not output_name:
                 raise UnsafeSQLError("Computed columns must have an explicit alias.")

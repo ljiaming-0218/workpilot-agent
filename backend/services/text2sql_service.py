@@ -37,35 +37,46 @@ class Text2SQLService:
 
     def generate_sql(self, question: str) -> GuardedSQL:
         request = Text2SQLRequest(question=question)
-        generated = self._llm.generate_structured(
-            TEXT2SQL_SYSTEM_PROMPT,
-            self._build_user_prompt(request.question),
-            GeneratedSQL,
-        )
-        started_ns = perf_counter_ns()
-        try:
-            guarded = self._guard.validate(generated.sql)
-        except SQLGuardError as exc:
-            emit_sql_trace(
-                sql=generated.sql,
-                guard_result={"allowed": False, "code": exc.code},
-                latency_ms=_latency_ms(started_ns),
-                status="failed",
-                error=str(exc),
+        user_prompt = self._build_user_prompt(request.question)
+        for attempt in range(2):
+            generated = self._llm.generate_structured(
+                TEXT2SQL_SYSTEM_PROMPT,
+                user_prompt,
+                GeneratedSQL,
             )
-            raise
-        emit_sql_trace(
-            sql=guarded.sql,
-            guard_result={
-                "allowed": True,
-                "tables": list(guarded.tables),
-                "limit": guarded.limit,
-            },
-            latency_ms=_latency_ms(started_ns),
-            status="success",
-            error=None,
-        )
-        return guarded
+            started_ns = perf_counter_ns()
+            try:
+                guarded = self._guard.validate(generated.sql)
+            except SQLGuardError as exc:
+                emit_sql_trace(
+                    sql=generated.sql,
+                    guard_result={"allowed": False, "code": exc.code},
+                    latency_ms=_latency_ms(started_ns),
+                    status="failed",
+                    error=str(exc),
+                )
+                if attempt == 0:
+                    user_prompt = self._build_repair_prompt(
+                        user_prompt,
+                        generated.sql,
+                        exc,
+                    )
+                    continue
+                raise
+            emit_sql_trace(
+                sql=guarded.sql,
+                guard_result={
+                    "allowed": True,
+                    "tables": list(guarded.tables),
+                    "limit": guarded.limit,
+                },
+                latency_ms=_latency_ms(started_ns),
+                status="success",
+                error=None,
+            )
+            return guarded
+
+        raise RuntimeError("Text2SQL retry loop ended without a result.")
 
     def query(self, session: Session, question: str) -> Text2SQLResult:
         guarded = self.generate_sql(question)
@@ -100,6 +111,26 @@ class Text2SQLService:
             + "\n".join(schema_lines)
             + f"\n\nCURRENT_UTC: {now}"
             + f"\n\nUSER_QUESTION_JSON: {question_json}"
+        )
+
+    @staticmethod
+    def _build_repair_prompt(
+        original_prompt: str,
+        rejected_sql: str,
+        error: SQLGuardError,
+    ) -> str:
+        correction = json.dumps(
+            {
+                "rejected_sql": rejected_sql,
+                "guard_error": str(error),
+            },
+            ensure_ascii=False,
+        )
+        return (
+            f"{original_prompt}\n\nCORRECTION_JSON: {correction}\n"
+            "The previous SQL was rejected by the deterministic SQL Guard. "
+            "Return one corrected GeneratedSQL object that fixes this violation "
+            "and still follows every original constraint."
         )
 
     @staticmethod

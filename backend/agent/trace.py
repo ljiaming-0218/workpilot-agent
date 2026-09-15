@@ -48,11 +48,14 @@ class TraceRecorder:
     """Buffer trace events without changing a node's transaction boundary."""
 
     def __init__(self, session: Session, agent_run_id: int) -> None:
-        last_step = session.scalar(
-            select(func.max(AgentTraceEvent.step)).where(
-                AgentTraceEvent.agent_run_id == agent_run_id
+        # This read precedes potentially long LLM calls. Close its transaction
+        # immediately so the request Session does not hold an idle connection.
+        with Session(session.get_bind()) as read_session:
+            last_step = read_session.scalar(
+                select(func.max(AgentTraceEvent.step)).where(
+                    AgentTraceEvent.agent_run_id == agent_run_id
+                )
             )
-        )
         self.agent_run_id = agent_run_id
         self._next_step = (last_step or 0) + 1
         self._events: list[PendingTraceEvent] = []

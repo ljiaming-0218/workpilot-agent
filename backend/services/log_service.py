@@ -25,10 +25,15 @@ def list_logs(session: Session, filters: LogFilters) -> Page[LogRead]:
         conditions.append(ErrorLog.created_at < end)
 
     total = session.scalar(select(func.count()).select_from(ErrorLog).where(*conditions))
+    order = (
+        (ErrorLog.id.desc(),)
+        if filters.sort_by == "added"
+        else (ErrorLog.created_at.desc(), ErrorLog.id.desc())
+    )
     statement = (
         select(ErrorLog)
         .where(*conditions)
-        .order_by(ErrorLog.created_at.desc(), ErrorLog.id.desc())
+        .order_by(*order)
         .offset(filters.offset)
         .limit(filters.page_size)
     )

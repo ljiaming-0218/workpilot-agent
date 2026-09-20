@@ -230,6 +230,53 @@ KNOWLEDGE_DATA = [
         "category": "runbook",
         "content": "先确认影响范围和时间窗口，再关联 request_id、错误类型、依赖指标、历史工单和变更记录。",
     },
+    {
+        "source": "seed://workpilot/mysql-slow-query-index",
+        "title": "MySQL 慢查询与索引失效诊断",
+        "category": "database",
+        "content": (
+            "先用慢查询日志确认 SQL 指纹、调用次数和 P95 耗时，再用 EXPLAIN 检查访问类型、"
+            "扫描行数与实际使用索引。函数包裹索引列、隐式类型转换和联合索引最左前缀缺失，"
+            "都可能导致索引失效。优化后应对比执行计划与业务延迟，禁止直接在生产库执行写操作。"
+        ),
+    },
+    {
+        "source": "seed://workpilot/sqlalchemy-session-leak",
+        "title": "SQLAlchemy Session 与连接泄漏排查",
+        "category": "runbook",
+        "content": (
+            "每个 HTTP 请求应创建独立 Session，并在 finally 中关闭。异常事务先 rollback，"
+            "再继续审计或返回错误。若连接池 active 持续增长且请求结束后不下降，检查未关闭的"
+            "Session、流式结果集和长事务。不要在并发请求间共享 Session。"
+        ),
+    },
+    {
+        "source": "seed://workpilot/deployment-change-correlation",
+        "title": "故障时间窗与发布变更关联方法",
+        "category": "incident",
+        "content": (
+            "把错误率开始上升的时间与应用发布、配置变更、依赖升级和数据库变更对齐。"
+            "时间接近只能形成候选原因，还需通过版本分组、实例对照或回滚后的指标变化补充证据。"
+        ),
+    },
+    {
+        "source": "seed://workpilot/redis-cache-breakdown",
+        "title": "Redis 热点 Key 与缓存击穿处理",
+        "category": "runbook",
+        "content": (
+            "缓存命中率下降且数据库请求突增时，检查热点 Key 是否集中失效。可采用过期时间抖动、"
+            "请求合并、互斥重建和限流降低回源压力，并持续观察 Redis P99 与数据库连接数。"
+        ),
+    },
+    {
+        "source": "seed://workpilot/incident-evidence-quality",
+        "title": "Agent 故障分析证据质量规则",
+        "category": "agent",
+        "content": (
+            "日志说明当前发生了什么，历史工单提供相似案例，知识文档提供排查方法。"
+            "Agent 应区分事实、推断和建议；没有命中记录时必须明确证据不足，不能把空结果解释为系统正常。"
+        ),
+    },
 ]
 
 
@@ -267,6 +314,41 @@ LOG_GROUPS = [
             "Authentication failed; detected 94 second clock difference between instances.",
         ],
         "stack_trace": "TokenExpiredError: JWT validation failed on exp claim",
+    },
+    {
+        "service_name": "payment-service",
+        "error_type": "SlowQuery",
+        "prefix": "demo-pay-slow",
+        "offsets": [4, 8, 13, 18, 24, 31, 39, 48, 58],
+        "messages": [
+            "SELECT payment_orders exceeded 2500 ms and held a pooled connection.",
+            "Payment reconciliation query scanned 183420 rows; expected index was not used.",
+            "Database P95 latency exceeded threshold while connection waiters increased.",
+        ],
+        "stack_trace": "sqlalchemy.exc.OperationalError: query execution exceeded timeout",
+    },
+    {
+        "service_name": "database-platform",
+        "error_type": "ConnectionPressure",
+        "prefix": "demo-db-pressure",
+        "offsets": [10, 22, 35, 51, 79, 121],
+        "messages": [
+            "Active connections reached 92 percent of the configured database limit.",
+            "Long-running transaction remained open for more than 180 seconds.",
+            "Connection acquisition P95 exceeded 1500 ms across application instances.",
+        ],
+        "stack_trace": "DatabaseCapacityWarning: connection pressure threshold exceeded",
+    },
+    {
+        "service_name": "inventory-service",
+        "error_type": "UpstreamTimeout",
+        "prefix": "demo-inventory",
+        "offsets": [15, 33, 62, 94, 138],
+        "messages": [
+            "Inventory reservation timed out while calling warehouse gateway.",
+            "Warehouse upstream returned 504 after 2000 ms.",
+        ],
+        "stack_trace": "httpx.ReadTimeout: warehouse gateway did not respond",
     },
 ]
 

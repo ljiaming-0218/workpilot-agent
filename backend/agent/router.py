@@ -24,7 +24,10 @@ INTENT_INCIDENT_ANALYSIS = "incident_analysis"
 PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts" / "router.txt"
 ROUTER_SYSTEM_PROMPT = PROMPT_PATH.read_text(encoding="utf-8").strip()
 
-_INCIDENT_WORDS = ("故障", "异常", "报错", "错误", "失败", "超时", "500")
+_INCIDENT_WORDS = (
+    "故障", "异常", "报错", "错误", "失败", "超时", "500",
+    "error", "exception", "failure", "timeout",
+)
 _ANALYSIS_WORDS = ("分析", "原因", "排查", "诊断")
 _LOG_WORDS = ("日志", "error log", "错误记录", "报错记录")
 _KNOWLEDGE_WORDS = ("知识库", "文档", "操作手册", "解决方案")

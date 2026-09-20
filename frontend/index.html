@@ -6,6 +6,7 @@
   <meta name="color-scheme" content="dark">
   <meta name="description" content="WorkPilot Agent 执行与追踪调试台">
   <title>WorkPilot · Agent Trace Console</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230571f9'/%3E%3Cpath d='M7 8h4l3 14 3-10 3 10 3-14h4l-5 18h-4l-3-9-3 9h-4z' fill='white'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
@@ -21,6 +22,7 @@
     <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
     <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
     <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+    <symbol id="icon-import" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6V3Z"/><path d="M14 3v5h5M12 11v6M9 14h6"/></symbol>
   </svg>
 
   <header class="topbar">
@@ -46,7 +48,10 @@
     <aside class="panel business-panel" data-panel="data">
       <div class="panel-heading">
         <div><span class="eyebrow">OPERATIONS</span><h1>Business Data</h1></div>
-        <button class="icon-button" id="refresh-data" type="button" aria-label="刷新业务数据">↻</button>
+        <div class="data-actions">
+          <button class="import-button" id="open-import" type="button"><svg><use href="#icon-import"/></svg>Add Data</button>
+          <button class="icon-button" id="refresh-data" type="button" aria-label="刷新业务数据">↻</button>
+        </div>
       </div>
       <div class="data-tabs" role="tablist" aria-label="业务数据类型">
         <button class="data-tab active" data-data-type="tickets" role="tab">
@@ -56,7 +61,7 @@
           <svg><use href="#icon-log"/></svg><span>Logs</span><b id="log-count">—</b>
         </button>
         <button class="data-tab" data-data-type="knowledge" role="tab">
-          <svg><use href="#icon-book"/></svg><span>Knowledge</span><b>Agent</b>
+          <svg><use href="#icon-book"/></svg><span>Knowledge</span><b id="knowledge-count">—</b>
         </button>
         <button class="data-tab" data-data-type="services" role="tab">
           <svg><use href="#icon-service"/></svg><span>Services</span><b id="service-count">—</b>
@@ -65,9 +70,9 @@
       <div class="section-label"><span id="data-list-title">最近工单</span><span id="data-list-meta"></span></div>
       <div class="data-list" id="data-list" aria-live="polite"></div>
       <div class="recent-section">
-        <div class="section-label"><span>本次会话运行</span><span id="run-count">0</span></div>
+        <div class="section-label"><span>最近运行</span><span id="run-count">0</span></div>
         <div class="recent-runs" id="recent-runs">
-          <p class="empty-copy">运行任务后，这里会保留本次页面会话中的记录。</p>
+          <p class="empty-copy">正在加载运行历史…</p>
         </div>
       </div>
     </aside>
@@ -157,6 +162,63 @@
       </div>
     </aside>
   </main>
+
+  <dialog class="import-dialog" id="import-dialog">
+    <form id="import-form">
+      <div class="dialog-header">
+        <div><span class="eyebrow">DATA INGESTION</span><h2>导入业务数据</h2></div>
+        <button class="icon-button" id="close-import" type="button" aria-label="关闭导入窗口">×</button>
+      </div>
+      <p class="dialog-copy">填写业务字段即可添加一条数据。需要一次导入多条时，再使用下方的高级批量导入。</p>
+      <label class="field-label" for="import-type">数据类型</label>
+      <select id="import-type">
+        <option value="logs">故障日志</option>
+        <option value="knowledge">知识文档</option>
+      </select>
+      <label class="field-label" for="import-key">导入密钥</label>
+      <input id="import-key" type="password" minlength="16" autocomplete="off" placeholder="输入 Render 中配置的 INGESTION_API_KEY" required>
+
+      <fieldset class="import-fields" id="log-import-fields">
+        <legend>故障日志内容</legend>
+        <div class="field-grid">
+          <label><span>服务名称</span><input id="log-service-name" maxlength="128" value="payment-service" required></label>
+          <label><span>级别</span><select id="log-level" required><option>ERROR</option><option>CRITICAL</option><option>WARNING</option><option>INFO</option></select></label>
+          <label><span>错误类型</span><input id="log-error-type" maxlength="128" value="DB_TIMEOUT" placeholder="例如 DB_TIMEOUT"></label>
+          <label><span>请求 ID</span><input id="log-request-id" maxlength="64" required></label>
+        </div>
+        <label><span>错误信息</span><textarea id="log-message" rows="3" maxlength="20000" required>Database connection timed out after 3000 ms</textarea></label>
+        <label><span>堆栈信息（可选）</span><textarea id="log-stack-trace" rows="2" maxlength="100000" placeholder="可留空"></textarea></label>
+      </fieldset>
+
+      <fieldset class="import-fields" id="knowledge-import-fields" hidden>
+        <legend>知识文档内容</legend>
+        <div class="field-grid">
+          <label><span>标题</span><input id="knowledge-title" maxlength="255" value="payment-service 数据库超时排查" required disabled></label>
+          <label><span>分类</span><input id="knowledge-category" maxlength="64" value="runbook" placeholder="例如 runbook" disabled></label>
+        </div>
+        <label><span>来源标识</span><input id="knowledge-source" maxlength="512" required disabled></label>
+        <label><span>文档内容</span><textarea id="knowledge-content" rows="5" maxlength="100000" required disabled>检查连接池占用、慢查询、长事务和数据库响应延迟，再结合请求日志定位问题。</textarea></label>
+      </fieldset>
+
+      <details class="advanced-import" id="advanced-import">
+        <summary>高级批量导入（JSON）</summary>
+        <p>支持 JSON 文件或文本，每批最多 100 条；整批校验通过后才会写入。</p>
+        <label class="file-picker" for="import-file">
+          <svg><use href="#icon-import"/></svg>
+          <span>添加本地 JSON 文件</span>
+          <input id="import-file" type="file" accept="application/json,.json">
+        </label>
+        <label class="field-label" for="import-json">JSON 数据</label>
+        <textarea id="import-json" rows="10" spellcheck="false"></textarea>
+        <button class="secondary-button batch-import-button" type="submit" data-import-mode="batch" formnovalidate>批量导入</button>
+      </details>
+      <p class="import-feedback" id="import-feedback" aria-live="polite"></p>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="cancel-import" type="button">取消</button>
+        <button class="primary-button" id="submit-import" type="submit" data-import-mode="single"><svg><use href="#icon-import"/></svg><span>添加这条数据</span></button>
+      </div>
+    </form>
+  </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="./app.js" defer></script>

@@ -1,0 +1,84 @@
+[
+  {
+    "id": "select-ticket-columns",
+    "sql": "SELECT id, title FROM tickets LIMIT 10",
+    "expected_allowed": true,
+    "expected_tables": ["tickets"],
+    "expected_limit": 10
+  },
+  {
+    "id": "count-error-logs",
+    "sql": "SELECT COUNT(id) AS total FROM error_logs",
+    "expected_allowed": true,
+    "expected_tables": ["error_logs"],
+    "expected_limit": 100
+  },
+  {
+    "id": "cap-large-limit",
+    "sql": "SELECT service_name, COUNT(id) AS error_count FROM error_logs GROUP BY service_name LIMIT 500",
+    "expected_allowed": true,
+    "expected_tables": ["error_logs"],
+    "expected_limit": 100
+  },
+  {
+    "id": "allow-multiple-where-predicates",
+    "sql": "SELECT id, created_at, error_type, level, message FROM error_logs WHERE service_name = 'inventory-service' AND error_type = 'UpstreamTimeout' LIMIT 100",
+    "expected_allowed": true,
+    "expected_tables": ["error_logs"],
+    "expected_limit": 100
+  },
+  {
+    "id": "reject-delete",
+    "sql": "DELETE FROM tickets WHERE id = 1",
+    "expected_allowed": false,
+    "expected_error_code": "UNSAFE_SQL"
+  },
+  {
+    "id": "reject-wildcard",
+    "sql": "SELECT * FROM tickets",
+    "expected_allowed": false,
+    "expected_error_code": "UNSAFE_SQL"
+  },
+  {
+    "id": "reject-count-wildcard",
+    "sql": "SELECT COUNT(*) AS total FROM tickets",
+    "expected_allowed": false,
+    "expected_error_code": "UNSAFE_SQL"
+  },
+  {
+    "id": "reject-unknown-table",
+    "sql": "SELECT id FROM users",
+    "expected_allowed": false,
+    "expected_error_code": "UNSAFE_SQL"
+  },
+  {
+    "id": "reject-unknown-column",
+    "sql": "SELECT password FROM tickets",
+    "expected_allowed": false,
+    "expected_error_code": "UNSAFE_SQL"
+  },
+  {
+    "id": "reject-subquery",
+    "sql": "SELECT id FROM tickets WHERE id IN (SELECT id FROM error_logs)",
+    "expected_allowed": false,
+    "expected_error_code": "UNSAFE_SQL"
+  },
+  {
+    "id": "reject-multiple-statements",
+    "sql": "SELECT id FROM tickets; SELECT id FROM error_logs",
+    "expected_allowed": false,
+    "expected_error_code": "UNSAFE_SQL"
+  },
+  {
+    "id": "reject-database-qualified-table",
+    "sql": "SELECT id FROM workpilot_agent.tickets",
+    "expected_allowed": false,
+    "expected_error_code": "UNSAFE_SQL"
+  },
+  {
+    "id": "reject-sleep-function",
+    "sql": "SELECT SLEEP(5) AS delayed FROM tickets",
+    "expected_allowed": false,
+    "expected_error_code": "UNSAFE_SQL"
+  }
+]

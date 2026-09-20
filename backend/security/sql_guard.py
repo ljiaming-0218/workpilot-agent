@@ -185,6 +185,11 @@ class SQLGuard:
 
     def _validate_functions(self, statement: exp.Select) -> None:
         for function in statement.find_all(exp.Func):
+            # sqlglot models boolean AND/OR connectors as Func subclasses in
+            # current releases, although they are operators rather than SQL
+            # function calls. Their operands are validated separately.
+            if isinstance(function, exp.Connector):
+                continue
             name = function.name if isinstance(function, exp.Anonymous) else function.sql_name()
             normalized = name.upper()
             if normalized not in self._allowed_functions:

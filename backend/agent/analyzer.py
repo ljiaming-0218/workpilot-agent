@@ -2,6 +2,7 @@
 
 import json
 import logging
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -25,10 +26,12 @@ class IncidentAnalyzer:
         query: str,
         evidence: list[dict[str, Any]],
     ) -> IncidentAnalysisDecision:
+        evidence_links = _correlate_evidence(evidence)
         if self._llm is None or not evidence:
             return IncidentAnalysisDecision(
                 analysis=_fallback_analysis(evidence),
                 source="fallback",
+                evidence_links=evidence_links,
             )
 
         last_error: LLMServiceError | None = None
@@ -41,6 +44,7 @@ class IncidentAnalyzer:
                         {
                             "query": query,
                             "evidence": _compact_evidence(evidence),
+                            "evidence_links": evidence_links,
                         },
                         ensure_ascii=False,
                     ),
@@ -56,7 +60,11 @@ class IncidentAnalyzer:
             except LLMServiceError as exc:
                 last_error = exc
                 continue
-            return IncidentAnalysisDecision(analysis=analysis, source="llm")
+            return IncidentAnalysisDecision(
+                analysis=analysis,
+                source="llm",
+                evidence_links=evidence_links,
+            )
 
         logger.warning(
             "INCIDENT_ANALYSIS_LLM_ERROR: using grounded fallback (%s)",
@@ -67,7 +75,69 @@ class IncidentAnalyzer:
         return IncidentAnalysisDecision(
             analysis=_fallback_analysis(evidence),
             source="fallback",
+            evidence_links=evidence_links,
         )
+
+
+def _correlate_evidence(evidence: list[dict[str, Any]]) -> list[str]:
+    """Link bounded records by service and event time; never infer causality."""
+    outputs = {
+        item.get("tool"): item
+        for item in evidence
+        if isinstance(item, dict) and isinstance(item.get("output"), dict)
+    }
+    log_result = outputs.get("query_error_logs", {})
+    ticket_result = outputs.get("search_tickets", {})
+    knowledge_result = outputs.get("search_knowledge", {})
+    logs = log_result.get("output", {}).get("items", [])[:10]
+    tickets = ticket_result.get("output", {}).get("items", [])[:10]
+    docs = knowledge_result.get("output", {}).get("items", [])[:3]
+    valid_logs = [row for row in logs if isinstance(row, dict)]
+    times = [_parse_time(row.get("created_at")) for row in valid_logs]
+    times = [value for value in times if value is not None]
+    services = {row.get("service_name") for row in valid_logs}
+    services.discard(None)
+    links: list[str] = []
+
+    if valid_logs:
+        log_ids = [row["id"] for row in valid_logs if isinstance(row.get("id"), int)]
+        if log_ids:
+            links.append(
+                f"日志步骤 {log_result['step']}：服务 {', '.join(sorted(services))} 的"
+                f"日志 ID {', '.join(map(str, log_ids))}；仅展示前 10 条。"
+            )
+    if times and len(services) == 1:
+        earliest, latest = min(times), max(times)
+        matched = []
+        for row in tickets:
+            if not isinstance(row, dict) or row.get("service_name") not in services:
+                continue
+            created = _parse_time(row.get("created_at"))
+            if created is not None and earliest - timedelta(hours=1) <= created <= latest + timedelta(hours=1):
+                matched.append(row)
+        ticket_ids = [row["id"] for row in matched if isinstance(row.get("id"), int)]
+        if ticket_ids:
+            links.append(
+                f"工单步骤 {ticket_result['step']}：同服务且创建时间位于日志时间范围前后 1 小时的"
+                f"工单 ID {', '.join(map(str, ticket_ids))}；时间接近不代表因果关系。"
+            )
+    doc_ids = [row["document_id"] for row in docs if isinstance(row, dict) and isinstance(row.get("document_id"), int)]
+    if doc_ids:
+        links.append(
+            f"知识步骤 {knowledge_result['step']}：BM25 检索命中文档 ID "
+            f"{', '.join(map(str, doc_ids))}；可作排查参考，不能证明当前根因。"
+        )
+    return links
+
+
+def _parse_time(value: Any) -> datetime | None:
+    if not isinstance(value, str):
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return parsed if parsed.tzinfo is not None else None
 
 
 def _compact_evidence(evidence: list[dict[str, Any]]) -> list[dict[str, Any]]:

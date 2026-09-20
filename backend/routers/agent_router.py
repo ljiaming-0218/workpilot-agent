@@ -2,13 +2,15 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path, Request
+from fastapi import APIRouter, Depends, Path, Query, Request
 from sqlalchemy.orm import Session
 
 from backend.dependencies import get_db
 from backend.schemas.agent import AgentApprovalRequest, AgentRequest, AgentResult
-from backend.schemas.common import ErrorResponse, SuccessResponse
+from backend.schemas.common import ErrorResponse, Page, PaginationParams, SuccessResponse
+from backend.schemas.run_history import AgentRunDetail, AgentRunSummary
 from backend.services.agent_service import resume_agent, run_agent
+from backend.services.run_history_service import get_agent_run_detail, list_agent_runs
 
 
 router = APIRouter(
@@ -21,6 +23,26 @@ router = APIRouter(
     },
 )
 DbSession = Annotated[Session, Depends(get_db)]
+
+
+@router.get("/runs", response_model=SuccessResponse[Page[AgentRunSummary]])
+def get_agent_runs(
+    pagination: Annotated[PaginationParams, Query()],
+    session: DbSession,
+) -> SuccessResponse[Page[AgentRunSummary]]:
+    return SuccessResponse(data=list_agent_runs(session, pagination))
+
+
+@router.get(
+    "/runs/{run_id}",
+    response_model=SuccessResponse[AgentRunDetail],
+    responses={404: {"model": ErrorResponse}},
+)
+def get_agent_run(
+    session: DbSession,
+    run_id: int = Path(ge=1),
+) -> SuccessResponse[AgentRunDetail]:
+    return SuccessResponse(data=get_agent_run_detail(session, run_id))
 
 
 @router.post("/runs", response_model=SuccessResponse[AgentResult])

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "incident-payment-500",
+    "query": "分析 payment-service 出现 500 错误的可能原因",
+    "expected_intent": "incident_analysis",
+    "expected_source": "rule"
+  },
+  {
+    "id": "incident-timeout",
+    "query": "帮我排查 order-service 超时问题",
+    "expected_intent": "incident_analysis",
+    "expected_source": "rule"
+  },
+  {
+    "id": "incident-db-timeout-code",
+    "query": "分析 payment-service 的 DB_TIMEOUT 日志并给出排查方案",
+    "expected_intent": "incident_analysis",
+    "expected_source": "rule"
+  },
+  {
+    "id": "log-search",
+    "query": "查看 payment-service 最近的错误日志",
+    "expected_intent": "log_analysis",
+    "expected_source": "rule"
+  },
+  {
+    "id": "knowledge-search",
+    "query": "搜索知识库中的数据库连接池文档",
+    "expected_intent": "knowledge_search",
+    "expected_source": "rule"
+  },
+  {
+    "id": "ticket-search",
+    "query": "查询工单 42 的详情",
+    "expected_intent": "ticket_search",
+    "expected_source": "rule"
+  },
+  {
+    "id": "data-query",
+    "query": "统计各服务的故障数量",
+    "expected_intent": "data_query",
+    "expected_source": "rule"
+  },
+  {
+    "id": "high-risk-simulation",
+    "query": "模拟重启 payment-service",
+    "expected_intent": "operation",
+    "expected_source": "rule"
+  },
+  {
+    "id": "ambiguous-general",
+    "query": "今天系统情况怎么样",
+    "expected_intent": "general",
+    "expected_source": "fallback"
+  }
+]

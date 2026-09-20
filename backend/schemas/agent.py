@@ -68,6 +68,7 @@ class IncidentAnalysis(BaseModel):
 class IncidentAnalysisDecision(BaseModel):
     analysis: IncidentAnalysis
     source: Literal["llm", "fallback"]
+    evidence_links: list[str] = Field(default_factory=list, max_length=3)
 
 
 class AgentRequest(BaseModel):

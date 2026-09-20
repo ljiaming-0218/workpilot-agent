@@ -1,0 +1,44 @@
+[
+  {
+    "id": "operation-tool",
+    "query": "模拟删除测试配置",
+    "intent": "operation",
+    "expected_tool": "simulate_high_risk_operation",
+    "expected_inputs": {"request": "模拟删除测试配置"}
+  },
+  {
+    "id": "knowledge-tool",
+    "query": "搜索知识库中的连接池文档",
+    "intent": "knowledge_search",
+    "expected_tool": "search_knowledge",
+    "expected_inputs": {"query": "搜索知识库中的连接池文档", "limit": 5}
+  },
+  {
+    "id": "ticket-detail-tool",
+    "query": "查看工单编号 42",
+    "intent": "ticket_search",
+    "expected_tool": "get_ticket_detail",
+    "expected_inputs": {"ticket_id": 42}
+  },
+  {
+    "id": "ticket-query-tool",
+    "query": "查询支付服务的历史工单",
+    "intent": "ticket_search",
+    "expected_tool": "query_database",
+    "expected_inputs": {"question": "查询支付服务的历史工单"}
+  },
+  {
+    "id": "log-query-tool",
+    "query": "统计最近一小时错误日志",
+    "intent": "log_analysis",
+    "expected_tool": "query_database",
+    "expected_inputs": {"question": "统计最近一小时错误日志"}
+  },
+  {
+    "id": "general-no-tool",
+    "query": "你好",
+    "intent": "general",
+    "expected_tool": "",
+    "expected_inputs": {}
+  }
+]

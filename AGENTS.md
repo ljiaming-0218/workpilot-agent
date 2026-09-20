@@ -3939,3 +3939,171 @@ Codex 的职责是：
 ↓
 让我能够在面试中独立讲清楚
 ```
+
+---
+
+# 125. 第二阶段目标
+
+Phase 0–16 完成基础 Agent 闭环后，项目进入第二阶段：
+
+```text
+从可运行的个人 Agent Demo
+↓
+升级为公开版本一致、真实可演示、质量可测、限制可解释的工程项目
+```
+
+第二阶段不以堆叠框架或简历关键词为目标，优先解决公开交付、真实数据边界、可靠性和可验证性。
+
+---
+
+# 126. Phase 17 — Public Delivery Consistency
+
+目标：让本地实现、Git 提交、GitHub README 和线上演示描述保持一致。
+
+完成标准：
+
+```text
+审查所有未提交文件及变更范围
+静态检查通过
+README 只描述已经实现并验证的能力
+README 明确评估样本量和生产限制
+GitHub About / Website / Topics 可按真实信息配置
+形成可审查的提交范围与提交命令
+```
+
+Codex 不得未经用户明确授权执行 commit、push 或创建 PR。
+
+---
+
+# 127. Phase 18 — Real Incident Input
+
+目标：增加一个具有真实业务语义的只读事故输入边界。
+
+第一版优先：
+
+```text
+Alert Webhook
+↓
+Validated Incident Input
+↓
+Existing Agent Workflow
+↓
+Evidence-linked Incident Report
+```
+
+约束：
+
+```text
+不引入 Kafka、Celery 或微服务
+不执行真实生产写操作或自动重启
+复用现有 Router、Planner、Tool Registry、Risk Checker 与 Trace
+输入必须校验、限长、可追踪并避免记录密钥
+```
+
+---
+
+# 128. Phase 19 — Streaming Run Progress
+
+目标：避免长时间同步请求缺少反馈。
+
+实现方向：
+
+```text
+创建 Agent Run 并返回 run_id
+通过 SSE 输出 Node / Tool / LLM / Final 状态
+前端展示运行中、失败、等待审批和完成状态
+断开连接不得改变工具事务语义
+```
+
+不得为了流式输出绕开 Tool Registry、Risk Checker 或审计。
+
+---
+
+# 129. Phase 20 — Durable Approval Recovery
+
+目标：明确并解决服务重启后 `WAITING_APPROVAL` 与 checkpoint 不一致的问题。
+
+开始实现前必须先验证：
+
+```text
+所选 checkpointer 与当前 MySQL / TiDB 的兼容性
+checkpoint 生命周期和 thread_id 映射
+重复 approve / reject / cancel 的幂等语义
+旧 checkpoint、缺失 checkpoint 和过期请求的处理方式
+```
+
+不能把数据库中的 `WAITING_APPROVAL` 当作 checkpoint 仍存在的证明。
+
+---
+
+# 130. Phase 21 — Representative Agent Evaluation
+
+目标：使用代表性失败案例评估完整 Agent，而不仅验证组件函数。
+
+至少覆盖：
+
+```text
+正常故障分析
+空日志和空知识命中
+错误服务名与时间窗不匹配
+日志、工单和知识证据冲突
+LLM 结构化输出失败
+MCP 调用失败
+SQL Guard 拒绝
+人工审批恢复失败
+```
+
+指标至少区分：
+
+```text
+任务成功率
+工具选择正确率
+证据覆盖率
+引用正确率
+安全拒绝率
+端到端延迟
+LLM 调用次数与 Token 成本（供应商可提供时）
+```
+
+在功能阶段完成前，不新增或运行 pytest；使用 compileall、pip check、node --check、git diff --check、手工 smoke check 和真实集成验证。进入最终验收阶段后，再集中补充必要测试。
+
+---
+
+# 131. Phase 22 — Multi-Agent Experiment Gate
+
+Multi-Agent 只能作为可量化实验，不得直接替换稳定的单 Agent 主流程。
+
+允许开始的条件：
+
+```text
+Single Agent 主流程完成并有评估基线
+存在跨服务事故，需要独立上下文和独立调查
+子任务能够并行且结果可以结构化合并
+工具权限、Risk Checker、审批和审计仍由统一边界控制
+```
+
+实验必须比较：
+
+```text
+证据覆盖率
+引用正确率
+任务成功率
+P95 延迟
+Token 成本
+子任务失败与降级行为
+```
+
+如果 Multi-Agent 没有带来可测量收益，则保留 Single Agent。
+
+---
+
+# 132. 当前阶段
+
+截至第二阶段规划建立时：
+
+```text
+Phase 0–16：已有本地实现
+Current Phase：Phase 17 — Public Delivery Consistency
+```
+
+必须先完成 Phase 17，之后才能进入 Phase 18。

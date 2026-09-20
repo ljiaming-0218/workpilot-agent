@@ -1,0 +1,18 @@
+[
+  {
+    "id": "text2sql-service-count-live",
+    "query": "统计各 service_name 的记录数量",
+    "expected_intent": "data_query",
+    "expected_status": "completed",
+    "expected_plan_tools": ["query_database"],
+    "expected_executed_tools": ["query_database"],
+    "expected_risk_level": "LOW",
+    "expected_requires_approval": false,
+    "minimum_evidence": 1,
+    "analysis_required": false,
+    "required_answer_terms": ["计划执行完成"],
+    "required_output_keys": {
+      "query_database": ["sql", "columns", "rows", "row_count"]
+    }
+  }
+]

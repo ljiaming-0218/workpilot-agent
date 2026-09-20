@@ -17,6 +17,14 @@ SERVICE_NAME_PATTERN = re.compile(
     r"(?:服务|service)\s*[:：]?\s*([a-z0-9][a-z0-9._-]{0,127})",
     re.IGNORECASE,
 )
+BARE_SERVICE_NAME_PATTERN = re.compile(
+    r"\b([a-z0-9][a-z0-9._-]*-service)\b",
+    re.IGNORECASE,
+)
+ERROR_TYPE_PATTERN = re.compile(r"\b([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+)\b")
+TIME_WINDOW_PATTERN = re.compile(
+    r"(?:最近|近)\s*(\d+)\s*(分钟|小时|天)",
+)
 
 
 class Planner:
@@ -77,12 +85,22 @@ def _single_step(query: str, intent: str) -> list[PlanStep]:
 def _incident_evidence_steps(query: str) -> list[PlanStep]:
     match = SERVICE_NAME_PATTERN.search(query)
     if match is None:
+        match = BARE_SERVICE_NAME_PATTERN.search(query)
+    if match is None:
         return []
     service_name = match.group(1)
+    log_inputs: dict[str, object] = {
+        "service_name": service_name,
+        "minutes": _log_window_minutes(query),
+        "limit": 20,
+    }
+    error_type = ERROR_TYPE_PATTERN.search(query)
+    if error_type is not None:
+        log_inputs["error_type"] = error_type.group(1)
     return [
         PlanStep(
             tool="query_error_logs",
-            inputs={"service_name": service_name, "minutes": 60, "limit": 20},
+            inputs=log_inputs,
         ),
         PlanStep(
             tool="search_tickets",
@@ -93,3 +111,12 @@ def _incident_evidence_steps(query: str) -> list[PlanStep]:
             inputs={"query": query, "limit": 5},
         ),
     ]
+
+
+def _log_window_minutes(query: str) -> int:
+    match = TIME_WINDOW_PATTERN.search(query)
+    if match is None:
+        return 60 if "最近" in query else 10_080
+    amount = int(match.group(1))
+    multiplier = {"分钟": 1, "小时": 60, "天": 1_440}[match.group(2)]
+    return max(1, min(amount * multiplier, 10_080))

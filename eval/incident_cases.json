@@ -1,0 +1,33 @@
+[
+  {
+    "id": "incident-payment-500-live",
+    "query": "分析 service: payment-service 最近 60 分钟大量出现 500 错误的可能原因",
+    "expected_intent": "incident_analysis",
+    "expected_status": "completed",
+    "expected_plan_tools": [
+      "query_error_logs",
+      "search_tickets",
+      "search_knowledge"
+    ],
+    "expected_executed_tools": [
+      "query_error_logs",
+      "search_tickets",
+      "search_knowledge"
+    ],
+    "expected_risk_level": "MEDIUM",
+    "expected_requires_approval": false,
+    "minimum_evidence": 3,
+    "analysis_required": true,
+    "required_answer_terms": [
+      "故障分析",
+      "已确认事实",
+      "建议操作",
+      "引用证据步骤"
+    ],
+    "required_output_keys": {
+      "query_error_logs": ["items", "total"],
+      "search_tickets": ["items", "total"],
+      "search_knowledge": ["items", "total"]
+    }
+  }
+]

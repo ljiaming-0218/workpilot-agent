@@ -174,6 +174,7 @@ def analyze_incident(
     return {
         "analysis": decision.analysis.model_dump(mode="json"),
         "analysis_source": decision.source,
+        "evidence_links": decision.evidence_links,
     }
 
 
@@ -198,9 +199,14 @@ def answer_generator(state: AgentState) -> dict[str, object]:
         return {"final_answer": "计划执行完成，但没有获得可用结果。"}
     if state.get("analysis"):
         analysis = IncidentAnalysis.model_validate(state["analysis"])
+        answer = _format_incident_analysis(analysis)
+        if state.get("evidence_links"):
+            answer += "\n\n关联证据（记录 ID 可在原始结果中核对）：\n" + "\n".join(
+                f"- {item}" for item in state["evidence_links"]
+            )
         return {
             "final_answer": _with_risk_notice(
-                _format_incident_analysis(analysis),
+                answer,
                 state,
             ),
         }

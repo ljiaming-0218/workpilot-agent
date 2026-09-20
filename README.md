@@ -1,8 +1,12 @@
 # WorkPilot Agent
 
-面向企业工单、故障分析和研发效能的智能 Agent 平台。本项目分阶段开发；当前推进到 **Phase 14：Frontend Debug Console**，已实现基础后端、数据模型、业务接口、受控工具注册表、只读自然语言查询链路、LangGraph Agent 和执行追踪调试台。
+面向企业工单、故障分析和研发效能的智能 Agent 平台。Phase 0–16 已形成可部署的单 Agent 闭环，当前进入 **Phase 17：Public Delivery Consistency**，统一本地实现、GitHub 代码、项目说明和线上演示边界。系统已提供业务数据调试台、受控数据导入、只读工具链、LangGraph Agent 和执行追踪。
 
 基础 Agent、本地 MCP stdio 链路和响应式 Trace 调试台已实现。项目协作规范见 [AGENTS.md](AGENTS.md)。
+
+- 在线控制台：<https://workpilot-agent.onrender.com/console/>
+- 健康检查：<https://workpilot-agent.onrender.com/health>
+- 免费实例可能冷启动；2026-09-21 已确认健康检查返回数据库连接成功。
 
 ## 当前阶段与验收
 
@@ -26,10 +30,13 @@
 - Phase 12：已实现 MCP Python SDK v2 Server、持久 stdio Client 和三个只读 MCP Tools，并接入 Agent Tool Registry。
 - Phase 13：已实现按 Agent Run 持久化的 Node、Tool、SQL Guard、Retrieval、MCP 和 LLM Trace，并提供有序 Trace 查询接口。
 - Phase 14：已实现 Business Data、Agent Workspace 和 Agent Trace 三栏调试台，支持任务执行、人工审批、Trace 筛选及移动端视图。
+- Phase 15：2026-09-21 本地复核 Router、Tool、SQL Guard、Retrieval 四组确定性评估分别通过 9/9、6/6、13/13、4/4；2026-09-15 在 Render 上运行的 Text2SQL Agent 用例通过 1/1。样本量有限，不能据此推断生产准确率。
+- Phase 16：项目架构、演示用例、面试讲述、简历描述和限制见 [项目展示说明](docs/phase16-project-showcase.md)。
+- Phase 17：正在审查并统一未提交实现、公开 README、线上演示和真实验证结论；完成前不进入新的业务功能阶段。
 
 ## 整体架构
 
-当前分层：Frontend Debug Console → HTTP Router → Agent Service → LangGraph → Tool Registry → MCP Client → MCP Server → Retrieval / Service → ORM / MySQL，并由 Agent Trace 记录和展示关键执行事件；下一阶段进入 Evaluation。
+当前分层：Frontend Console → HTTP Router → Agent Service → LangGraph → Tool Registry → MCP Client → MCP Server → Retrieval / Service → ORM / MySQL，并由 Agent Trace 记录和展示关键执行事件。
 
 Phase 0 提供配置、数据库连接和请求生命周期管理。Phase 1 使用 `python -m scripts.init_db` 显式创建缺失的业务表；应用启动不会自动建库或改表。
 
@@ -134,7 +141,7 @@ Phase 2 业务接口统一返回 `success/data/error`。列表的 `data` 包含 
 
 数据库连接失败、认证失败、目标库不存在或连接池超时：HTTP 503，`{"status":"degraded","database":"disconnected"}`。详细连接信息不会出现在 HTTP 响应中。配置缺失或非法会阻止应用启动，程序逻辑错误不会伪装成数据库降级。
 
-此接口检查配置所指向数据库的可达性，不验证业务表权限或后续 Agent 功能。`MYSQL_CONNECT_TIMEOUT` 控制连接超时（默认 5 秒，允许 1–30）；连接池等待、驱动读写超时分别为 5 秒，不代表整个请求严格在 5 秒内结束。
+此接口检查配置所指向数据库的可达性，不验证业务表权限或后续 Agent 功能。`MYSQL_CONNECT_TIMEOUT` 同时配置连接、驱动读写超时（默认 5 秒，允许 1–30）；连接池等待超时为 5 秒，不代表整个请求严格在 5 秒内结束。
 
 ## 测试与验收
 
@@ -198,11 +205,11 @@ mysql -h 127.0.0.1 -P 3306 -u your_mysql_user -p -D workpilot_agent -e 'SELECT 1
 
 ## 当前限制与下一阶段
 
-当前已实现七个数据库模型、四个工单/日志接口、Tool Registry、SQL Guard、Text2SQL 编排、同步 Agent API、Rule Router + LLM fallback、最多 5 步的 Planner 执行循环、BM25 Top-K 检索工具、基于证据的故障分析闭环、Risk Checker、Human-in-the-loop、本地 MCP stdio 链路、Agent Trace 和前端调试台；尚未完成 Evaluation 或部署验证。故障分析会区分确认事实和模型推断，并校验引用步骤；模型不可用或结构校验失败时返回基于工具结果的 fallback。BM25 当前会在每次查询时从数据库读取文档并重建内存索引，尚未进行业务负载性能测试；系统也尚无认证、幂等键或限流，仅用于本地开发阶段。
+当前已实现七个数据库模型、业务读写接口、受控日志/知识导入、Tool Registry、SQL Guard、Text2SQL、最多 5 步的 Planner、BM25 检索、基于证据的故障分析、Risk Checker、Human-in-the-loop、本地 MCP stdio 链路、Agent Trace 和前端调试台。系统已在 Render/TiDB 上通过健康检查与一个真实 Text2SQL Agent 评估用例。BM25 在每次检索时检查数据库文档版本，仅版本变化时重建本进程内的索引；尚未做多进程或业务负载性能验证。导入接口使用独立 API Key；Agent 与业务读取接口仍无用户级认证和限流，不宜直接承载真实企业数据。
 
 Phase 4 已增加 `sqlglot>=30.18,<31` 和 `openai>=3,<4`。SQL Guard 只允许 MySQL 单条 SELECT、三张业务表的白名单列和有限函数，禁止通配列、跨库名、子查询、CTE、UNION、锁、变量及写操作，并把 LIMIT 限制到 100、OFFSET 限制到 10000。已通过真实 OpenRouter 结构化输出完成 `LLMService → Text2SQLService → SQLGuard → MySQL` 手动 smoke check；免费路由可能发生重试，且模糊问题可能返回安全零行兜底 SQL。
 
-本次止于 Phase 14。FastAPI 在 `/console/` 同源托管无构建依赖的 HTML/CSS/JavaScript 调试台；页面读取真实业务接口，支持运行 Agent、处理人工审批、查看计划/证据/回答，并按 Node、Tool、SQL Guard、Retrieval、MCP、LLM 和错误筛选 Trace。最近运行只保留在当前浏览器页面内存中，刷新页面后不会恢复列表。
+FastAPI 在 `/console/` 同源托管无构建依赖的 HTML/CSS/JavaScript 调试台；页面读取真实业务接口，支持运行 Agent、处理人工审批、查看持久化运行历史、计划/证据/回答，并按 Node、Tool、SQL Guard、Retrieval、MCP、LLM 和错误筛选 Trace。日志和知识文档可从调试台查看，导入操作需配置 `INGESTION_API_KEY`。运行历史来自数据库审计记录，但等待审批的 LangGraph checkpoint 仍保存在进程内，服务重启后不能继续原任务。
 
 ## 原理参考
 

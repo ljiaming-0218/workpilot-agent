@@ -34,6 +34,7 @@ class AgentState(TypedDict, total=False):
     evidence: list[dict[str, Any]]
     analysis: dict[str, Any]
     analysis_source: str
+    evidence_links: list[str]
     risk_level: str
     requires_approval: bool
     risk_reasons: list[str]

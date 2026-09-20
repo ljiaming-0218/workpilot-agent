@@ -1,0 +1,65 @@
+{
+  "documents": [
+    {
+      "id": 1,
+      "title": "数据库连接池耗尽排查",
+      "content": "检查 active connections、连接池大小、慢查询、长事务和连接泄漏。",
+      "category": "database",
+      "source": "eval://knowledge/db-pool"
+    },
+    {
+      "id": 2,
+      "title": "支付服务网关超时",
+      "content": "payment-service 调用网关超时时，检查上游响应时间、重试次数和请求链路。",
+      "category": "payment",
+      "source": "eval://knowledge/payment-timeout"
+    },
+    {
+      "id": 3,
+      "title": "Redis 缓存命中率下降",
+      "content": "检查缓存键过期策略、热点键和缓存穿透。",
+      "category": "cache",
+      "source": "eval://knowledge/redis"
+    },
+    {
+      "id": 4,
+      "title": "发布失败回滚手册",
+      "content": "部署失败时停止发布流程，保留日志并回滚到上一稳定版本。",
+      "category": "deployment",
+      "source": "eval://knowledge/rollback"
+    },
+    {
+      "id": 5,
+      "title": "用户认证失败排查",
+      "content": "出现 access denied 时检查用户名、密码、令牌有效期和权限配置。",
+      "category": "authentication",
+      "source": "eval://knowledge/auth"
+    }
+  ],
+  "cases": [
+    {
+      "id": "database-pool",
+      "query": "数据库连接池耗尽和连接泄漏怎么排查",
+      "relevant_document_ids": [1],
+      "k": 3
+    },
+    {
+      "id": "payment-timeout",
+      "query": "payment-service 网关请求超时",
+      "relevant_document_ids": [2],
+      "k": 3
+    },
+    {
+      "id": "deployment-rollback",
+      "query": "部署失败以后如何回滚",
+      "relevant_document_ids": [4],
+      "k": 3
+    },
+    {
+      "id": "authentication-denied",
+      "query": "access denied 用户认证失败",
+      "relevant_document_ids": [5],
+      "k": 3
+    }
+  ]
+}

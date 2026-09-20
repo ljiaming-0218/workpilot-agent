@@ -1,6 +1,6 @@
 """Read-only log API schemas; filter timestamps must include a timezone."""
 
-from typing import Self
+from typing import Literal, Self
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
@@ -9,6 +9,7 @@ from backend.schemas.common import PaginationParams, UtcDatetime
 
 
 class LogFilters(PaginationParams):
+    sort_by: Literal["event_time", "added"] = "event_time"
     service_name: str | None = Field(default=None, min_length=1, max_length=128)
     level: LogLevel | None = None
     error_type: str | None = Field(default=None, min_length=1, max_length=128)

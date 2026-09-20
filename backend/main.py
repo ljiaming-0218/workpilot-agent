@@ -21,6 +21,8 @@ from backend.errors import register_error_handlers
 from backend.mcp import WorkPilotMCPClient
 from backend.routers.agent_router import router as agent_router
 from backend.routers.health_router import router as health_router
+from backend.routers.ingestion_router import router as ingestion_router
+from backend.routers.knowledge_router import router as knowledge_router
 from backend.routers.log_router import router as log_router
 from backend.routers.ticket_router import router as ticket_router
 from backend.routers.trace_router import router as trace_router
@@ -57,6 +59,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             server_environment=_mcp_database_environment(runtime_settings)
         )
         try:
+            app.state.settings = runtime_settings
             if (
                 runtime_settings.llm_api_key is not None
                 and runtime_settings.llm_model is not None
@@ -94,6 +97,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(health_router)
     application.include_router(ticket_router)
     application.include_router(log_router)
+    application.include_router(knowledge_router)
+    application.include_router(ingestion_router)
     application.include_router(agent_router)
     application.include_router(trace_router)
 

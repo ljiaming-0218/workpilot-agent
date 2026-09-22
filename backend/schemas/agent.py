@@ -77,6 +77,13 @@ class AgentRequest(BaseModel):
     query: str = Field(min_length=1, max_length=2_000)
 
 
+class AgentRunAccepted(BaseModel):
+    run_id: int = Field(ge=1)
+    request_id: str
+    status: Literal["running"] = "running"
+    events_url: str
+
+
 ApprovalAction: TypeAlias = Literal["approve", "reject", "cancel"]
 ApprovalStatus: TypeAlias = Literal["pending", "approved", "rejected", "cancelled"]
 

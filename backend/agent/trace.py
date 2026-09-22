@@ -20,6 +20,7 @@ from backend.schemas.trace import AgentTraceEventRead, AgentTraceRead
 
 
 NodeFunction = Callable[..., dict[str, object]]
+ProgressSink = Callable[[str, dict[str, Any]], None]
 MCP_TOOL_NAMES = frozenset({"search_tickets", "query_error_logs", "search_knowledge"})
 
 
@@ -47,7 +48,12 @@ class PendingTraceEvent:
 class TraceRecorder:
     """Buffer trace events without changing a node's transaction boundary."""
 
-    def __init__(self, session: Session, agent_run_id: int) -> None:
+    def __init__(
+        self,
+        session: Session,
+        agent_run_id: int,
+        progress_sink: ProgressSink | None = None,
+    ) -> None:
         # This read precedes potentially long LLM calls. Close its transaction
         # immediately so the request Session does not hold an idle connection.
         with Session(session.get_bind()) as read_session:
@@ -61,6 +67,7 @@ class TraceRecorder:
         self._events: list[PendingTraceEvent] = []
         self._active_node = "llm"
         self._active_intent: str | None = None
+        self._progress_sink = progress_sink
 
     @contextmanager
     def node_scope(self, node: str, state: AgentState) -> Iterator[None]:
@@ -205,7 +212,21 @@ class TraceRecorder:
             )
 
     def _append(self, **values: Any) -> None:
-        self._events.append(PendingTraceEvent(step=self._next_step, **values))
+        event = PendingTraceEvent(step=self._next_step, **values)
+        self._events.append(event)
+        if self._progress_sink is not None:
+            self._progress_sink(
+                "progress",
+                {
+                    "step": event.step,
+                    "node": event.node,
+                    "event_type": event.event_type,
+                    "status": event.status.value,
+                    "tool_name": event.tool_name,
+                    "latency_ms": event.latency_ms,
+                    "error": event.error,
+                },
+            )
         self._next_step += 1
 
 

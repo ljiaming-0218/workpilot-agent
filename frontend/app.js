@@ -280,14 +280,29 @@ async function runAgent(event) {
   ui.runStatus.textContent = "RUNNING";
   ui.runStatus.className = "status-badge idle";
   ui.approvalPanel.hidden = true;
+  state.trace = [];
   renderTrace([]);
   try {
-    const result = await requestJson("/agent/runs", {
+    const accepted = await requestJson("/agent/runs/async", {
       method: "POST",
       body: JSON.stringify({ query }),
     });
-    acceptResult(result, query);
-    await loadTrace(result.run_id);
+    acceptResult({
+      run_id: accepted.run_id,
+      request_id: accepted.request_id,
+      intent: null,
+      status: accepted.status,
+      final_answer: null,
+      plan: [],
+      evidence: [],
+      routing_source: null,
+      routing_confidence: null,
+      planner_source: null,
+      risk_level: null,
+      risk_reasons: [],
+      steps_executed: 0,
+    }, query);
+    const result = await streamAgentRun(accepted, query);
     await loadRunHistory();
     showToast(`Agent Run #${result.run_id} 已返回 ${result.status} 状态。`);
   } catch (error) {
@@ -298,6 +313,49 @@ async function runAgent(event) {
   } finally {
     setBusy(false);
   }
+}
+
+function streamAgentRun(accepted, query) {
+  return new Promise((resolve, reject) => {
+    const source = new EventSource(accepted.events_url);
+    let settled = false;
+
+    source.addEventListener("progress", (event) => {
+      const progress = JSON.parse(event.data);
+      if (state.result?.run_id !== accepted.run_id) return;
+      state.trace.push(progress);
+      renderTrace();
+    });
+
+    source.addEventListener("terminal", async (event) => {
+      if (settled) return;
+      settled = true;
+      source.close();
+      try {
+        const terminal = JSON.parse(event.data);
+        let result = terminal.result;
+        if (!result && terminal.error) {
+          throw new Error(`Agent 后台执行失败：${terminal.error}`);
+        }
+        if (!result) {
+          const detail = await requestJson(`/agent/runs/${accepted.run_id}`);
+          result = resultFromRunDetail(detail);
+        }
+        acceptResult(result, query);
+        await loadTrace(accepted.run_id);
+        resolve(result);
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    source.onerror = () => {
+      if (settled) return;
+      settled = true;
+      source.close();
+      reject(new Error("实时进度连接中断，请从运行历史查看任务终态。"));
+    };
+  });
 }
 
 function acceptResult(result, query) {
@@ -447,21 +505,7 @@ async function openHistoricRun(entry) {
   const runId = entry.summary.id;
   try {
     const detail = await requestJson(`/agent/runs/${runId}`);
-    const result = {
-      run_id: detail.id,
-      request_id: detail.request_id,
-      intent: detail.intent,
-      status: detail.status,
-      final_answer: detail.final_answer,
-      plan: detail.plan,
-      evidence: detail.evidence,
-      routing_source: detail.routing_source,
-      routing_confidence: detail.routing_confidence,
-      planner_source: detail.planner_source,
-      risk_level: detail.risk_level,
-      risk_reasons: detail.risk_reasons,
-      steps_executed: detail.steps_executed,
-    };
+    const result = resultFromRunDetail(detail);
     entry.result = result;
     entry.query = detail.user_query;
     state.result = result;
@@ -473,6 +517,24 @@ async function openHistoricRun(entry) {
   } catch (error) {
     showToast(`运行详情加载失败：${error.message}`, true);
   }
+}
+
+function resultFromRunDetail(detail) {
+  return {
+    run_id: detail.id,
+    request_id: detail.request_id,
+    intent: detail.intent,
+    status: detail.status,
+    final_answer: detail.final_answer,
+    plan: detail.plan,
+    evidence: detail.evidence,
+    routing_source: detail.routing_source,
+    routing_confidence: detail.routing_confidence,
+    planner_source: detail.planner_source,
+    risk_level: detail.risk_level,
+    risk_reasons: detail.risk_reasons,
+    steps_executed: detail.steps_executed,
+  };
 }
 
 function renderTrace(events = state.trace) {

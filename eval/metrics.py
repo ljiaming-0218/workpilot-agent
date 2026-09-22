@@ -26,3 +26,14 @@ def reciprocal_rank(
         if document_id in relevant_document_ids:
             return 1.0 / rank
     return 0.0
+
+
+def percentile(values: Sequence[int | float], fraction: float) -> float:
+    """Return a nearest-rank percentile without external dependencies."""
+    if not values:
+        return 0.0
+    if not 0 < fraction <= 1:
+        raise ValueError("fraction must be in (0, 1].")
+    ordered = sorted(values)
+    rank = max(1, int(len(ordered) * fraction + 0.999999))
+    return float(ordered[rank - 1])

@@ -1,0 +1,56 @@
+{
+  "phase": 21,
+  "status": "passed",
+  "recorded_at": "2026-09-22T17:25:41+08:00",
+  "result_source": "user-reported eval.runner output with database trace audit",
+  "command": "python -m eval.runner --suite representative_agent",
+  "metrics": {
+    "total": 8,
+    "passed": 8,
+    "failed": 0,
+    "task_success_rate": 1.0,
+    "online_llm_success_rate": 1.0,
+    "average_latency_ms": 8840,
+    "p95_latency_ms": 18420,
+    "llm_calls": 6,
+    "total_tokens": 7498
+  },
+  "runtime": {
+    "python": "3.11",
+    "llm_host": "api-inference.modelscope.cn",
+    "llm_model": "Qwen/Qwen3.5-35B-A3B",
+    "llm_timeout_seconds": 90,
+    "llm_max_retries": 2,
+    "llm_thinking_enabled": false
+  },
+  "git": {
+    "head": "38a2d78e3c98b10ece2513785bb330ad3a72bcb8",
+    "working_tree_dirty": true,
+    "note": "The Phase 18-21 changes were not committed when this evidence was recorded."
+  },
+  "audits": {
+    "empty_evidence": {
+      "agent_run_id": 510003,
+      "run_status": "completed",
+      "tool_observation_count": 3,
+      "substantive_evidence_count": 0,
+      "tool_totals": {
+        "query_error_logs": 0,
+        "search_tickets": 0,
+        "search_knowledge": 0
+      },
+      "analysis_source": "llm",
+      "interpretation": "Three tools completed successfully, but all returned empty business results."
+    },
+    "injected_llm_failure": {
+      "expected": true,
+      "attempts": 2,
+      "tokens": 0,
+      "expected_outcome": "grounded fallback"
+    }
+  },
+  "limitations": [
+    "This run proves the evaluated request set passed once; it does not prove permanent TLS or provider availability.",
+    "The recorded HEAD does not yet contain the dirty working-tree changes."
+  ]
+}

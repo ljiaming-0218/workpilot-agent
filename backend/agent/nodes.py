@@ -97,6 +97,31 @@ def approval_gate(state: AgentState) -> dict[str, object]:
     raise ValueError("Unsupported approval action.")
 
 
+def approval_decision(state: AgentState) -> dict[str, object]:
+    """Apply a decision restored from the durable approval checkpoint."""
+    action = state.get("approval_action")
+    if action == "approve":
+        return {
+            "requires_approval": False,
+            "approval_status": "approved",
+            "resume_after_approval": False,
+            "error": None,
+        }
+    if action in {"reject", "cancel"}:
+        return {
+            "requires_approval": False,
+            "approval_status": "rejected" if action == "reject" else "cancelled",
+            "resume_after_approval": False,
+            "error": "APPROVAL_REJECTED" if action == "reject" else "APPROVAL_CANCELLED",
+        }
+    raise ValueError("Unsupported durable approval action.")
+
+
+def route_from_start(state: AgentState) -> Literal["approval_decision", "intent_router"]:
+    """Enter the normal workflow or resume directly after durable approval."""
+    return "approval_decision" if state.get("resume_after_approval") else "intent_router"
+
+
 def route_after_approval(
     state: AgentState,
 ) -> Literal["tool_executor", "answer_generator"]:

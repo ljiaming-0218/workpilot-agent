@@ -97,6 +97,32 @@ class LiveAgentCase(EvalCase):
     required_output_keys: dict[AgentToolName, list[str]] = Field(default_factory=dict)
 
 
+RepresentativeFault = Literal[
+    "none",
+    "empty_mcp",
+    "llm_failure",
+    "mcp_failure",
+    "sql_guard_rejection",
+    "missing_approval_checkpoint",
+]
+
+
+class RepresentativeAgentCase(EvalCase):
+    query: str = Field(min_length=1, max_length=2_000)
+    fault: RepresentativeFault = "none"
+    expected_http_status: int = Field(default=200, ge=200, le=599)
+    expected_intent: AgentIntent
+    expected_status: AgentRunStatus
+    expected_plan_tools: list[AgentToolName] = Field(default_factory=list, max_length=5)
+    expected_executed_tools: list[AgentToolName] = Field(default_factory=list, max_length=5)
+    expected_error: str | None = None
+    expected_analysis_source: Literal["llm", "fallback"] | None = None
+    zero_result_tools: list[AgentToolName] = Field(default_factory=list)
+    minimum_substantive_evidence: int = Field(default=0, ge=0, le=5)
+    maximum_substantive_evidence: int | None = Field(default=None, ge=0, le=5)
+    safety_case: bool = False
+
+
 ModelT = TypeVar("ModelT", bound=BaseModel)
 
 

@@ -5,6 +5,7 @@ from langgraph.graph import END, START, StateGraph
 
 from backend.agent.nodes import (
     analyze_incident,
+    approval_decision,
     approval_gate,
     answer_generator,
     check_risk,
@@ -14,6 +15,7 @@ from backend.agent.nodes import (
     route_after_execution,
     route_after_planning,
     route_after_risk,
+    route_from_start,
     tool_executor,
 )
 from backend.agent.state import AgentContext, AgentState
@@ -27,6 +29,7 @@ def build_agent_graph(checkpointer: InMemorySaver | None = None):
     builder.add_node("planner", trace_node("planner", plan_task))
     builder.add_node("risk_checker", trace_node("risk_checker", check_risk))
     builder.add_node("approval_gate", trace_node("approval_gate", approval_gate))
+    builder.add_node("approval_decision", trace_node("approval_decision", approval_decision))
     builder.add_node("tool_executor", trace_node("tool_executor", tool_executor))
     builder.add_node(
         "incident_analyzer",
@@ -37,7 +40,14 @@ def build_agent_graph(checkpointer: InMemorySaver | None = None):
         trace_node("answer_generator", answer_generator),
     )
 
-    builder.add_edge(START, "intent_router")
+    builder.add_conditional_edges(
+        START,
+        route_from_start,
+        {
+            "intent_router": "intent_router",
+            "approval_decision": "approval_decision",
+        },
+    )
     builder.add_edge("intent_router", "planner")
     builder.add_conditional_edges(
         "planner",
@@ -57,6 +67,14 @@ def build_agent_graph(checkpointer: InMemorySaver | None = None):
     )
     builder.add_conditional_edges(
         "approval_gate",
+        route_after_approval,
+        {
+            "tool_executor": "tool_executor",
+            "answer_generator": "answer_generator",
+        },
+    )
+    builder.add_conditional_edges(
+        "approval_decision",
         route_after_approval,
         {
             "tool_executor": "tool_executor",

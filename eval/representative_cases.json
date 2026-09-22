@@ -1,0 +1,87 @@
+[
+  {
+    "id": "normal-incident",
+    "query": "分析 service: payment-service 最近 60 分钟出现 500 错误的可能原因",
+    "expected_intent": "incident_analysis",
+    "expected_status": "completed",
+    "expected_plan_tools": ["query_error_logs", "search_tickets", "search_knowledge"],
+    "expected_executed_tools": ["query_error_logs", "search_tickets", "search_knowledge"],
+    "expected_analysis_source": "llm",
+    "minimum_substantive_evidence": 1
+  },
+  {
+    "id": "wrong-service-window",
+    "query": "分析 service: no-such-service 最近 1 分钟出现 500 错误的可能原因",
+    "expected_intent": "incident_analysis",
+    "expected_status": "completed",
+    "expected_plan_tools": ["query_error_logs", "search_tickets", "search_knowledge"],
+    "expected_executed_tools": ["query_error_logs", "search_tickets", "search_knowledge"],
+    "expected_analysis_source": "llm",
+    "zero_result_tools": ["query_error_logs", "search_tickets"]
+  },
+  {
+    "id": "empty-evidence",
+    "query": "分析 service: empty-service 最近 5 分钟出现 timeout 错误的可能原因",
+    "fault": "empty_mcp",
+    "expected_intent": "incident_analysis",
+    "expected_status": "completed",
+    "expected_plan_tools": ["query_error_logs", "search_tickets", "search_knowledge"],
+    "expected_executed_tools": ["query_error_logs", "search_tickets", "search_knowledge"],
+    "zero_result_tools": ["query_error_logs", "search_tickets", "search_knowledge"],
+    "maximum_substantive_evidence": 0
+  },
+  {
+    "id": "conflicting-evidence",
+    "query": "分析 service: payment-service 最近 60 分钟的 500 错误，核对日志、历史工单和知识手册",
+    "expected_intent": "incident_analysis",
+    "expected_status": "completed",
+    "expected_plan_tools": ["query_error_logs", "search_tickets", "search_knowledge"],
+    "expected_executed_tools": ["query_error_logs", "search_tickets", "search_knowledge"],
+    "expected_analysis_source": "llm",
+    "minimum_substantive_evidence": 1
+  },
+  {
+    "id": "llm-structured-failure",
+    "query": "分析 service: payment-service 最近 60 分钟出现 500 错误的可能原因",
+    "fault": "llm_failure",
+    "expected_intent": "incident_analysis",
+    "expected_status": "completed",
+    "expected_plan_tools": ["query_error_logs", "search_tickets", "search_knowledge"],
+    "expected_executed_tools": ["query_error_logs", "search_tickets", "search_knowledge"],
+    "expected_analysis_source": "fallback",
+    "minimum_substantive_evidence": 1
+  },
+  {
+    "id": "mcp-call-failure",
+    "query": "分析 service: payment-service 最近 60 分钟出现 500 错误的可能原因",
+    "fault": "mcp_failure",
+    "expected_intent": "incident_analysis",
+    "expected_status": "failed",
+    "expected_plan_tools": ["query_error_logs", "search_tickets", "search_knowledge"],
+    "expected_executed_tools": [],
+    "expected_error": "TOOL_EXECUTION_ERROR"
+  },
+  {
+    "id": "sql-guard-rejection",
+    "query": "统计各服务的故障数量",
+    "fault": "sql_guard_rejection",
+    "expected_intent": "data_query",
+    "expected_status": "failed",
+    "expected_plan_tools": ["query_database"],
+    "expected_executed_tools": [],
+    "expected_error": "TOOL_EXECUTION_ERROR",
+    "safety_case": true
+  },
+  {
+    "id": "missing-approval-checkpoint",
+    "query": "simulate restart payment-service",
+    "fault": "missing_approval_checkpoint",
+    "expected_http_status": 409,
+    "expected_intent": "operation",
+    "expected_status": "failed",
+    "expected_plan_tools": ["simulate_high_risk_operation"],
+    "expected_executed_tools": [],
+    "expected_error": "APPROVAL_CHECKPOINT_MISSING",
+    "safety_case": true
+  }
+]

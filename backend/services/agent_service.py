@@ -1,11 +1,13 @@
 """Persist, interrupt, and resume one synchronous Agent run."""
 
 import logging
+from collections.abc import Callable
+from datetime import timedelta
 from time import perf_counter_ns
+from typing import Any
 from uuid import uuid4
 
 from langgraph.graph.state import CompiledStateGraph
-from langgraph.types import Command
 from sqlalchemy import update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -17,6 +19,7 @@ from backend.agent.router import IntentRouter
 from backend.agent.state import AgentContext, AgentState
 from backend.agent.trace import TraceRecorder
 from backend.models.agent_run import AgentRun
+from backend.models.approval_checkpoint import AgentApprovalCheckpoint
 from backend.models.common import utc_now
 from backend.models.enums import AgentRunStatus
 from backend.schemas.agent import AgentResult, ApprovalAction
@@ -29,6 +32,8 @@ WAITING_MESSAGE = (
     "\u9ad8\u98ce\u9669\u8ba1\u5212\u6b63\u5728\u7b49\u5f85\u4eba\u5de5\u5ba1\u6279\uff0c"
     "\u5c1a\u672a\u6267\u884c\u4efb\u4f55\u5de5\u5177\u3002"
 )
+APPROVAL_TTL = timedelta(hours=24)
+APPROVAL_STATE_KEYS = frozenset(AgentState.__annotations__)
 
 
 class AgentExecutionError(RuntimeError):
@@ -54,7 +59,23 @@ def run_agent(
     query: str,
 ) -> AgentResult:
     """Create a run and either finish it or persist its interrupted state."""
-    started_ns = perf_counter_ns()
+    run_id, request_id = prepare_agent_run(session, query)
+    return execute_agent_run(
+        session,
+        graph,
+        registry,
+        intent_router,
+        planner,
+        incident_analyzer,
+        risk_checker,
+        run_id,
+        request_id,
+        query,
+    )
+
+
+def prepare_agent_run(session: Session, query: str) -> tuple[int, str]:
+    """Persist RUNNING before synchronous or background execution begins."""
     request_id = uuid4().hex
     run = AgentRun(
         request_id=request_id,
@@ -65,6 +86,24 @@ def run_agent(
     session.flush()
     run_id = run.id
     session.commit()
+    return run_id, request_id
+
+
+def execute_agent_run(
+    session: Session,
+    graph: CompiledStateGraph,
+    registry: ToolRegistry,
+    intent_router: IntentRouter,
+    planner: Planner,
+    incident_analyzer: IncidentAnalyzer,
+    risk_checker: RiskChecker,
+    run_id: int,
+    request_id: str,
+    query: str,
+    progress_sink: Callable[[str, dict[str, Any]], None] | None = None,
+) -> AgentResult:
+    """Execute one previously persisted run with request-owned resources."""
+    started_ns = perf_counter_ns()
 
     initial_state: AgentState = {
         "query": query,
@@ -79,7 +118,7 @@ def run_agent(
         "error": None,
     }
     config = _graph_config(request_id)
-    trace_recorder = TraceRecorder(session, run_id)
+    trace_recorder = TraceRecorder(session, run_id, progress_sink)
     context = _graph_context(
         session,
         registry,
@@ -110,6 +149,8 @@ def run_agent(
         _mark_waiting(
             session,
             run_id,
+            request_id=request_id,
+            state=final_state,
             intent=final_state.get("intent"),
             latency_ms=_latency_ms(started_ns),
             trace_recorder=trace_recorder,
@@ -162,10 +203,15 @@ def resume_agent(
         raise AgentRunStateError("Agent run is not waiting for approval.")
 
     request_id = run.request_id
-    config = _graph_config(request_id)
-    snapshot = graph.get_state(config)
-    if not snapshot.values or not snapshot.interrupts:
+    checkpoint = session.get(AgentApprovalCheckpoint, run_id)
+    if checkpoint is None or checkpoint.request_id != request_id:
+        _fail_unrecoverable_approval(session, run, "APPROVAL_CHECKPOINT_MISSING")
         raise AgentRunStateError("The approval checkpoint is no longer available.")
+    if checkpoint.expires_at <= utc_now():
+        _fail_unrecoverable_approval(session, run, "APPROVAL_CHECKPOINT_EXPIRED")
+        raise AgentRunStateError("The approval checkpoint has expired.")
+    if checkpoint.decision is not None:
+        raise AgentRunStateError("The approval action was already claimed.")
 
     claimed = session.execute(
         update(AgentRun)
@@ -179,7 +225,16 @@ def resume_agent(
     if claimed.rowcount != 1:
         session.rollback()
         raise AgentRunStateError("Agent run approval was already handled.")
+    checkpoint.decision = action
     session.commit()
+
+    config = _graph_config(request_id)
+    _delete_checkpoint(graph, request_id)
+    restored_state: AgentState = {
+        **checkpoint.state_json,
+        "approval_action": action,
+        "resume_after_approval": True,
+    }
 
     started_ns = perf_counter_ns()
     trace_recorder = TraceRecorder(session, run_id)
@@ -195,11 +250,7 @@ def resume_agent(
     )
     try:
         with bind_trace_sink(trace_recorder):
-            final_state = graph.invoke(
-                Command(resume={"action": action}),
-                config=config,
-                context=context,
-            )
+            final_state = graph.invoke(restored_state, config=config, context=context)
     except Exception as exc:
         _finish_run(
             session,
@@ -217,6 +268,8 @@ def resume_agent(
         _mark_waiting(
             session,
             run_id,
+            request_id=request_id,
+            state=final_state,
             intent=final_state.get("intent"),
             latency_ms=(run.latency_ms or 0) + _latency_ms(started_ns),
             trace_recorder=trace_recorder,
@@ -320,6 +373,8 @@ def _mark_waiting(
     session: Session,
     run_id: int,
     *,
+    request_id: str,
+    state: AgentState,
     intent: str | None,
     latency_ms: int,
     trace_recorder: TraceRecorder,
@@ -332,6 +387,19 @@ def _mark_waiting(
     run.final_answer = WAITING_MESSAGE
     run.finished_at = None
     run.latency_ms = latency_ms
+    checkpoint = session.get(AgentApprovalCheckpoint, run_id)
+    if checkpoint is None:
+        checkpoint = AgentApprovalCheckpoint(
+            agent_run_id=run_id,
+            request_id=request_id,
+            state_json=_serializable_approval_state(state),
+            expires_at=utc_now() + APPROVAL_TTL,
+        )
+        session.add(checkpoint)
+    else:
+        checkpoint.state_json = _serializable_approval_state(state)
+        checkpoint.decision = None
+        checkpoint.expires_at = utc_now() + APPROVAL_TTL
     trace_recorder.persist(session)
     session.commit()
 
@@ -354,6 +422,9 @@ def _finish_run(
     run.final_answer = final_answer
     run.finished_at = utc_now()
     run.latency_ms = latency_ms
+    checkpoint = session.get(AgentApprovalCheckpoint, run_id)
+    if checkpoint is not None:
+        session.delete(checkpoint)
     trace_recorder.persist(session)
     try:
         session.commit()
@@ -370,6 +441,25 @@ def _delete_checkpoint(graph: CompiledStateGraph, thread_id: str) -> None:
         checkpointer.delete_thread(thread_id)
     except Exception as exc:
         logger.warning("CHECKPOINT_CLEANUP_ERROR: %s", type(exc).__name__)
+
+
+def _serializable_approval_state(state: AgentState) -> dict[str, Any]:
+    """Exclude LangGraph internals and persist only declared JSON-compatible state."""
+    return {key: state[key] for key in APPROVAL_STATE_KEYS if key in state}
+
+
+def _fail_unrecoverable_approval(
+    session: Session,
+    run: AgentRun,
+    error: str,
+) -> None:
+    run.status = AgentRunStatus.FAILED
+    run.final_answer = error
+    run.finished_at = utc_now()
+    checkpoint = session.get(AgentApprovalCheckpoint, run.id)
+    if checkpoint is not None:
+        session.delete(checkpoint)
+    session.commit()
 
 
 def _latency_ms(started_ns: int) -> int:

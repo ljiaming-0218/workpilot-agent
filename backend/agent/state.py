@@ -39,6 +39,8 @@ class AgentState(TypedDict, total=False):
     requires_approval: bool
     risk_reasons: list[str]
     approval_status: str
+    approval_action: str
+    resume_after_approval: bool
     final_answer: str
     error: str | None
 

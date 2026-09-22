@@ -4103,7 +4103,12 @@ Token 成本
 
 ```text
 Phase 0–16：已有本地实现
-Current Phase：Phase 17 — Public Delivery Consistency
+Phase 17：已完成公开版本一致性整理并提交
+Phase 18：已完成受控真实告警输入
+Phase 19：已完成 Streaming Run Progress 与真实链路验证
+Phase 20：已完成 Durable Approval Recovery 与重启恢复验证
+Current Phase：Phase 21 — Representative Agent Evaluation（已通过 8/8 代表性评估并保存验收证据）
+Next Phase：Phase 22 — Multi-Agent Experiment Gate（尚未开始）
 ```
 
-必须先完成 Phase 17，之后才能进入 Phase 18。
+进入 Phase 22 前，必须先完成 Phase 21 代码讲解与理解检查。

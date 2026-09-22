@@ -19,6 +19,7 @@ from backend.config import Settings
 from backend.database import build_engine
 from backend.errors import register_error_handlers
 from backend.mcp import WorkPilotMCPClient
+from backend.routers.alert_router import router as alert_router
 from backend.routers.agent_router import router as agent_router
 from backend.routers.health_router import router as health_router
 from backend.routers.ingestion_router import router as ingestion_router
@@ -27,6 +28,8 @@ from backend.routers.log_router import router as log_router
 from backend.routers.ticket_router import router as ticket_router
 from backend.routers.trace_router import router as trace_router
 from backend.services.llm_service import LLMService
+from backend.services.approval_recovery_service import reconcile_approval_checkpoints
+from backend.services.run_event_service import RunEventBroker
 from backend.services.text2sql_service import Text2SQLService
 from backend.tools import create_default_registry
 
@@ -70,6 +73,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             )
             mcp_client.connect()
             app.state.session_factory = sessionmaker(bind=engine, autoflush=False)
+            with app.state.session_factory() as recovery_session:
+                reconcile_approval_checkpoints(recovery_session)
             app.state.mcp_client = mcp_client
             app.state.tool_registry = create_default_registry(
                 text2sql_service,
@@ -79,6 +84,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             app.state.planner = Planner(llm_service, max_steps=5)
             app.state.incident_analyzer = IncidentAnalyzer(llm_service)
             app.state.risk_checker = RiskChecker()
+            app.state.run_event_broker = RunEventBroker()
             app.state.agent_checkpointer = InMemorySaver()
             app.state.agent_graph = build_agent_graph(app.state.agent_checkpointer)
             yield
@@ -99,6 +105,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(log_router)
     application.include_router(knowledge_router)
     application.include_router(ingestion_router)
+    application.include_router(alert_router)
     application.include_router(agent_router)
     application.include_router(trace_router)
 

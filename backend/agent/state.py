@@ -32,6 +32,7 @@ class AgentState(TypedDict, total=False):
     tool_inputs: dict[str, Any]
     tool_results: list[dict[str, Any]]
     evidence: list[dict[str, Any]]
+    service_investigations: list[dict[str, Any]]
     analysis: dict[str, Any]
     analysis_source: str
     evidence_links: list[str]

@@ -5,8 +5,18 @@ import logging
 from pathlib import Path
 import re
 
-from backend.agent.router import INTENT_GENERAL, INTENT_INCIDENT_ANALYSIS, select_tool
-from backend.schemas.agent import GeneratedPlan, PlanStep, PlannerDecision
+from backend.agent.router import (
+    INTENT_GENERAL,
+    INTENT_INCIDENT_ANALYSIS,
+    INTENT_LOG_ANALYSIS,
+    select_tool,
+)
+from backend.schemas.agent import (
+    GeneratedPlan,
+    PlanStep,
+    PlannerDecision,
+    ServiceInvestigation,
+)
 from backend.services.llm_service import LLMServiceError, StructuredLLM
 
 
@@ -37,6 +47,19 @@ class Planner:
         self.max_steps = max_steps
 
     def create_plan(self, query: str, intent: str) -> PlannerDecision:
+        services = _service_names(query)
+        if len(services) > 1 and intent in {
+            INTENT_INCIDENT_ANALYSIS,
+            INTENT_LOG_ANALYSIS,
+        }:
+            steps = _multi_service_steps(query, services, self.max_steps)
+            return PlannerDecision(
+                steps=steps,
+                source="rule",
+                investigations=[
+                    ServiceInvestigation(service=service) for service in services
+                ],
+            )
         if intent == INTENT_GENERAL:
             return PlannerDecision(steps=[], source="rule")
         if intent == INTENT_INCIDENT_ANALYSIS:
@@ -111,6 +134,59 @@ def _incident_evidence_steps(query: str) -> list[PlanStep]:
             inputs={"query": query, "limit": 5},
         ),
     ]
+
+
+def _service_names(query: str) -> list[str]:
+    matches = [
+        (match.start(), match.group(1).lower())
+        for match in BARE_SERVICE_NAME_PATTERN.finditer(query)
+    ]
+    matches.extend(
+        (match.start(), match.group(1).lower())
+        for match in SERVICE_NAME_PATTERN.finditer(query)
+        if match.start() == 0 or not (
+            query[match.start() - 1].isalnum()
+            or query[match.start() - 1] in "-_."
+        )
+    )
+    services: list[str] = []
+    for _position, service in sorted(matches):
+        if service.isdigit():
+            continue
+        if service not in services:
+            services.append(service)
+    return services[:3]
+
+
+def _multi_service_steps(
+    query: str,
+    services: list[str],
+    max_steps: int,
+) -> list[PlanStep]:
+    """Spend the bounded budget on service coverage before supporting context."""
+    steps = [
+        PlanStep(
+            tool="query_error_logs",
+            inputs={
+                "service_name": service,
+                "minutes": _log_window_minutes(query),
+                "limit": 20,
+            },
+        )
+        for service in services
+    ]
+    primary = services[0]
+    supporting = [
+        PlanStep(
+            tool="search_tickets",
+            inputs={"service_name": primary, "limit": 10},
+        ),
+        PlanStep(
+            tool="search_knowledge",
+            inputs={"query": query, "limit": 5},
+        ),
+    ]
+    return [*steps, *supporting][:max_steps]
 
 
 def _log_window_minutes(query: str) -> int:

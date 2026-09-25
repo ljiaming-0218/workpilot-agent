@@ -31,6 +31,9 @@ def plan_task(
     decision = runtime.context.planner.create_plan(state["query"], state["intent"])
     return {
         "plan": [step.model_dump(mode="json") for step in decision.steps],
+        "service_investigations": [
+            item.model_dump(mode="json") for item in decision.investigations
+        ],
         "current_step": 0,
         "max_steps": runtime.context.planner.max_steps,
         "planner_source": decision.source,
@@ -140,6 +143,8 @@ def tool_executor(
     next_step = step_index + 1
     previous_results = state.get("tool_results", [])
     previous_evidence = state.get("evidence", [])
+    investigations = [dict(item) for item in state.get("service_investigations", [])]
+    service = _step_service(step, investigations)
 
     try:
         output = runtime.context.registry.call_tool(
@@ -151,6 +156,16 @@ def tool_executor(
             ),
         )
     except ToolRegistryError as exc:
+        if investigations:
+            _record_investigation_failure(investigations, service, exc.code)
+            return {
+                "selected_tool": tool_name,
+                "tool_inputs": tool_inputs,
+                "current_step": next_step,
+                "tool_results": previous_results,
+                "service_investigations": investigations,
+                "error": None,
+            }
         return {
             "selected_tool": tool_name,
             "tool_inputs": tool_inputs,
@@ -161,15 +176,25 @@ def tool_executor(
 
     observation = {
         "step": next_step,
+        "service": service,
         "tool": tool_name,
+        "source": "tool_registry",
         "output": output.model_dump(mode="json"),
     }
+    if investigations:
+        _record_investigation_success(
+            investigations,
+            service,
+            observation,
+            state["plan"][next_step:],
+        )
     return {
         "selected_tool": tool_name,
         "tool_inputs": tool_inputs,
         "current_step": next_step,
         "tool_results": [*previous_results, observation],
         "evidence": [*previous_evidence, observation],
+        "service_investigations": investigations,
         "error": None,
     }
 
@@ -182,7 +207,10 @@ def route_after_execution(
         return "answer_generator"
     current_step = state.get("current_step", 0)
     if current_step >= min(len(state.get("plan", [])), state.get("max_steps", 5)):
-        if state.get("intent") == "incident_analysis" and state.get("evidence"):
+        if (
+            state.get("intent") == "incident_analysis"
+            or len(state.get("service_investigations", [])) > 1
+        ) and (state.get("evidence") or state.get("service_investigations")):
             return "incident_analyzer"
         return "answer_generator"
     return "tool_executor"
@@ -195,12 +223,59 @@ def analyze_incident(
     decision = runtime.context.incident_analyzer.analyze(
         state["query"],
         state.get("evidence", []),
+        state.get("service_investigations", []),
     )
     return {
         "analysis": decision.analysis.model_dump(mode="json"),
         "analysis_source": decision.source,
         "evidence_links": decision.evidence_links,
     }
+
+
+def _step_service(
+    step: dict[str, object],
+    investigations: list[dict[str, object]],
+) -> str:
+    inputs = step.get("inputs")
+    if isinstance(inputs, dict) and isinstance(inputs.get("service_name"), str):
+        return inputs["service_name"]
+    return str(investigations[0]["service"]) if investigations else "unscoped"
+
+
+def _record_investigation_failure(
+    investigations: list[dict[str, object]],
+    service: str,
+    error: str,
+) -> None:
+    for item in investigations:
+        if item.get("service") != service:
+            continue
+        item["status"] = "partial" if item.get("evidence") else "failed"
+        item["error"] = error
+        return
+
+
+def _record_investigation_success(
+    investigations: list[dict[str, object]],
+    service: str,
+    observation: dict[str, object],
+    remaining_steps: list[dict[str, object]],
+) -> None:
+    for item in investigations:
+        if item.get("service") != service:
+            continue
+        evidence = list(item.get("evidence", []))
+        citations = list(item.get("citations", []))
+        evidence.append(observation)
+        citations.append(int(observation["step"]))
+        item["evidence"] = evidence
+        item["citations"] = citations
+        has_more = any(_step_service(step, investigations) == service for step in remaining_steps)
+        if item.get("error"):
+            item["status"] = "partial"
+        else:
+            item["status"] = "running" if has_more else "completed"
+        return
 
 
 def answer_generator(state: AgentState) -> dict[str, object]:

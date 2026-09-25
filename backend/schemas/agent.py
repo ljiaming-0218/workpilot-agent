@@ -44,6 +44,18 @@ class PlanStep(BaseModel):
     inputs: dict[str, Any]
 
 
+class ServiceInvestigation(BaseModel):
+    """Serializable progress and evidence for one service subtask."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    service: str = Field(min_length=1, max_length=128)
+    status: Literal["pending", "running", "completed", "partial", "failed"] = "pending"
+    evidence: list[dict[str, Any]] = Field(default_factory=list)
+    error: str | None = None
+    citations: list[int] = Field(default_factory=list)
+
+
 class GeneratedPlan(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -53,6 +65,7 @@ class GeneratedPlan(BaseModel):
 class PlannerDecision(BaseModel):
     steps: list[PlanStep] = Field(max_length=5)
     source: Literal["rule", "llm", "fallback"]
+    investigations: list[ServiceInvestigation] = Field(default_factory=list, max_length=3)
 
 
 class IncidentAnalysis(BaseModel):
@@ -107,6 +120,7 @@ class AgentResult(BaseModel):
     final_answer: str
     tool_results: list[dict[str, Any]]
     evidence: list[dict[str, Any]]
+    service_investigations: list[ServiceInvestigation] = Field(default_factory=list)
     analysis: IncidentAnalysis | None
     analysis_source: Literal["llm", "fallback"] | None
     risk_level: RiskLevel

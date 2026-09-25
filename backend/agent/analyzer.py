@@ -25,11 +25,13 @@ class IncidentAnalyzer:
         self,
         query: str,
         evidence: list[dict[str, Any]],
+        investigations: list[dict[str, Any]] | None = None,
     ) -> IncidentAnalysisDecision:
+        investigations = investigations or []
         evidence_links = _correlate_evidence(evidence)
         if self._llm is None or not evidence:
             return IncidentAnalysisDecision(
-                analysis=_fallback_analysis(evidence),
+                analysis=_fallback_analysis(evidence, investigations),
                 source="fallback",
                 evidence_links=evidence_links,
             )
@@ -44,6 +46,7 @@ class IncidentAnalyzer:
                         {
                             "query": query,
                             "evidence": _compact_evidence(evidence),
+                            "service_investigations": _compact_value(investigations),
                             "evidence_links": evidence_links,
                         },
                         ensure_ascii=False,
@@ -56,6 +59,19 @@ class IncidentAnalyzer:
                 ):
                     raise LLMServiceError(
                         "Incident analysis cited invalid evidence steps."
+                    )
+                service_citations = [
+                    item["citations"][0]
+                    for item in investigations
+                    if item.get("citations")
+                ]
+                analysis.evidence_steps = list(dict.fromkeys(
+                    [*service_citations, *analysis.evidence_steps]
+                ))[:5]
+                if _needs_uncertainty(evidence, investigations):
+                    analysis.summary = (
+                        "证据存在冲突或不足，当前结论具有不确定性。"
+                        + analysis.summary
                     )
             except LLMServiceError as exc:
                 last_error = exc
@@ -73,13 +89,30 @@ class IncidentAnalyzer:
             else type(last_error).__name__,
         )
         return IncidentAnalysisDecision(
-            analysis=_fallback_analysis(evidence),
+            analysis=_fallback_analysis(evidence, investigations),
             source="fallback",
             evidence_links=evidence_links,
         )
 
 
 def _correlate_evidence(evidence: list[dict[str, Any]]) -> list[str]:
+    services: list[str] = []
+    for item in evidence:
+        service = item.get("service")
+        if isinstance(service, str) and service not in services:
+            services.append(service)
+    if not services:
+        return _correlate_evidence_group(evidence)
+    links: list[str] = []
+    for service in services[:3]:
+        group = [item for item in evidence if item.get("service") == service]
+        group_links = _correlate_evidence_group(group)
+        if group_links:
+            links.append(group_links[0])
+    return links[:3]
+
+
+def _correlate_evidence_group(evidence: list[dict[str, Any]]) -> list[str]:
     """Link bounded records by service and event time; never infer causality."""
     outputs = {
         item.get("tool"): item
@@ -155,7 +188,10 @@ def _compact_value(value: Any) -> Any:
     return value
 
 
-def _fallback_analysis(evidence: list[dict[str, Any]]) -> IncidentAnalysis:
+def _fallback_analysis(
+    evidence: list[dict[str, Any]],
+    investigations: list[dict[str, Any]],
+) -> IncidentAnalysis:
     facts: list[str] = []
     evidence_steps: list[int] = []
     for item in evidence:
@@ -171,10 +207,33 @@ def _fallback_analysis(evidence: list[dict[str, Any]]) -> IncidentAnalysis:
             facts.append(f"步骤 {step} 已完成工具 {tool}。")
     if not facts:
         facts.append("本次运行没有获得可用于故障判断的工具证据。")
+    for item in investigations:
+        if item.get("error"):
+            facts.append(
+                f"服务 {item.get('service')} 调查状态为 {item.get('status')}，"
+                f"错误为 {item.get('error')}。"
+            )
+    uncertain = _needs_uncertainty(evidence, investigations)
     return IncidentAnalysis(
-        summary="已完成证据收集；当前没有可用的 LLM 分析结果。",
+        summary=(
+            "证据存在冲突或不足，当前结论具有不确定性。"
+            if uncertain else "已完成有界证据收集，但缺少可用的在线 LLM 分析结果。"
+        ),
         confirmed_facts=facts[:10],
         hypotheses=[],
         recommended_actions=["检查各工具返回的原始证据后再确定故障原因。"],
-        evidence_steps=evidence_steps,
+        evidence_steps=list(dict.fromkeys(evidence_steps))[:5],
+    )
+
+
+def _needs_uncertainty(
+    evidence: list[dict[str, Any]],
+    investigations: list[dict[str, Any]],
+) -> bool:
+    if any(item.get("status") in {"partial", "failed"} for item in investigations):
+        return True
+    serialized = json.dumps(evidence, ensure_ascii=False).casefold()
+    return any(
+        marker in serialized
+        for marker in ("conflict", "does not establish", "冲突", "证据不足")
     )

@@ -2,7 +2,7 @@
 
 面向研发故障排查的单 Agent 应用。用户描述工单或线上告警后，系统通过受限计划查询日志、历史工单和知识手册，聚合证据并生成带引用的排查建议。项目包含 FastAPI API、LangGraph 工作流、MCP 查询服务、SQL Guard 和浏览器 Trace Console。
 
-这是一个用于展示和学习 Agent 工程的作品集项目，不是生产事故自动处置平台。当前保留增强版 Single Agent；没有采用 Multi-Agent。
+系统用于演示研发故障排查场景下的证据驱动分析，不会自动执行生产运维操作。当前保留增强版 Single Agent；没有采用 Multi-Agent。
 
 ## 能力概览
 
@@ -133,13 +133,3 @@ Conflict Router intent diagnostic 仍为 0/5：它仍将该类请求路由为 lo
 - SSE 事件和 LangGraph checkpoint 使用进程内实现；实例重启或多副本部署不具备完整的事件重放/工作队列语义。
 - 用户认证、租户权限、限流、生产审批集成、真实操作执行和大规模负载测试均不在当前实现范围。
 - Conflict intent 路由仍需修复；本项目当前不开发 Multi-Agent。
-
-## 求职项目描述草稿
-
-可在简历中按实际版本和演示结果调整，不应把固定样本评估写成生产指标：
-
-> **WorkPilot Agent｜研发故障分析与工单智能体**
-> 基于 FastAPI、LangGraph、MySQL 和 MCP 构建单 Agent 诊断工作流，集成日志查询、历史工单检索、BM25 知识检索与受限 Text2SQL；实现最多 5 步工具计划及最多 3 个服务的结构化跨服务调查，使用 Pydantic Tool Registry 统一工具契约和调用审计。
-> 基于 SQLGlot AST 构建只读 SQL Guard，并加入整体风险评估、人工审批、持久化运行记录与 Trace Console。对三个固定跨服务 Case 进行 baseline/enhanced 各 15 次对照，enhanced 业务成功 15/15，Gold 覆盖、引用和服务完成均 15/15；同时记录延迟/Token 成本增加及 Conflict Router 路由缺陷。
-
-求职时可把其余十个面试题和回答提纲作为项目讲解备忘，不把 README 当作线上健康状态或生产部署证明。

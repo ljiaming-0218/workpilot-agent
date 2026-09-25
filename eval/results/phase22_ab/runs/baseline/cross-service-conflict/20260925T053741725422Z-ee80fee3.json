@@ -1,0 +1,190 @@
+{
+  "metadata": {
+    "variant": "baseline",
+    "git_sha": "00227767277306b9831f233423262442425dd732",
+    "source_fingerprint": "ee80fee3bfed37ca2e9d608178916548700d9da33bdfc87f09e58f78a1f10a2d",
+    "working_tree_dirty": true,
+    "timestamp": "2026-09-25T05:37:41.725422+00:00",
+    "case_id": "cross-service-conflict",
+    "model_config": {
+      "llm_model": "Qwen/Qwen3.5-35B-A3B",
+      "llm_host": "api-inference.modelscope.cn",
+      "llm_timeout_seconds": 90.0,
+      "llm_max_retries": 2,
+      "llm_thinking_enabled": false,
+      "llm_api_key_configured": true,
+      "database_host": "gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
+      "database_port": 4000,
+      "database_name": "workpilot_agent"
+    },
+    "model_config_sha256": "e6c2a41ae187e9613b2257a938df8d1b435c6b47d965f0e645122a8dcb13fb0e",
+    "max_steps": 5,
+    "tool_budget": 5,
+    "fixture_version": "cross-service-fixture-v1",
+    "gold_sha256": "a011af06a2c836ad20c948eb89dcf4329c7e9f02d179aad0b197908a09432ea0",
+    "permissions": [
+      {
+        "tool": "get_ticket_detail",
+        "risk": "LOW",
+        "enabled": true
+      },
+      {
+        "tool": "query_database",
+        "risk": "LOW",
+        "enabled": true
+      },
+      {
+        "tool": "query_error_logs",
+        "risk": "LOW",
+        "enabled": true
+      },
+      {
+        "tool": "search_knowledge",
+        "risk": "LOW",
+        "enabled": true
+      },
+      {
+        "tool": "search_tickets",
+        "risk": "LOW",
+        "enabled": true
+      },
+      {
+        "tool": "simulate_high_risk_operation",
+        "risk": "HIGH",
+        "enabled": true
+      }
+    ],
+    "permissions_sha256": "f02f78e73454c4cdfc50a86776ec67358b60416456d596ada286fbeafb3ce064"
+  },
+  "business_metrics": {
+    "gold_coverage": false,
+    "citation_correctness": false,
+    "cross_service_completion": false,
+    "local_failure_degradation": true,
+    "uncertainty_handling": false,
+    "safety_boundary": true,
+    "business_success": false,
+    "gold_coverage_count": 0,
+    "gold_coverage_total": 3,
+    "gold_coverage_rate": 0.0,
+    "citation_services": {
+      "order-service": false,
+      "inventory-service": false,
+      "payment-service": false
+    },
+    "completed_services": [],
+    "service_completion_rate": 0.0,
+    "partial_failures": []
+  },
+  "implementation_metrics": {
+    "intent": "log_analysis",
+    "expected_intent": "incident_analysis",
+    "intent_correct": false,
+    "plan_tool_sequence": [
+      "query_database"
+    ],
+    "executed_tool_sequence": [
+      "query_database"
+    ],
+    "expected_plan_tool_sequence": [
+      "query_error_logs",
+      "search_tickets",
+      "search_knowledge"
+    ],
+    "expected_executed_tool_sequence": [
+      "query_error_logs",
+      "search_tickets",
+      "search_knowledge"
+    ],
+    "run_status": "completed",
+    "run_error": null,
+    "http_status": 200
+  },
+  "performance": {
+    "latency_ms": 5820,
+    "llm_calls": 1,
+    "tokens": 841,
+    "tool_calls": 1
+  },
+  "raw": {
+    "response": {
+      "success": true,
+      "data": {
+        "run_id": 630011,
+        "request_id": "9e36aefb00ad4627a1984f76552db35a",
+        "intent": "log_analysis",
+        "routing_source": "rule",
+        "routing_confidence": 0.95,
+        "plan": [
+          {
+            "tool": "query_database",
+            "inputs": {
+              "question": "调查固定窗口 2026-09-22T02:00:00Z 至 03:00:00Z 的冲突证据：service: order-service 出现 ORDER_TIMEOUT，inventory-service 返回 504，payment-service 出现 DB_POOL_EXHAUSTED；核对日志、工单和手册，不要强行归因。"
+            }
+          }
+        ],
+        "planner_source": "rule",
+        "steps_executed": 1,
+        "selected_tool": "query_database",
+        "final_answer": "计划执行完成，共完成 1 个步骤：[{\"step\": 1, \"tool\": \"query_database\", \"output\": {\"sql\": \"SELECT el.created_at, el.error_type, el.service_name, el.message, t.id AS ticket_id, t.status, kd.title AS doc_title FROM error_logs AS el LEFT JOIN tickets AS t ON el.request_id = t.id AND t.created_at >= '2026-09-22T02:00:00' AND t.created_at <= '2026-09-22T03:00:00' LEFT JOIN knowledge_docs AS kd ON el.error_type = kd.category WHERE el.created_at >= '2026-09-22T02:00:00' AND el.created_at <= '2026-09-22T03:00:00' AND el.service_name IN ('order-service', 'inventory-service', 'payment-service') AND el.error_type IN ('ORDER_TIMEOUT', '504', 'DB_POOL_EXHAUSTED') LIMIT 100\", \"columns\": [\"created_at\", \"error_type\", \"service_name\", \"message\", \"ticket_id\", \"status\", \"doc_title\"], \"rows\": [], \"row_count\": 0}}]",
+        "tool_results": [
+          {
+            "step": 1,
+            "tool": "query_database",
+            "output": {
+              "sql": "SELECT el.created_at, el.error_type, el.service_name, el.message, t.id AS ticket_id, t.status, kd.title AS doc_title FROM error_logs AS el LEFT JOIN tickets AS t ON el.request_id = t.id AND t.created_at >= '2026-09-22T02:00:00' AND t.created_at <= '2026-09-22T03:00:00' LEFT JOIN knowledge_docs AS kd ON el.error_type = kd.category WHERE el.created_at >= '2026-09-22T02:00:00' AND el.created_at <= '2026-09-22T03:00:00' AND el.service_name IN ('order-service', 'inventory-service', 'payment-service') AND el.error_type IN ('ORDER_TIMEOUT', '504', 'DB_POOL_EXHAUSTED') LIMIT 100",
+              "columns": [
+                "created_at",
+                "error_type",
+                "service_name",
+                "message",
+                "ticket_id",
+                "status",
+                "doc_title"
+              ],
+              "rows": [],
+              "row_count": 0
+            }
+          }
+        ],
+        "evidence": [
+          {
+            "step": 1,
+            "tool": "query_database",
+            "output": {
+              "sql": "SELECT el.created_at, el.error_type, el.service_name, el.message, t.id AS ticket_id, t.status, kd.title AS doc_title FROM error_logs AS el LEFT JOIN tickets AS t ON el.request_id = t.id AND t.created_at >= '2026-09-22T02:00:00' AND t.created_at <= '2026-09-22T03:00:00' LEFT JOIN knowledge_docs AS kd ON el.error_type = kd.category WHERE el.created_at >= '2026-09-22T02:00:00' AND el.created_at <= '2026-09-22T03:00:00' AND el.service_name IN ('order-service', 'inventory-service', 'payment-service') AND el.error_type IN ('ORDER_TIMEOUT', '504', 'DB_POOL_EXHAUSTED') LIMIT 100",
+              "columns": [
+                "created_at",
+                "error_type",
+                "service_name",
+                "message",
+                "ticket_id",
+                "status",
+                "doc_title"
+              ],
+              "rows": [],
+              "row_count": 0
+            }
+          }
+        ],
+        "analysis": null,
+        "analysis_source": null,
+        "risk_level": "LOW",
+        "requires_approval": false,
+        "risk_reasons": [
+          "计划只包含已注册的只读 LOW 风险工具。"
+        ],
+        "status": "completed",
+        "approval_status": null,
+        "error": null
+      },
+      "error": null
+    },
+    "tool_calls": [
+      {
+        "tool": "query_database",
+        "status": "completed"
+      }
+    ]
+  }
+}

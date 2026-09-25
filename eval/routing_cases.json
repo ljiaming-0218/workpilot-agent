@@ -18,6 +18,12 @@
     "expected_source": "rule"
   },
   {
+    "id": "incident-conflicting-cross-service-investigation",
+    "query": "调查跨服务的冲突故障并核对日志、工单和手册证据",
+    "expected_intent": "incident_analysis",
+    "expected_source": "rule"
+  },
+  {
     "id": "log-search",
     "query": "查看 payment-service 最近的错误日志",
     "expected_intent": "log_analysis",

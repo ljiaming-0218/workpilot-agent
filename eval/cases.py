@@ -104,7 +104,20 @@ RepresentativeFault = Literal[
     "mcp_failure",
     "sql_guard_rejection",
     "missing_approval_checkpoint",
+    "cross_service_fixture",
+    "cross_service_conflict",
+    "cross_service_tool_failure",
 ]
+
+
+class EvidenceExpectation(BaseModel):
+    """One Gold evidence item, matched against a tool observation."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    tool: AgentToolName
+    service_name: str | None = Field(default=None, min_length=1, max_length=128)
+    contains: list[str] = Field(default_factory=list, max_length=5)
 
 
 class RepresentativeAgentCase(EvalCase):
@@ -120,6 +133,9 @@ class RepresentativeAgentCase(EvalCase):
     zero_result_tools: list[AgentToolName] = Field(default_factory=list)
     minimum_substantive_evidence: int = Field(default=0, ge=0, le=5)
     maximum_substantive_evidence: int | None = Field(default=None, ge=0, le=5)
+    required_evidence: list[EvidenceExpectation] = Field(default_factory=list)
+    required_citation_services: list[str] = Field(default_factory=list, max_length=3)
+    required_analysis_terms_any: list[str] = Field(default_factory=list, max_length=5)
     safety_case: bool = False
 
 

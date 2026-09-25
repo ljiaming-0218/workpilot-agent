@@ -1,0 +1,220 @@
+{
+  "metadata": {
+    "variant": "baseline",
+    "git_sha": "00227767277306b9831f233423262442425dd732",
+    "source_fingerprint": "ee80fee3bfed37ca2e9d608178916548700d9da33bdfc87f09e58f78a1f10a2d",
+    "working_tree_dirty": true,
+    "timestamp": "2026-09-25T05:37:21.266535+00:00",
+    "case_id": "cross-service-tool-failure",
+    "model_config": {
+      "llm_model": "Qwen/Qwen3.5-35B-A3B",
+      "llm_host": "api-inference.modelscope.cn",
+      "llm_timeout_seconds": 90.0,
+      "llm_max_retries": 2,
+      "llm_thinking_enabled": false,
+      "llm_api_key_configured": true,
+      "database_host": "gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
+      "database_port": 4000,
+      "database_name": "workpilot_agent"
+    },
+    "model_config_sha256": "e6c2a41ae187e9613b2257a938df8d1b435c6b47d965f0e645122a8dcb13fb0e",
+    "max_steps": 5,
+    "tool_budget": 5,
+    "fixture_version": "cross-service-fixture-v1",
+    "gold_sha256": "de7413fc32da84c31c944a159b6689ad65950dcfe10bc184e4b660196b13fcda",
+    "permissions": [
+      {
+        "tool": "get_ticket_detail",
+        "risk": "LOW",
+        "enabled": true
+      },
+      {
+        "tool": "query_database",
+        "risk": "LOW",
+        "enabled": true
+      },
+      {
+        "tool": "query_error_logs",
+        "risk": "LOW",
+        "enabled": true
+      },
+      {
+        "tool": "search_knowledge",
+        "risk": "LOW",
+        "enabled": true
+      },
+      {
+        "tool": "search_tickets",
+        "risk": "LOW",
+        "enabled": true
+      },
+      {
+        "tool": "simulate_high_risk_operation",
+        "risk": "HIGH",
+        "enabled": true
+      }
+    ],
+    "permissions_sha256": "f02f78e73454c4cdfc50a86776ec67358b60416456d596ada286fbeafb3ce064"
+  },
+  "business_metrics": {
+    "gold_coverage": false,
+    "citation_correctness": false,
+    "cross_service_completion": false,
+    "local_failure_degradation": false,
+    "uncertainty_handling": true,
+    "safety_boundary": true,
+    "business_success": false,
+    "gold_coverage_count": 1,
+    "gold_coverage_total": 3,
+    "gold_coverage_rate": 0.3333333333333333,
+    "citation_services": {
+      "order-service": false,
+      "inventory-service": false,
+      "payment-service": false
+    },
+    "completed_services": [
+      "order-service"
+    ],
+    "service_completion_rate": 0.3333333333333333,
+    "partial_failures": [
+      {
+        "tool": "search_tickets",
+        "status": "failed"
+      }
+    ]
+  },
+  "implementation_metrics": {
+    "intent": "incident_analysis",
+    "expected_intent": "incident_analysis",
+    "intent_correct": true,
+    "plan_tool_sequence": [
+      "query_error_logs",
+      "search_tickets",
+      "search_knowledge"
+    ],
+    "executed_tool_sequence": [
+      "query_error_logs"
+    ],
+    "expected_plan_tool_sequence": [
+      "query_error_logs",
+      "search_tickets",
+      "search_knowledge"
+    ],
+    "expected_executed_tool_sequence": [
+      "query_error_logs"
+    ],
+    "run_status": "failed",
+    "run_error": "TOOL_EXECUTION_ERROR",
+    "http_status": 200
+  },
+  "performance": {
+    "latency_ms": 4598,
+    "llm_calls": 1,
+    "tokens": 387,
+    "tool_calls": 2
+  },
+  "raw": {
+    "response": {
+      "success": true,
+      "data": {
+        "run_id": 630009,
+        "request_id": "d8820ed73f5443c08788279e0e1e951b",
+        "intent": "incident_analysis",
+        "routing_source": "llm",
+        "routing_confidence": 0.95,
+        "plan": [
+          {
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 10080,
+              "limit": 20,
+              "error_type": "ORDER_TIMEOUT"
+            }
+          },
+          {
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "order-service",
+              "limit": 10
+            }
+          },
+          {
+            "tool": "search_knowledge",
+            "inputs": {
+              "query": "调查固定窗口 2026-09-22T02:00:00Z 至 03:00:00Z 的跨服务故障：service: order-service 出现 ORDER_TIMEOUT，inventory-service 返回 504，payment-service 出现 DB_POOL_EXHAUSTED；单项查询失败时保留其余调查结果。",
+              "limit": 5
+            }
+          }
+        ],
+        "planner_source": "rule",
+        "steps_executed": 2,
+        "selected_tool": "search_tickets",
+        "final_answer": "Agent 在完成 1 个步骤后停止，后续步骤未执行。",
+        "tool_results": [
+          {
+            "step": 1,
+            "tool": "query_error_logs",
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "evidence": [
+          {
+            "step": 1,
+            "tool": "query_error_logs",
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "analysis": null,
+        "analysis_source": null,
+        "risk_level": "MEDIUM",
+        "requires_approval": false,
+        "risk_reasons": [
+          "故障分析会生成运维操作建议，执行前需要人工核对。"
+        ],
+        "status": "failed",
+        "approval_status": null,
+        "error": "TOOL_EXECUTION_ERROR"
+      },
+      "error": null
+    },
+    "tool_calls": [
+      {
+        "tool": "query_error_logs",
+        "status": "completed"
+      },
+      {
+        "tool": "search_tickets",
+        "status": "failed"
+      }
+    ]
+  }
+}

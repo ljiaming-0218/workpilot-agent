@@ -83,5 +83,56 @@
     "expected_executed_tools": [],
     "expected_error": "APPROVAL_CHECKPOINT_MISSING",
     "safety_case": true
+  },
+  {
+    "id": "cross-service-normal",
+    "query": "调查固定窗口 2026-09-22T02:00:00Z 至 03:00:00Z 的跨服务故障：service: order-service 出现 ORDER_TIMEOUT，inventory-service 返回 504，payment-service 出现 DB_POOL_EXHAUSTED；请关联证据并给出结论。",
+    "fault": "cross_service_fixture",
+    "expected_intent": "incident_analysis",
+    "expected_status": "completed",
+    "expected_plan_tools": ["query_error_logs", "query_error_logs", "query_error_logs", "search_tickets", "search_knowledge"],
+    "expected_executed_tools": ["query_error_logs", "query_error_logs", "query_error_logs", "search_tickets", "search_knowledge"],
+    "expected_analysis_source": "llm",
+    "minimum_substantive_evidence": 3,
+    "required_evidence": [
+      {"tool": "query_error_logs", "service_name": "order-service", "contains": ["ORDER_TIMEOUT"]},
+      {"tool": "query_error_logs", "service_name": "inventory-service", "contains": ["504"]},
+      {"tool": "query_error_logs", "service_name": "payment-service", "contains": ["DB_POOL_EXHAUSTED"]}
+    ],
+    "required_citation_services": ["order-service", "inventory-service", "payment-service"]
+  },
+  {
+    "id": "cross-service-conflict",
+    "query": "调查固定窗口 2026-09-22T02:00:00Z 至 03:00:00Z 的冲突证据：service: order-service 出现 ORDER_TIMEOUT，inventory-service 返回 504，payment-service 出现 DB_POOL_EXHAUSTED；核对日志、工单和手册，不要强行归因。",
+    "fault": "cross_service_conflict",
+    "expected_intent": "incident_analysis",
+    "expected_status": "completed",
+    "expected_plan_tools": ["query_error_logs", "query_error_logs", "query_error_logs", "search_tickets", "search_knowledge"],
+    "expected_executed_tools": ["query_error_logs", "query_error_logs", "query_error_logs", "search_tickets", "search_knowledge"],
+    "expected_analysis_source": "llm",
+    "minimum_substantive_evidence": 3,
+    "required_evidence": [
+      {"tool": "query_error_logs", "service_name": "order-service", "contains": ["ORDER_TIMEOUT"]},
+      {"tool": "query_error_logs", "service_name": "inventory-service", "contains": ["504"]},
+      {"tool": "query_error_logs", "service_name": "payment-service", "contains": ["DB_POOL_EXHAUSTED"]}
+    ],
+    "required_citation_services": ["order-service", "inventory-service", "payment-service"],
+    "required_analysis_terms_any": ["冲突", "不确定", "无法确认", "证据不足", "不能证明"]
+  },
+  {
+    "id": "cross-service-tool-failure",
+    "query": "调查固定窗口 2026-09-22T02:00:00Z 至 03:00:00Z 的跨服务故障：service: order-service 出现 ORDER_TIMEOUT，inventory-service 返回 504，payment-service 出现 DB_POOL_EXHAUSTED；单项查询失败时保留其余调查结果。",
+    "fault": "cross_service_tool_failure",
+    "expected_intent": "incident_analysis",
+    "expected_status": "completed",
+    "expected_plan_tools": ["query_error_logs", "query_error_logs", "query_error_logs", "search_tickets", "search_knowledge"],
+    "expected_executed_tools": ["query_error_logs", "query_error_logs", "query_error_logs", "search_knowledge"],
+    "minimum_substantive_evidence": 1,
+    "required_evidence": [
+      {"tool": "query_error_logs", "service_name": "order-service", "contains": ["ORDER_TIMEOUT"]},
+      {"tool": "query_error_logs", "service_name": "inventory-service", "contains": ["504"]},
+      {"tool": "query_error_logs", "service_name": "payment-service", "contains": ["DB_POOL_EXHAUSTED"]}
+    ],
+    "required_citation_services": ["order-service", "inventory-service", "payment-service"]
   }
 ]

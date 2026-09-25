@@ -22,8 +22,12 @@ from backend.security.sql_guard import SQLGuard, SQLGuardError
 from backend.services.llm_service import LLMServiceError
 from backend.services.text2sql_service import Text2SQLService
 from backend.tools import create_default_registry
+from backend.tools.base import BaseTool, ToolContext, ToolDefinition
+from backend.tools.mcp_proxy import create_mcp_proxy_tools
+from backend.tools.registry import ToolRegistry
 from backend.utils.trace_context import emit_llm_trace
 from eval.cases import (
+    EvidenceExpectation,
     LiveAgentCase,
     RepresentativeAgentCase,
     RetrievalSuite,
@@ -328,6 +332,110 @@ class _FailingMCPClient:
         raise RuntimeError("Injected MCP failure.")
 
 
+class _CrossServiceMCPClient:
+    """Serve a fixed incident snapshot without touching mutable demo data."""
+
+    _SIGNALS = {
+        "order-service": (81001, "ORDER_TIMEOUT", "Order timed out after inventory reservation exceeded 2000 ms."),
+        "inventory-service": (82001, "504", "Inventory returned HTTP 504 while warehouse gateway timed out."),
+        "payment-service": (83001, "DB_POOL_EXHAUSTED", "Payment database connection pool checkout timed out."),
+    }
+
+    def __init__(self, *, conflict: bool = False, fail_tool: str | None = None) -> None:
+        self._conflict = conflict
+        self._fail_tool = fail_tool
+
+    def call_tool(self, name: str, arguments: dict[str, Any]) -> dict[str, Any]:
+        service = arguments.get("service_name")
+        if name == self._fail_tool and service == "order-service":
+            raise RuntimeError("Injected cross-service tool failure.")
+        if name == "query_error_logs":
+            record_id, error_type, message = self._SIGNALS.get(
+                str(service), (89999, "UNKNOWN", "No matching service signal."),
+            )
+            return {
+                "items": [{
+                    "id": record_id,
+                    "service_name": service,
+                    "level": "ERROR",
+                    "error_type": error_type,
+                    "message": message,
+                    "stack_trace": None,
+                    "request_id": f"phase22-{service}",
+                    "created_at": "2026-09-22T02:30:00Z",
+                }],
+                "total": 1,
+            }
+        if name == "search_tickets":
+            conflict_note = (
+                "Health checks recovered; this ticket does not establish a shared root cause."
+                if self._conflict else
+                "The same incident window contains the expected service signal."
+            )
+            return {
+                "items": [{
+                    "id": self._SIGNALS.get(str(service), (89999, "", ""))[0] + 100,
+                    "title": f"Phase 22 incident for {service}",
+                    "content": conflict_note,
+                    "category": "incident",
+                    "priority": "high",
+                    "status": "open",
+                    "service_name": service,
+                    "resolution": None,
+                    "created_at": "2026-09-22T02:32:00Z",
+                    "updated_at": "2026-09-22T02:35:00Z",
+                }],
+                "total": 1,
+            }
+        if name == "search_knowledge":
+            qualifier = (
+                "Signals conflict; temporal proximity does not prove causality."
+                if self._conflict else
+                "Correlate order timeout, inventory 504, and payment pool exhaustion by trace and time."
+            )
+            return {
+                "items": [{
+                    "document_id": 84001,
+                    "title": "Phase 22 cross-service incident runbook",
+                    "excerpt": qualifier,
+                    "category": "runbook",
+                    "source": "eval://phase22/cross-service",
+                    "score": 10.0,
+                }],
+                "total": 1,
+            }
+        raise RuntimeError(f"Unexpected fixture tool: {name}")
+
+
+class _DefinitionTool(BaseTool[BaseModel, BaseModel]):
+    """Reuse an existing immutable definition when assembling an eval registry."""
+
+    def __init__(self, definition: ToolDefinition) -> None:
+        self.name = definition.name
+        self.description = definition.description
+        self.input_schema = definition.input_schema
+        self.output_schema = definition.output_schema
+        self.risk_level = definition.risk_level
+        self.enabled = definition.enabled
+        self._handler = definition.handler
+
+    def execute(self, context: ToolContext, tool_input: BaseModel) -> BaseModel:
+        return self._handler(context, tool_input)
+
+
+def _registry_with_mcp_fixture(
+    original: ToolRegistry,
+    fixture: _CrossServiceMCPClient,
+) -> ToolRegistry:
+    replacements = {
+        tool.name: tool for tool in create_mcp_proxy_tools(fixture)
+    }
+    return ToolRegistry(
+        replacements.get(definition.name, _DefinitionTool(definition))
+        for definition in original.list_tools()
+    )
+
+
 class _FailingStructuredLLM:
     def generate_structured(
         self,
@@ -403,6 +511,22 @@ def run_representative_agent(
                 client.app.state.tool_registry = create_default_registry(
                     Text2SQLService(_UnsafeSQLLLM()),
                     client.app.state.mcp_client,
+                )
+            elif case.fault in {
+                "cross_service_fixture",
+                "cross_service_conflict",
+                "cross_service_tool_failure",
+            }:
+                fixture = _CrossServiceMCPClient(
+                    conflict=case.fault == "cross_service_conflict",
+                    fail_tool=(
+                        "search_tickets"
+                        if case.fault == "cross_service_tool_failure" else None
+                    ),
+                )
+                client.app.state.tool_registry = _registry_with_mcp_fixture(
+                    original_registry,
+                    fixture,
                 )
 
             started = perf_counter()
@@ -490,6 +614,29 @@ def run_representative_agent(
             citation_ok = analysis is None or (
                 bool(cited_steps) and cited_steps.issubset(evidence_steps)
             )
+            gold_matches = [
+                [item for item in evidence if _matches_gold_evidence(item, gold)]
+                for gold in case.required_evidence
+            ]
+            gold_evidence_ok = all(gold_matches)
+            if case.required_citation_services:
+                citation_ok = analysis is not None and all(
+                    any(
+                        item.get("step") in cited_steps
+                        for gold, matches in zip(case.required_evidence, gold_matches)
+                        if gold.service_name == service
+                        for item in matches
+                    )
+                    for service in case.required_citation_services
+                )
+            analysis_text = (
+                json.dumps(analysis.model_dump(mode="json"), ensure_ascii=False)
+                if analysis is not None else ""
+            )
+            analysis_expectation_ok = (
+                not case.required_analysis_terms_any
+                or any(term in analysis_text for term in case.required_analysis_terms_any)
+            )
             safety_ok = not case.safety_case or not executed_tools
             checks = {
                 "http_status": response.status_code == case.expected_http_status,
@@ -500,7 +647,9 @@ def run_representative_agent(
                 "zero_results": zero_results_ok,
                 "tool_execution_coverage": tool_execution_coverage_ok,
                 "substantive_evidence": substantive_evidence_ok,
+                "gold_evidence_coverage": gold_evidence_ok,
                 "citation_correctness": citation_ok,
+                "analysis_expectation": analysis_expectation_ok,
                 "analysis_source": (
                     case.expected_analysis_source is None
                     or analysis_source == case.expected_analysis_source
@@ -519,7 +668,7 @@ def run_representative_agent(
             total_tokens += case_tokens
             outcomes.append(passed)
             tool_checks.append(expected_tools_ok)
-            evidence_checks.append(substantive_evidence_ok)
+            evidence_checks.append(substantive_evidence_ok and gold_evidence_ok)
             citation_checks.append(citation_ok)
             if case.safety_case:
                 safety_checks.append(safety_ok)
@@ -542,6 +691,8 @@ def run_representative_agent(
                     "executed_tools": executed_tools,
                     "tool_observation_count": len(evidence),
                     "substantive_evidence_count": substantive_evidence_count,
+                    "gold_evidence_matched": sum(bool(items) for items in gold_matches),
+                    "gold_evidence_required": len(case.required_evidence),
                     "llm_calls": len(case_llm_events),
                     "tokens": case_tokens,
                 },
@@ -578,6 +729,17 @@ def _is_substantive_evidence(item: dict[str, Any]) -> bool:
     if "ticket" in output:
         return output["ticket"] is not None
     return bool(output)
+
+
+def _matches_gold_evidence(
+    item: dict[str, Any], gold: EvidenceExpectation,
+) -> bool:
+    if item.get("tool") != gold.tool:
+        return False
+    serialized = json.dumps(item, ensure_ascii=False).lower()
+    if gold.service_name and gold.service_name.lower() not in serialized:
+        return False
+    return all(marker.lower() in serialized for marker in gold.contains)
 
 
 def _suite_result(

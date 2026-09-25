@@ -1,0 +1,30 @@
+{
+    "phase":  21,
+    "purpose":  "single post-Phase-22 regression run of the original representative_agent suite",
+    "status":  "failed",
+    "started_at_utc":  "2026-09-25T05:54:26.100419+00:00",
+    "completed_at_utc":  "2026-09-25T05:54:27.861505+00:00",
+    "command":  "python -m eval.runner --suite representative_agent",
+    "git":  {
+                "head":  "00227767277306b9831f233423262442425dd732",
+                "working_tree_dirty":  true
+            },
+    "runtime":  {
+                    "python":  "3.13.5",
+                    "llm_host":  "api-inference.modelscope.cn",
+                    "llm_model":  "Qwen/Qwen3.5-35B-A3B",
+                    "llm_timeout_seconds":  90.0,
+                    "llm_max_retries":  2,
+                    "llm_thinking_enabled":  false,
+                    "llm_api_key_configured":  true,
+                    "python_environment":  "base interpreter (D:\\Anaconda), not workpilot"
+                },
+    "exit_code":  1,
+    "results":  null,
+    "infrastructure_error":  null,
+    "execution_error":  {
+                            "type":  "ModuleNotFoundError",
+                            "message":  "No module named \u0027langgraph\u0027",
+                            "stage":  "runner import before any representative case executed"
+                        }
+}

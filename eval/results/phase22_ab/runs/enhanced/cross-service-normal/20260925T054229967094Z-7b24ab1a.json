@@ -1,0 +1,593 @@
+{
+  "metadata": {
+    "variant": "enhanced",
+    "git_sha": "00227767277306b9831f233423262442425dd732",
+    "source_fingerprint": "7b24ab1aae0af33b930fead7ca7d075250f9b44920849dfe8b77ed2dcc0bc633",
+    "working_tree_dirty": true,
+    "timestamp": "2026-09-25T05:42:29.967094+00:00",
+    "case_id": "cross-service-normal",
+    "model_config": {
+      "llm_model": "Qwen/Qwen3.5-35B-A3B",
+      "llm_host": "api-inference.modelscope.cn",
+      "llm_timeout_seconds": 90.0,
+      "llm_max_retries": 2,
+      "llm_thinking_enabled": false,
+      "llm_api_key_configured": true,
+      "database_host": "gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
+      "database_port": 4000,
+      "database_name": "workpilot_agent"
+    },
+    "model_config_sha256": "e6c2a41ae187e9613b2257a938df8d1b435c6b47d965f0e645122a8dcb13fb0e",
+    "max_steps": 5,
+    "tool_budget": 5,
+    "fixture_version": "cross-service-fixture-v1",
+    "gold_sha256": "de7413fc32da84c31c944a159b6689ad65950dcfe10bc184e4b660196b13fcda",
+    "permissions": [
+      {
+        "tool": "get_ticket_detail",
+        "risk": "LOW",
+        "enabled": true
+      },
+      {
+        "tool": "query_database",
+        "risk": "LOW",
+        "enabled": true
+      },
+      {
+        "tool": "query_error_logs",
+        "risk": "LOW",
+        "enabled": true
+      },
+      {
+        "tool": "search_knowledge",
+        "risk": "LOW",
+        "enabled": true
+      },
+      {
+        "tool": "search_tickets",
+        "risk": "LOW",
+        "enabled": true
+      },
+      {
+        "tool": "simulate_high_risk_operation",
+        "risk": "HIGH",
+        "enabled": true
+      }
+    ],
+    "permissions_sha256": "f02f78e73454c4cdfc50a86776ec67358b60416456d596ada286fbeafb3ce064"
+  },
+  "business_metrics": {
+    "gold_coverage": true,
+    "citation_correctness": true,
+    "cross_service_completion": true,
+    "local_failure_degradation": true,
+    "uncertainty_handling": true,
+    "safety_boundary": true,
+    "business_success": true,
+    "gold_coverage_count": 3,
+    "gold_coverage_total": 3,
+    "gold_coverage_rate": 1.0,
+    "citation_services": {
+      "order-service": true,
+      "inventory-service": true,
+      "payment-service": true
+    },
+    "completed_services": [
+      "inventory-service",
+      "order-service",
+      "payment-service"
+    ],
+    "service_completion_rate": 1.0,
+    "partial_failures": []
+  },
+  "implementation_metrics": {
+    "intent": "incident_analysis",
+    "expected_intent": "incident_analysis",
+    "intent_correct": true,
+    "plan_tool_sequence": [
+      "query_error_logs",
+      "query_error_logs",
+      "query_error_logs",
+      "search_tickets",
+      "search_knowledge"
+    ],
+    "executed_tool_sequence": [
+      "query_error_logs",
+      "query_error_logs",
+      "query_error_logs",
+      "search_tickets",
+      "search_knowledge"
+    ],
+    "expected_plan_tool_sequence": [
+      "query_error_logs",
+      "search_tickets",
+      "search_knowledge"
+    ],
+    "expected_executed_tool_sequence": [
+      "query_error_logs",
+      "search_tickets",
+      "search_knowledge"
+    ],
+    "run_status": "completed",
+    "run_error": null,
+    "http_status": 200
+  },
+  "performance": {
+    "latency_ms": 15889,
+    "llm_calls": 2,
+    "tokens": 3046,
+    "tool_calls": 5
+  },
+  "raw": {
+    "response": {
+      "success": true,
+      "data": {
+        "run_id": 630028,
+        "request_id": "8172a44f259b443d89196baa5bb16bd8",
+        "intent": "incident_analysis",
+        "routing_source": "llm",
+        "routing_confidence": 0.95,
+        "plan": [
+          {
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 10080,
+              "limit": 20
+            }
+          },
+          {
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 10080,
+              "limit": 20
+            }
+          },
+          {
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "payment-service",
+              "minutes": 10080,
+              "limit": 20
+            }
+          },
+          {
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "order-service",
+              "limit": 10
+            }
+          },
+          {
+            "tool": "search_knowledge",
+            "inputs": {
+              "query": "调查固定窗口 2026-09-22T02:00:00Z 至 03:00:00Z 的跨服务故障：service: order-service 出现 ORDER_TIMEOUT，inventory-service 返回 504，payment-service 出现 DB_POOL_EXHAUSTED；请关联证据并给出结论。",
+              "limit": 5
+            }
+          }
+        ],
+        "planner_source": "rule",
+        "steps_executed": 5,
+        "selected_tool": "search_knowledge",
+        "final_answer": "风险提示：故障分析会生成运维操作建议，执行前需要人工核对。\n\n故障分析：在2026-09-22T02:30:00Z的固定窗口内，order-service报告ORDER_TIMEOUT，inventory-service返回504错误，payment-service报告DB_POOL_EXHAUSTED。所有错误日志时间戳一致，且存在关联的Phase 22事件工单和跨服务故障运行手册。证据显示多服务同时发生故障，但缺乏链路追踪数据以确认因果顺序。\n\n已确认事实：\n- order-service在2026-09-22T02:30:00Z记录到ORDER_TIMEOUT错误，消息为等待库存预留时超时。\n- inventory-service在2026-09-22T02:30:00Z记录到HTTP 504错误，源自仓库网关。\n- payment-service在2026-09-22T02:30:00Z记录到DB_POOL_EXHAUSTED错误，数据库连接池检出超时。\n- 存在一个标题为'Phase 22 incident for order-service'的高优先级开放工单，创建时间为2026-09-22T02:32:00Z。\n- 知识库中存在与本次故障相关的Phase 22跨服务故障运行手册，建议通过追踪和时间进行关联。\n\n可能原因（推断）：\n- warehouse网关的不可用（导致inventory-service 504）可能是引发order-service超时的直接原因。\n- payment-service的数据库连接池耗尽可能是由于并发请求激增导致的独立故障，也可能是由上游服务异常引发的连锁反应。\n- 三个服务可能同时受到同一底层基础设施问题（如网络分区或数据库主节点故障）的影响。\n- 缺少分布式追踪ID无法确定是订单服务先超时还是支付池先耗尽。\n\n建议操作：\n- 检索trace_id 'phase22-order-service'、'phase22-inventory-service'和'phase22-payment-service'的完整分布式追踪数据以确定调用链顺序。\n- 检查warehouse网关在2026-09-22T02:30:00Z的健康状态和延迟指标。\n- 分析payment-service在故障期间的数据库连接池使用率趋势及活跃查询列表。\n- 验证是否存在共享的数据库实例或网络组件在故障时间点出现异常。\n- 查阅Phase 22运行手册中关于此类跨服务故障的标准排查流程。\n- 检查order-service的库存预留逻辑是否因超时未正确释放资源。\n\n引用证据步骤：1, 2, 3, 4, 5\n\n关联证据（记录 ID 可在原始结果中核对）：\n- 日志步骤 1：服务 order-service 的日志 ID 81001；仅展示前 10 条。\n- 日志步骤 2：服务 inventory-service 的日志 ID 82001；仅展示前 10 条。\n- 日志步骤 3：服务 payment-service 的日志 ID 83001；仅展示前 10 条。",
+        "tool_results": [
+          {
+            "step": 1,
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "source": "tool_registry",
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 2,
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "source": "tool_registry",
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "service": "payment-service",
+            "tool": "query_error_logs",
+            "source": "tool_registry",
+            "output": {
+              "items": [
+                {
+                  "id": 83001,
+                  "service_name": "payment-service",
+                  "level": "ERROR",
+                  "error_type": "DB_POOL_EXHAUSTED",
+                  "message": "Payment database connection pool checkout timed out.",
+                  "stack_trace": null,
+                  "request_id": "phase22-payment-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "service": "order-service",
+            "tool": "search_tickets",
+            "source": "tool_registry",
+            "output": {
+              "items": [
+                {
+                  "id": 81101,
+                  "title": "Phase 22 incident for order-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "order-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 5,
+            "service": "order-service",
+            "tool": "search_knowledge",
+            "source": "tool_registry",
+            "output": {
+              "items": [
+                {
+                  "document_id": 84001,
+                  "title": "Phase 22 cross-service incident runbook",
+                  "excerpt": "Correlate order timeout, inventory 504, and payment pool exhaustion by trace and time.",
+                  "category": "runbook",
+                  "source": "eval://phase22/cross-service",
+                  "score": 10.0
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "evidence": [
+          {
+            "step": 1,
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "source": "tool_registry",
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 2,
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "source": "tool_registry",
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "service": "payment-service",
+            "tool": "query_error_logs",
+            "source": "tool_registry",
+            "output": {
+              "items": [
+                {
+                  "id": 83001,
+                  "service_name": "payment-service",
+                  "level": "ERROR",
+                  "error_type": "DB_POOL_EXHAUSTED",
+                  "message": "Payment database connection pool checkout timed out.",
+                  "stack_trace": null,
+                  "request_id": "phase22-payment-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "service": "order-service",
+            "tool": "search_tickets",
+            "source": "tool_registry",
+            "output": {
+              "items": [
+                {
+                  "id": 81101,
+                  "title": "Phase 22 incident for order-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "order-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 5,
+            "service": "order-service",
+            "tool": "search_knowledge",
+            "source": "tool_registry",
+            "output": {
+              "items": [
+                {
+                  "document_id": 84001,
+                  "title": "Phase 22 cross-service incident runbook",
+                  "excerpt": "Correlate order timeout, inventory 504, and payment pool exhaustion by trace and time.",
+                  "category": "runbook",
+                  "source": "eval://phase22/cross-service",
+                  "score": 10.0
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "service_investigations": [
+          {
+            "service": "order-service",
+            "status": "completed",
+            "evidence": [
+              {
+                "step": 1,
+                "service": "order-service",
+                "tool": "query_error_logs",
+                "source": "tool_registry",
+                "output": {
+                  "items": [
+                    {
+                      "id": 81001,
+                      "service_name": "order-service",
+                      "level": "ERROR",
+                      "error_type": "ORDER_TIMEOUT",
+                      "message": "Order timed out while waiting for inventory reservation.",
+                      "stack_trace": null,
+                      "request_id": "phase22-order-service",
+                      "created_at": "2026-09-22T02:30:00Z"
+                    }
+                  ],
+                  "total": 1
+                }
+              },
+              {
+                "step": 4,
+                "service": "order-service",
+                "tool": "search_tickets",
+                "source": "tool_registry",
+                "output": {
+                  "items": [
+                    {
+                      "id": 81101,
+                      "title": "Phase 22 incident for order-service",
+                      "content": "Ticket matches the fixed incident window.",
+                      "category": "incident",
+                      "priority": "high",
+                      "status": "open",
+                      "service_name": "order-service",
+                      "resolution": null,
+                      "created_at": "2026-09-22T02:32:00Z",
+                      "updated_at": "2026-09-22T02:35:00Z"
+                    }
+                  ],
+                  "total": 1
+                }
+              },
+              {
+                "step": 5,
+                "service": "order-service",
+                "tool": "search_knowledge",
+                "source": "tool_registry",
+                "output": {
+                  "items": [
+                    {
+                      "document_id": 84001,
+                      "title": "Phase 22 cross-service incident runbook",
+                      "excerpt": "Correlate order timeout, inventory 504, and payment pool exhaustion by trace and time.",
+                      "category": "runbook",
+                      "source": "eval://phase22/cross-service",
+                      "score": 10.0
+                    }
+                  ],
+                  "total": 1
+                }
+              }
+            ],
+            "error": null,
+            "citations": [
+              1,
+              4,
+              5
+            ]
+          },
+          {
+            "service": "inventory-service",
+            "status": "completed",
+            "evidence": [
+              {
+                "step": 2,
+                "service": "inventory-service",
+                "tool": "query_error_logs",
+                "source": "tool_registry",
+                "output": {
+                  "items": [
+                    {
+                      "id": 82001,
+                      "service_name": "inventory-service",
+                      "level": "ERROR",
+                      "error_type": "504",
+                      "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                      "stack_trace": null,
+                      "request_id": "phase22-inventory-service",
+                      "created_at": "2026-09-22T02:30:00Z"
+                    }
+                  ],
+                  "total": 1
+                }
+              }
+            ],
+            "error": null,
+            "citations": [
+              2
+            ]
+          },
+          {
+            "service": "payment-service",
+            "status": "completed",
+            "evidence": [
+              {
+                "step": 3,
+                "service": "payment-service",
+                "tool": "query_error_logs",
+                "source": "tool_registry",
+                "output": {
+                  "items": [
+                    {
+                      "id": 83001,
+                      "service_name": "payment-service",
+                      "level": "ERROR",
+                      "error_type": "DB_POOL_EXHAUSTED",
+                      "message": "Payment database connection pool checkout timed out.",
+                      "stack_trace": null,
+                      "request_id": "phase22-payment-service",
+                      "created_at": "2026-09-22T02:30:00Z"
+                    }
+                  ],
+                  "total": 1
+                }
+              }
+            ],
+            "error": null,
+            "citations": [
+              3
+            ]
+          }
+        ],
+        "analysis": {
+          "summary": "在2026-09-22T02:30:00Z的固定窗口内，order-service报告ORDER_TIMEOUT，inventory-service返回504错误，payment-service报告DB_POOL_EXHAUSTED。所有错误日志时间戳一致，且存在关联的Phase 22事件工单和跨服务故障运行手册。证据显示多服务同时发生故障，但缺乏链路追踪数据以确认因果顺序。",
+          "confirmed_facts": [
+            "order-service在2026-09-22T02:30:00Z记录到ORDER_TIMEOUT错误，消息为等待库存预留时超时。",
+            "inventory-service在2026-09-22T02:30:00Z记录到HTTP 504错误，源自仓库网关。",
+            "payment-service在2026-09-22T02:30:00Z记录到DB_POOL_EXHAUSTED错误，数据库连接池检出超时。",
+            "存在一个标题为'Phase 22 incident for order-service'的高优先级开放工单，创建时间为2026-09-22T02:32:00Z。",
+            "知识库中存在与本次故障相关的Phase 22跨服务故障运行手册，建议通过追踪和时间进行关联。"
+          ],
+          "hypotheses": [
+            "warehouse网关的不可用（导致inventory-service 504）可能是引发order-service超时的直接原因。",
+            "payment-service的数据库连接池耗尽可能是由于并发请求激增导致的独立故障，也可能是由上游服务异常引发的连锁反应。",
+            "三个服务可能同时受到同一底层基础设施问题（如网络分区或数据库主节点故障）的影响。",
+            "缺少分布式追踪ID无法确定是订单服务先超时还是支付池先耗尽。"
+          ],
+          "recommended_actions": [
+            "检索trace_id 'phase22-order-service'、'phase22-inventory-service'和'phase22-payment-service'的完整分布式追踪数据以确定调用链顺序。",
+            "检查warehouse网关在2026-09-22T02:30:00Z的健康状态和延迟指标。",
+            "分析payment-service在故障期间的数据库连接池使用率趋势及活跃查询列表。",
+            "验证是否存在共享的数据库实例或网络组件在故障时间点出现异常。",
+            "查阅Phase 22运行手册中关于此类跨服务故障的标准排查流程。",
+            "检查order-service的库存预留逻辑是否因超时未正确释放资源。"
+          ],
+          "evidence_steps": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "analysis_source": "llm",
+        "risk_level": "MEDIUM",
+        "requires_approval": false,
+        "risk_reasons": [
+          "故障分析会生成运维操作建议，执行前需要人工核对。"
+        ],
+        "status": "completed",
+        "approval_status": null,
+        "error": null
+      },
+      "error": null
+    },
+    "tool_calls": [
+      {
+        "tool": "query_error_logs",
+        "status": "completed"
+      },
+      {
+        "tool": "query_error_logs",
+        "status": "completed"
+      },
+      {
+        "tool": "query_error_logs",
+        "status": "completed"
+      },
+      {
+        "tool": "search_tickets",
+        "status": "completed"
+      },
+      {
+        "tool": "search_knowledge",
+        "status": "completed"
+      }
+    ]
+  }
+}

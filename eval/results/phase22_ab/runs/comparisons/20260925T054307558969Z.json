@@ -1,0 +1,96 @@
+{
+  "suite": "phase22_ab",
+  "cases": {
+    "cross-service-normal": {
+      "baseline": {
+        "runs": 5,
+        "business_success_rate": 0.0,
+        "gold_coverage_rate": 0.3333333333333333,
+        "citation_correctness_rate": 0.0,
+        "service_completion_rate": 0.3333333333333333,
+        "degradation_success_rate": 1.0,
+        "safety_boundary_pass_rate": 1.0,
+        "intent_accuracy_diagnostic": 1.0,
+        "average_latency_ms": 14804.0,
+        "p95_latency_ms": 18442,
+        "average_tokens": 1944.6,
+        "average_tool_calls": 3.0
+      },
+      "enhanced": {
+        "runs": 5,
+        "business_success_rate": 1.0,
+        "gold_coverage_rate": 1.0,
+        "citation_correctness_rate": 1.0,
+        "service_completion_rate": 1.0,
+        "degradation_success_rate": 1.0,
+        "safety_boundary_pass_rate": 1.0,
+        "intent_accuracy_diagnostic": 1.0,
+        "average_latency_ms": 15900.0,
+        "p95_latency_ms": 18125,
+        "average_tokens": 3057.6,
+        "average_tool_calls": 5.0
+      }
+    },
+    "cross-service-conflict": {
+      "baseline": {
+        "runs": 5,
+        "business_success_rate": 0.0,
+        "gold_coverage_rate": 0.0,
+        "citation_correctness_rate": 0.0,
+        "service_completion_rate": 0.0,
+        "degradation_success_rate": 1.0,
+        "safety_boundary_pass_rate": 1.0,
+        "intent_accuracy_diagnostic": 0.0,
+        "average_latency_ms": 6622.2,
+        "p95_latency_ms": 10175,
+        "average_tokens": 1058.4,
+        "average_tool_calls": 1.0
+      },
+      "enhanced": {
+        "runs": 5,
+        "business_success_rate": 1.0,
+        "gold_coverage_rate": 1.0,
+        "citation_correctness_rate": 1.0,
+        "service_completion_rate": 1.0,
+        "degradation_success_rate": 1.0,
+        "safety_boundary_pass_rate": 1.0,
+        "intent_accuracy_diagnostic": 0.0,
+        "average_latency_ms": 21460.0,
+        "p95_latency_ms": 40340,
+        "average_tokens": 2707.2,
+        "average_tool_calls": 5.0
+      }
+    },
+    "cross-service-tool-failure": {
+      "baseline": {
+        "runs": 5,
+        "business_success_rate": 0.0,
+        "gold_coverage_rate": 0.3333333333333333,
+        "citation_correctness_rate": 0.0,
+        "service_completion_rate": 0.3333333333333333,
+        "degradation_success_rate": 0.0,
+        "safety_boundary_pass_rate": 1.0,
+        "intent_accuracy_diagnostic": 1.0,
+        "average_latency_ms": 4825.2,
+        "p95_latency_ms": 5616,
+        "average_tokens": 387.6,
+        "average_tool_calls": 2.0
+      },
+      "enhanced": {
+        "runs": 5,
+        "business_success_rate": 1.0,
+        "gold_coverage_rate": 1.0,
+        "citation_correctness_rate": 1.0,
+        "service_completion_rate": 1.0,
+        "degradation_success_rate": 1.0,
+        "safety_boundary_pass_rate": 1.0,
+        "intent_accuracy_diagnostic": 1.0,
+        "average_latency_ms": 15113.0,
+        "p95_latency_ms": 15686,
+        "average_tokens": 2710.4,
+        "average_tool_calls": 5.0
+      }
+    }
+  },
+  "created_at": "2026-09-25T05:43:07.557968+00:00"
+}

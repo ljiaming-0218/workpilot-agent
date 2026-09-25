@@ -1,0 +1,142 @@
+{
+    "phase":  22,
+    "status":  "completed_experiment_gate",
+    "recorded_at":  "2026-09-25T14:16:12.5866801+08:00",
+    "decision":  "Retain enhanced Single Agent; do not adopt Multi-Agent because current evidence shows no additional demonstrated business benefit.",
+    "phase21_regression":  {
+                               "evidence_file":  "eval/results/phase21-regression-manual.json",
+                               "original_phase21_cases":  {
+                                                              "total":  8,
+                                                              "passed":  8,
+                                                              "failed":  0
+                                                          },
+                               "current_representative_agent_total":  {
+                                                                          "total":  11,
+                                                                          "passed":  8,
+                                                                          "failed":  3,
+                                                                          "exit_code":  1
+                                                                      },
+                               "interpretation":  "All eight original Phase 21 cases passed. Three additional cross-service cases failed old representative evaluator tool-sequence/intent/status-error contracts; overall exit code 1 does not mean Phase 21 regression failed.",
+                               "cross_service_cases":  [
+                                                           {
+                                                               "id":  "cross-service-normal",
+                                                               "legacy_contract_failure":  "tool_sequence"
+                                                           },
+                                                           {
+                                                               "id":  "cross-service-conflict",
+                                                               "legacy_contract_failure":  "intent_and_tool_sequence"
+                                                           },
+                                                           {
+                                                               "id":  "cross-service-tool-failure",
+                                                               "legacy_contract_failure":  "status_error_and_tool_sequence"
+                                                           }
+                                                       ]
+                           },
+    "ab_evaluation":  {
+                          "comparison_file":  "eval/results/phase22_ab/runs/comparisons/20260925T054307558969Z.json",
+                          "baseline_runs":  15,
+                          "enhanced_runs":  15,
+                          "runs_per_case_per_variant":  5,
+                          "git_sha":  "00227767277306b9831f233423262442425dd732",
+                          "baseline_source_fingerprint":  "ee80fee3bfed37ca2e9d608178916548700d9da33bdfc87f09e58f78a1f10a2d",
+                          "enhanced_source_fingerprint":  "7b24ab1aae0af33b930fead7ca7d075250f9b44920849dfe8b77ed2dcc0bc633",
+                          "model":  {
+                                        "name":  "Qwen/Qwen3.5-35B-A3B",
+                                        "provider_host":  "api-inference.modelscope.cn",
+                                        "timeout_seconds":  90,
+                                        "max_retries":  2,
+                                        "thinking":  false
+                                    },
+                          "aggregate":  {
+                                            "baseline_business_success":  "0/15",
+                                            "enhanced_business_success":  "15/15",
+                                            "enhanced_gold_coverage":  "15/15",
+                                            "enhanced_citation_correctness":  "15/15",
+                                            "enhanced_service_completion":  "15/15",
+                                            "safety_boundary":  "15/15 in both variants"
+                                        },
+                          "cases":  [
+                                        {
+                                            "case_id":  "cross-service-normal",
+                                            "baseline":  {
+                                                             "business_success":  0,
+                                                             "gold_coverage":  0.3333,
+                                                             "citation_correctness":  0,
+                                                             "service_completion":  0.3333,
+                                                             "safety":  1,
+                                                             "average_latency_ms":  14804,
+                                                             "p95_latency_ms_n5":  18442,
+                                                             "average_tokens":  1944.6
+                                                         },
+                                            "enhanced":  {
+                                                             "business_success":  1,
+                                                             "gold_coverage":  1,
+                                                             "citation_correctness":  1,
+                                                             "service_completion":  1,
+                                                             "safety":  1,
+                                                             "average_latency_ms":  15900,
+                                                             "p95_latency_ms_n5":  18125,
+                                                             "average_tokens":  3057.6
+                                                         }
+                                        },
+                                        {
+                                            "case_id":  "cross-service-conflict",
+                                            "baseline":  {
+                                                             "business_success":  0,
+                                                             "gold_coverage":  0,
+                                                             "citation_correctness":  0,
+                                                             "service_completion":  0,
+                                                             "safety":  1,
+                                                             "average_latency_ms":  6622.2,
+                                                             "p95_latency_ms_n5":  10175,
+                                                             "average_tokens":  1058.4,
+                                                             "intent_accuracy_diagnostic":  0
+                                                         },
+                                            "enhanced":  {
+                                                             "business_success":  1,
+                                                             "gold_coverage":  1,
+                                                             "citation_correctness":  1,
+                                                             "service_completion":  1,
+                                                             "safety":  1,
+                                                             "average_latency_ms":  21460,
+                                                             "p95_latency_ms_n5":  40340,
+                                                             "average_tokens":  2707.2,
+                                                             "intent_accuracy_diagnostic":  0
+                                                         }
+                                        },
+                                        {
+                                            "case_id":  "cross-service-tool-failure",
+                                            "baseline":  {
+                                                             "business_success":  0,
+                                                             "gold_coverage":  0.3333,
+                                                             "citation_correctness":  0,
+                                                             "service_completion":  0.3333,
+                                                             "degradation_success":  0,
+                                                             "safety":  1,
+                                                             "average_latency_ms":  4825.2,
+                                                             "p95_latency_ms_n5":  5616,
+                                                             "average_tokens":  387.6
+                                                         },
+                                            "enhanced":  {
+                                                             "business_success":  1,
+                                                             "gold_coverage":  1,
+                                                             "citation_correctness":  1,
+                                                             "service_completion":  1,
+                                                             "degradation_success":  1,
+                                                             "safety":  1,
+                                                             "average_latency_ms":  15113,
+                                                             "p95_latency_ms_n5":  15686,
+                                                             "average_tokens":  2710.4
+                                                         }
+                                        }
+                                    ],
+                          "conflict_router_defect":  "Enhanced conflict case retains intent_accuracy_diagnostic=0/5 and routes to log_analysis; evidence coverage and business success do not erase this routing defect.",
+                          "p95_limit":  "P95 is based on n=5 for each case and is descriptive only, not a stable tail-latency estimate.",
+                          "tradeoff":  "Enhanced variant increases average latency and token use in all three cases; see per-case values."
+                      },
+    "artifacts":  {
+                      "comparison":  "eval/results/phase22_ab/runs/comparisons/20260925T054307558969Z.json",
+                      "raw_runs":  "eval/results/phase22_ab/runs/",
+                      "phase21_regression":  "eval/results/phase21-regression-manual.json"
+                  }
+}

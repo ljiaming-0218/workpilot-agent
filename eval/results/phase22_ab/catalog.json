@@ -1,0 +1,36 @@
+{
+    "phase":  22,
+    "status":  "completed_experiment_gate",
+    "baseline":  {
+                     "variant":  "baseline_single_agent",
+                     "git_sha":  "00227767277306b9831f233423262442425dd732",
+                     "commit":  "feat: complete durable agent workflow and evaluation",
+                     "sha_verified_at_head":  true
+                 },
+    "historical_results":  [
+                               {
+                                   "path":  "../phase22-normal.json",
+                                   "classification":  "historical",
+                                   "reason":  "No git SHA or model/config provenance; predates the current A/B artifact contract."
+                               },
+                               {
+                                   "path":  "../phase22-conflict.json",
+                                   "classification":  "historical",
+                                   "reason":  "No git SHA or model/config provenance; execution used log_analysis and query_database, so conflict fixture was not exercised."
+                               },
+                               {
+                                   "path":  "../phase22-tool-failure.json",
+                                   "classification":  "historical",
+                                   "reason":  "No git SHA or model/config provenance; predates the current A/B artifact contract."
+                               }
+                           ],
+    "enhanced_raw_results":  {
+                                 "present":  true,
+                                 "reason":  "15 auditable enhanced runs are saved under runs/enhanced/; each of the three cases has five runs."
+                             },
+    "new_run_layout":  "runs/\u003cvariant\u003e/\u003ccase_id\u003e/\u003ctimestamp\u003e-\u003csource_fingerprint\u003e.json",
+    "enhanced_run_count":  15,
+    "final_comparison":  "runs/comparisons/20260925T054307558969Z.json",
+    "phase21_regression":  "Eight original Phase 21 cases passed in the current enhanced worktree; three added cross-service cases fail only legacy representative evaluator contracts.",
+    "final_decision":  "Retain enhanced Single Agent; Multi-Agent not adopted because no incremental business benefit is evidenced."
+}

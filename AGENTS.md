@@ -4095,11 +4095,28 @@ Token 成本
 
 如果 Multi-Agent 没有带来可测量收益，则保留 Single Agent。
 
+### Phase 22 最终收口（2026-09-25）
+
+```text
+状态：实验门槛评估完成
+基线：baseline Single Agent 三个跨服务 Case 各运行 5 次，业务成功 0/15
+增强版：enhanced Single Agent 各运行 5 次，业务成功 15/15；Gold 覆盖、引用正确、服务完成均 15/15
+安全边界：两组均 15/15，无退化
+成本：增强版延迟与 Token 均增加；逐 Case 数值见 eval/results/phase22-final-closeout-2026-09-25.json
+已知问题：Conflict Router intent diagnostic 为 0/5，仍路由为 log_analysis；必须作为独立缺陷跟踪
+P95：每个 Case 仅 n=5，只作参考，不作为稳定尾延迟结论
+决策：保留增强 Single Agent；当前没有证据证明 Multi-Agent 有额外业务收益，因此不采用
+```
+
+Phase 21 原有八个 representative Case 在当前增强版工作树全部通过（8/8）。当前 `representative_agent` 已包含 11 例，完整命令报告 8/11 并返回 exit code 1；另外三例是 Phase 22 跨服务 Case，分别触发旧 evaluator 的 tool sequence、intent、status/error 契约失败，不能据此判定 Phase 21 回归失败。记录见 `eval/results/phase21-regression-manual.json` 及 Phase 22 收口产物。
+
+完整 A/B 指标、样本数、配置指纹和来源见 `eval/results/phase22-final-closeout-2026-09-25.json`；原始运行和对照保存在 `eval/results/phase22_ab/runs/`。
+
 ---
 
 # 132. 当前阶段
 
-截至第二阶段规划建立时：
+最终状态：
 
 ```text
 Phase 0–16：已有本地实现
@@ -4107,8 +4124,7 @@ Phase 17：已完成公开版本一致性整理并提交
 Phase 18：已完成受控真实告警输入
 Phase 19：已完成 Streaming Run Progress 与真实链路验证
 Phase 20：已完成 Durable Approval Recovery 与重启恢复验证
-Current Phase：Phase 21 — Representative Agent Evaluation（已通过 8/8 代表性评估并保存验收证据）
-Next Phase：Phase 22 — Multi-Agent Experiment Gate（尚未开始）
+Current Phase：Phase 22 — 实验门槛评估完成；保留增强 Single Agent；Multi-Agent 未采用（无额外业务收益依据）
 ```
 
-进入 Phase 22 前，必须先完成 Phase 21 代码讲解与理解检查。
+Phase 21 原有八例在当前增强版工作树 8/8 通过；代表性评估总计 11 例时，另外三例跨服务失败来自旧 evaluator 契约，不代表 Phase 21 回归失败。Phase 22 A/B 结果及限制见最终收口产物。

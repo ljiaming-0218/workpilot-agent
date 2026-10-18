@@ -1,135 +1,274 @@
 # WorkPilot Agent
 
-面向研发故障排查的单 Agent 应用。用户描述工单或线上告警后，系统通过受限计划查询日志、历史工单和知识手册，聚合证据并生成带引用的排查建议。项目包含 FastAPI API、LangGraph 工作流、MCP 查询服务、SQL Guard 和浏览器 Trace Console。
+面向研发故障排查的多 Agent 应用。用户描述一个或多个服务的故障后，Supervisor 按服务分派独立调查任务，收集日志、工单和知识库证据，再由核验 Agent 检查关键结论，输出带引用的分析与排查建议。
 
-系统用于演示研发故障排查场景下的证据驱动分析，不会自动执行生产运维操作。当前保留增强版 Single Agent；没有采用 Multi-Agent。
+项目包含 FastAPI API、MCP 查询服务、SQL Guard、人工审批和浏览器 Agent Trace Console。默认页面使用多 Agent 入口；运维操作目前仅支持模拟执行。
 
-## 能力概览
+## 功能概览
 
-- 故障分析：规则优先路由，必要时使用结构化 LLM 输出；Planner 生成最多 5 步的工具计划。
-- 跨服务调查：最多拆成 3 个服务调查项，保存各服务的状态、证据、错误和引用。工具经 Tool Registry 顺序执行；某项工具失败时记录局部失败并继续剩余计划。
-- 证据分析：按服务聚合日志、工单和知识检索结果；输出事实、假设、建议及证据步骤。证据不足或冲突时提示不确定性。
-- 工具治理：Tool Registry 对工具输入和输出执行 Pydantic 校验，记录 ToolCallLog；高风险计划在执行前进入人工审批流程。
-- Text2SQL：LLM 生成结构化 SQL 后，由 SQLGlot AST SQL Guard 再次检查；只有满足只读规则的 SQL 才能执行。
-- 知识检索：使用 BM25 搜索 MySQL 中的知识文档。
-- MCP：通过官方 Python MCP SDK 的本地 stdio Client/Server 边界提供工单、日志、知识查询能力。
-- 可观测性：AgentRun、工具调用和 Trace 持久化到数据库；Console 显示计划、证据、最终回答、审批状态和执行 Trace。
-- 受控入口：日志/知识批量导入和 Alert Webhook 使用 INGESTION_API_KEY 验证。
+- **按服务分工**：最多识别 3 个服务，每个调查 Agent 拥有独立任务状态、数据库 Session 和证据快照；默认最多同时运行 2 个调查分支。
+- **自主调查**：调查 Agent 根据已有证据选择后续只读工具，区分事实、假设、建议和证据缺口。
+- **局部失败隔离**：查询失败时记录错误，继续独立步骤和其他服务的调查。空结果表示未检索到相关记录。
+- **有限重试与补查**：可明确识别的临时只读连接错误最多额外重试一次；初始日志窗口为空时为 Supervisor 保留一次扩大时间窗查询的额度。
+- **独立结论核验**：Verifier 对照原始记录审查每条结论，标记 supported、unverified 或 unsupported。核验失败时仍展示原始记录与后续检查。
+- **工具与审批**：Tool Registry 校验工具输入输出、权限和风险，并记录审计。重启等操作请求进入已有的模拟操作审批流程。
+- **可观测性**：Console 展示任务分派、各服务状态、工具与模型调用、证据来源、核验意见及最终回答；运行历史和 Trace 持久化到数据库。
+- **查询能力**：BM25 知识检索、经 SQLGlot AST 校验的只读 Text2SQL，以及带 API Key 的日志/知识导入和告警入口。
 
-## 架构与数据流
+## 架构与工作流
 
-    Browser Console 或 Alert Webhook
-      → FastAPI Router / Pydantic Request Schema
-      → Agent Service：保存 AgentRun，建立请求级数据库 Session
-      → LangGraph：Intent Router → Planner → Risk Checker → Tool Executor
-      → Tool Registry：校验工具、执行查询、提交工具审计
-      → MCP Client（stdio）→ MCP Server → 查询 Service / SQLAlchemy → MySQL
-      → Incident Analyzer：按服务聚合 Evidence、核对引用
-      → Answer Generator
-      → 持久化 AgentRun / ToolCallLog / TraceEvent；Console 展示结果
+```mermaid
+flowchart TD
+    UI[Browser Console / API] --> API[FastAPI]
+    API --> Router[Intent Router]
+    Router --> Supervisor[Supervisor]
+    Supervisor --> A[服务调查 Agent A]
+    Supervisor --> B[服务调查 Agent B]
+    A --> Tools[Tool Registry]
+    B --> Tools
+    Tools --> MCP[MCP Client / Server · stdio]
+    MCP --> DB[(MySQL 兼容数据库)]
+    A --> Merge[合并证据与任务结果]
+    B --> Merge
+    Merge --> Followup{有明确缺口且预算允许?}
+    Followup -->|最多一次补查| Supervisor
+    Followup -->|结束调查| Verifier[Evidence Verifier]
+    Verifier --> Answer[事实 / 假设 / 建议 / 证据引用]
+    Answer --> History[运行历史与 Trace]
+    Router -->|操作及其他专门任务| Specialist[LangGraph 工作流]
+    Specialist -->|只读任务| Tools
+    Specialist -->|高风险模拟操作| Approval[人工审批]
+    Approval --> Tools
+```
 
-异步 Console 请求通过 POST /agent/runs/async 创建运行，前端通过 SSE 接收进度。当前 BackgroundTasks、SSE Broker 和 LangGraph InMemorySaver 都是进程内组件；项目没有 Redis、Celery 或持久化队列。数据库中的运行审计和审批快照不等同于可跨重启恢复的 LangGraph 完整 checkpoint。
+多 Agent 调查使用有界 Supervisor 调度；既有专门任务、Single Agent 基线和审批流程继续使用 LangGraph。日志、工单、知识查询通过官方 MCP Python SDK 的本地 stdio Client/Server 执行。
 
-## 安全边界
+分支之间传递结构化任务和结果，通过全局唯一 evidence_id 关联来源 Agent、工具、参数、尝试次数与原始记录。调查分支可并发执行，但当前共享 MCP Client 通过队列处理请求，不能将其描述为所有数据库工具均端到端并行。
 
-- SQL Guard 仅允许单条 MySQL SELECT；限制表为 tickets、error_logs、knowledge_docs，并校验列和函数白名单。结果最多 100 行，OFFSET 最大 10000；写操作和不支持的 AST 节点会被拒绝。
-- 高风险计划先整体评估，再要求人工审批。当前唯一 HIGH 工具是 simulate_high_risk_operation，只返回模拟结果；系统不执行真实重启、发布或其他生产写操作。
-- 工具调用必须经过 Tool Registry；输入输出契约、启用状态、工具风险等级和审计在统一边界内处理。
-- 导入与告警接口使用固定时间比较的 API Key 校验。普通业务读取和 Agent 接口没有用户身份认证、租户隔离或速率限制；不可直接用于承载敏感企业数据。
-- 示例数据是合成演示数据。不要导入真实凭据、个人信息或未经授权的生产日志。
+### 默认调查预算
+
+| 项目 | 当前上限 |
+| --- | --- |
+| 服务数 / 同时执行的调查分支 | 3 / 2 |
+| 全局工具尝试次数 | 9 |
+| 每服务工具尝试次数，含重试与补查 | 3 |
+| Supervisor 补查调度 | 每次运行最多 1 次 |
+| 可识别临时只读连接错误重试 | 原步骤最多额外 1 次 |
+| 诊断模型调用 | 3 × 服务数 + 1 |
+| 调查运行时间预算 | 180 秒，按调度检查；不保证中断已发出的远端请求 |
+
+诊断模型请求当前设置为 30 秒超时、SDK 自动重试 0 次。实验额外配置了输入长度、输出长度和保守 Token 预留上限，详见对应 manifest；这些实验限制不等同于所有在线接口的全局 Token 配额。旧 Single Agent 的最多 5 步计划仅用于既有工作流及基线。
 
 ## 技术栈
 
 | 层 | 实现 |
 | --- | --- |
-| API 与配置 | Python 3.11、FastAPI、Pydantic 2、pydantic-settings |
-| 持久化 | MySQL 8+ 兼容数据库、SQLAlchemy 2、PyMySQL |
-| Agent | LangGraph、结构化 LLM 调用、单 Agent 有界工作流 |
-| 工具与安全 | 自定义 Tool Registry、Pydantic 工具契约、SQLGlot SQL Guard |
-| 检索与协议 | BM25、官方 MCP Python SDK、本地 stdio |
-| 前端 | 原生 HTML、CSS、JavaScript，由 FastAPI 同源托管 |
-| 部署 | 提供 Render 配置模板 render.yaml；部署需要单独配置 MySQL 兼容数据库和密钥 |
+| API / 配置 | Python 3.11、FastAPI、Pydantic 2、pydantic-settings |
+| Agent / 审批 | Supervisor 有界调度、独立调查 Agent、Verifier、LangGraph 工作流 |
+| 数据库 | SQLAlchemy 2、PyMySQL、MySQL 8+ 兼容数据库 |
+| 工具 / SQL | 自定义 Tool Registry、Pydantic 工具契约、SQLGlot SQL Guard |
+| 检索 / 协议 | BM25、官方 MCP Python SDK、stdio |
+| 模型 | 统一 LLMService，支持 OpenAI-compatible 接口 |
+| 前端 | 原生 HTML、CSS、JavaScript；FastAPI 同源托管 |
+
+### 数据存储
+
+| 数据表 | 用途 |
+| --- | --- |
+| tickets / error_logs / knowledge_docs | 工单、日志和知识库 |
+| agent_runs | 运行状态、输入与最终回答 |
+| tool_call_logs / agent_trace_events | 工具审计、执行和模型调用轨迹 |
+| agent_approval_checkpoints | 等待审批的数据库快照及领取状态 |
 
 ## 本地启动
 
-需要 Python 3.11 Conda 环境 workpilot 和 MySQL 8+ 兼容数据库。先在 MySQL 中创建项目数据库：
+需要 Python 3.11、既有 Conda 环境 workpilot 和一个可连接的 MySQL 兼容数据库。
 
-    CREATE DATABASE workpilot_agent CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+### 1. 安装依赖与配置
 
 PowerShell：
 
-    Set-Location "D:\WorkPilot Agent\workpilot-agent"
-    conda activate workpilot
-    Copy-Item .env.example .env
-    python -m pip install -r requirements.txt
+```powershell
+Set-Location "D:\WorkPilot Agent\workpilot-agent"
+conda activate workpilot
+python -m pip install -r requirements.txt
 
-编辑根目录 .env，填写 MYSQL_HOST、MYSQL_PORT、MYSQL_USER、MYSQL_PASSWORD、MYSQL_DATABASE。设置 LLM_API_KEY、LLM_MODEL；需要自定义 OpenAI-compatible 服务时再填写 LLM_BASE_URL。配置 INGESTION_API_KEY 才能启用导入和告警接口。不要提交 .env。
+# 首次配置时执行；已有 .env 则保留原配置
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+```
 
-初始化表、装入演示数据并启动：
+在数据库中创建项目库，例如：
 
-    python -m scripts.init_db
-    python -m scripts.seed_data
-    python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
+```sql
+CREATE DATABASE workpilot_agent
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
 
-演示数据使用 [DEMO] 标记的工单和合成日志/知识记录；seed_data 可重复运行。若没有配置 LLM Key 和模型，系统不创建 LLM 服务，Text2SQL 工具也不会注册，分析会使用受限 fallback。
+编辑根目录 .env：
+
+| 配置 | 说明 |
+| --- | --- |
+| MYSQL_HOST / MYSQL_PORT / MYSQL_USER / MYSQL_PASSWORD / MYSQL_DATABASE | 数据库连接 |
+| MYSQL_SSL_CA | 托管数据库需要 TLS 时填写 CA 文件路径 |
+| LLM_API_KEY / LLM_MODEL | 启用模型调查和语义核验 |
+| LLM_BASE_URL | 自定义 OpenAI-compatible 服务地址 |
+| LLM_TIMEOUT / LLM_MAX_RETRIES | 通用网关配置；诊断路径采用上文的专门限制 |
+| LLM_ENABLE_THINKING | 服务商支持时控制推理模式 |
+| INGESTION_API_KEY | 导入和告警接口密钥，至少 16 个字符 |
+
+没有配置模型时使用受限回退能力，Text2SQL 工具不会注册，不能视为真实模型多 Agent 诊断演示。
+
+### 2. 初始化并启动
+
+```powershell
+python -m scripts.init_db
+python -m scripts.seed_data
+python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+seed_data 导入带 [DEMO] 标记的合成工单、日志和知识记录，可重复运行。应用启动时会连接本地 MCP 子进程，并检查已保存的审批状态。
 
 - Console：<http://127.0.0.1:8000/console/>
 - API 文档：<http://127.0.0.1:8000/docs>
 - 健康检查：<http://127.0.0.1:8000/health>
 
-## API 入口
+若模型连接受本地代理影响，可在当前 PowerShell 会话中将实际模型域名加入 NO_PROXY；例如使用 ModelScope 时：
+
+```powershell
+$env:NO_PROXY = "api-inference.modelscope.cn,127.0.0.1,localhost"
+```
+
+该设置用于模型网络连接，不会恢复服务商额度。接口返回 429 时需结合服务商消息判断限流或余额不足。
+
+## 页面使用
+
+### 双服务故障调查
+
+```text
+分析 order-service 和 inventory-service 最近的超时故障，
+分别核对日志和工单，判断是否存在关联，
+给出可能原因、排查建议、证据引用及仍不确定的事项。
+```
+
+在 Console 点击 Run Agent：
+
+1. 查看 Agent Trace 中的任务分派、调查决策和核验过程。
+2. 在 Plan 查看各服务任务、状态和预算。
+3. 在 Evidence 核对原始记录，在 Final Answer 查看结论和建议。
+4. 从最近运行中重新打开已完成任务，可复盘演示而无需再次调用模型。
+
+### 模拟重启与审批
+
+```text
+重启 order-service 和 inventory-service
+```
+
+该请求识别为 operation，由 Supervisor 交给审批工作流。页面提示当前仅支持模拟操作，在批准前不调用操作工具；批准后返回“已模拟执行”。系统不会真实重启服务。拒绝或取消则不执行该模拟工具。
+
+### 知识与数据查询
+
+```text
+搜索 Redis 超时排查的知识库文档
+统计各服务的工单数量
+```
+
+这些任务使用专门工作流。Text2SQL 经 SQL Guard 检查后才能执行：只允许受限表、列和函数范围内的单条 MySQL SELECT，结果最多 100 行，OFFSET 最大 10000。
+
+## API
 
 | 方法 | 路径 | 用途 |
 | --- | --- | --- |
-| GET | /health | 检查数据库连通性 |
-| POST | /agent/runs | 同步执行 Agent 任务 |
-| POST | /agent/runs/async | 创建异步运行并返回 run_id |
+| GET | /health | 数据库连通性 |
+| POST | /agent/runs | 默认入口：故障调查分派至 Multi，其他任务交给专门工作流 |
+| POST | /agent/runs/async | 创建异步任务，返回 run_id 与 events_url |
 | GET | /agent/runs/{run_id}/events | SSE 进度事件 |
-| POST | /agent/runs/{run_id}/approval | 批准、拒绝或取消等待中的审批 |
-| GET | /agent/runs | 分页查看运行历史 |
-| GET | /agent/runs/{run_id} | 查看运行详情 |
-| GET | /agent/runs/{run_id}/trace | 查看持久化 Trace |
-| POST | /alerts/incidents | 经 API Key 验证的告警入口 |
-| POST | /ingestion/logs | 经 API Key 验证的日志导入 |
-| POST | /ingestion/knowledge | 经 API Key 验证的知识导入 |
-| GET | /tickets、/logs、/knowledge | 查询业务演示数据 |
+| POST | /agent/runs/{run_id}/approval | approve / reject / cancel |
+| GET | /agent/runs | 分页查询历史 |
+| GET | /agent/runs/{run_id} | 运行详情 |
+| GET | /agent/runs/{run_id}/trace | 持久化 Trace |
+| GET | /tickets、/logs、/knowledge | 业务数据读取 |
+| POST | /ingestion/logs、/ingestion/knowledge | 受 API Key 保护的批量导入 |
+| POST | /alerts/incidents | 受 API Key 保护的告警入口，当前复用既有 LangGraph 调查工作流 |
 
-## 现场演示建议
+导入与告警接口使用 X-Ingestion-Key。同步 /agent/runs 的 X-WorkPilot-Comparison-Mode: single 请求头仅用于历史对照；Console 默认不提供单 / 多 Agent 切换。
 
-1. **单服务故障分析**：在 Console 输入“分析 payment-service 最近 60 分钟的 500 错误，结合日志、工单和知识库给出可能原因与排查方案”。展示路由、计划、三类证据和引用。根因表述应区分已证实事实与推测。
-2. **跨服务调查**：输入“分析 order-service、inventory-service 和 payment-service 的故障，分别查询日志并比较时间线；证据不足时说明不确定性”。展示最多三个 ServiceInvestigation、逐服务证据和统一结论。计划总预算仍受 5 步限制。
-3. **只读 Text2SQL**：提出对演示日志或工单的统计查询，展示 LLM 生成 SQL、SQL Guard 校验结果和查询 Trace。SQL 生成受模型影响，现场应准备一个已确认可用的查询作为备选。
-4. **高风险审批边界**：输入“模拟重启 payment-service”，展示执行前审批；批准后只会调用模拟工具并返回模拟结果，不会真的重启服务。
+## 验证与实验
 
-告警 API 也可作为备用演示入口：POST /alerts/incidents，携带 X-Ingestion-Key 和符合 IncidentAlertRequest 的字段。其结果走现有 Agent 工作流。
+### 本地验证
 
-## Phase 21 / Phase 22 评估
+```powershell
+# 路由、模拟操作审批与多 Agent 调度
+python -m pytest tests/test_router.py tests/test_agent.py tests/test_multi_agent.py -q
 
-### Phase 21：代表性回归
+# 诊断、评分与实验适配
+python -m pytest tests/test_diagnostic_agents.py tests/test_model_comparison.py tests/test_model_scoring.py tests/test_dataset_experiment.py -q
+```
 
-原有 8 个 Phase 21 Case 在增强版当前工作树通过 8/8。之后 representative_agent 扩展到 11 例；整体报告为 8/11、exit code 1，另外 3 例是 Phase 22 跨服务 Case，失败点是旧 evaluator 的工具序列、intent、status/error 契约，不等价于原 8 例回归失败。详情见 eval/results/phase21-regression-manual.json。
+重启请求修复后的第一组验证为 48 项通过。相关验证使用受控测试数据；不等同于对当前远端数据库和模型接口的在线验收。
 
-### Phase 22：固定跨服务 A/B
+### 18 场景对照实验
 
-三个固定 Case（正常、证据冲突、单工具失败）分别重复 5 次；baseline 和 enhanced 使用相同 Gold、fixture、模型配置与权限边界。
+2026-10-18 使用 Qwen/Qwen3.5-35B-A3B，对增强 Single 和 Multi 各运行 18 次，每场景每组一次。场景覆盖配置根因、跨服务依赖、冲突证据、空结果、工具失败、重试和补查。
 
-| Case | Baseline 业务成功 | Enhanced 业务成功 | 平均延迟（baseline → enhanced） | 平均 Token（baseline → enhanced） |
-| --- | ---: | ---: | ---: | ---: |
-| Normal | 0/5 | 5/5 | 14.80s → 15.90s | 1,945 → 3,058 |
-| Conflict | 0/5 | 5/5 | 6.62s → 21.46s | 1,058 → 2,707 |
-| Tool failure | 0/5 | 5/5 | 4.83s → 15.11s | 388 → 2,710 |
+两组使用相同合成记录与预算。调查与独立评分调用真实模型；工具和数据库 Session 使用 fixture。两组共享的相同工具请求返回内容一致，36 次运行均未超出实验预算。
 
-Enhanced 的 Gold evidence coverage、citation correctness、service completion 各为 15/15；两种方案的安全边界检查均为 15/15。单工具失败 Case 的降级成功率由 baseline 0/5 提升到 enhanced 5/5。
+| 主实验指标 | 增强 Single | Multi |
+| --- | ---: | ---: |
+| 执行流程完成 | 18/18 | 18/18 |
+| 核验流程完成 | 14/18 | 14/18 |
+| 平均耗时 | 27.6 秒 | 22.1 秒 |
+| 调查模型调用数 | 80 | 87 |
+| 调查 Token 合计 | 175,860 | 185,483 |
+| 自动严格验收通过，已评分 16 场景 | 5/16 | 1/16 |
 
-Conflict Router intent diagnostic 仍为 0/5：它仍将该类请求路由为 log_analysis。证据覆盖和业务任务成功不能掩盖这个路由问题。每个 Case 的 P95 只基于 5 次运行，属于小样本参考值，不代表稳定尾延迟。完整摘要见 eval/results/phase22-final-closeout-2026-09-25.json；原始逐次结果保存在本地 eval/results/phase22_ab/runs/，未作为生产性能承诺。
+两个场景的评分调用失败；评分另消耗 80,650 Token，不包含在调查 Token 中。执行 completed 或核验 completed 均不代表业务答案正确。
 
-实验支持保留增强版 Single Agent，但没有比较 Multi-Agent，因此不能声称 Multi-Agent 更差或增强版已经证明优于 Multi-Agent。当前没有证据证明 Multi-Agent 能带来额外业务收益，故暂不采用。跨服务调查仍顺序调用工具，并受 5 步总预算限制。
+自动评分已发现误判和对后续检查建议的统计遗漏，上表不是人工准确率。此次观察到 Multi 平均耗时更短、调查 Token 更多，但没有证明其整体诊断质量更优。样例已经参与调试，结果属于固定合成任务的探索复测，不是未见留出集或生产准确率。
 
-## 已知限制
+主实验后修复了过时缺口累计和补查预算被提前耗尽的问题。单独复验中，两组都在每服务 3 次工具额度内扩大到 24 小时并取回日志；Multi 给出 worker_slots=0 的受控原因及恢复到 10 的建议。该复验的自动评分解析失败，另保留 Codex 复核记录，不替换主实验分数。
 
-- 评估是小样本、固定合成 fixture 和特定模型配置；不代表真实生产准确率、可用性或泛化能力。
-- Free LLM 服务的模型输出、Token 与延迟会变化；演示时应预留冷启动和请求超时。
-- 计划上限为 5 步、最多识别 3 个服务；跨服务步骤顺序执行，当前票据检索仅针对首个服务，不是并行分布式调查。
-- SSE 事件和 LangGraph checkpoint 使用进程内实现；实例重启或多副本部署不具备完整的事件重放/工作队列语义。
-- 用户认证、租户权限、限流、生产审批集成、真实操作执行和大规模负载测试均不在当前实现范围。
-- Conflict intent 路由仍需修复；本项目当前不开发 Multi-Agent。
+- [冻结数据集](eval/datasets/w4_v1.json)
+- [主实验汇总](eval/results/dataset_experiment/20261018T142003Z/audit_summary.json)
+- [评分分歧与已发现问题](eval/results/dataset_experiment/20261018T142003Z/review_notes.json)
+- [补查复验汇总](eval/results/dataset_experiment/20261018T143910Z/audit_summary.json)
+- [补查复核记录](eval/results/dataset_experiment/20261018T143910Z/assistant_review.json)
+
+以下命令会消耗模型额度，并生成新的结果目录：
+
+```powershell
+# 全量：18 场景，每组各一次
+python -m eval.run_dataset_experiment --online
+
+# 只运行一个指定场景，两组各一次
+python -m eval.run_dataset_experiment --online --case followup_finds_logs
+```
+
+历史 Single Agent 实验单独保留在 [Phase 22 结果](eval/results/phase22-final-closeout-2026-09-25.json)，不与本轮不同预算、不同评分口径直接混算。当前尚未完成完整消融实验及每场景三次重复。
+
+## 目录导航
+
+```text
+backend/
+  agent/          路由、规划、风险判断、诊断与核验
+  services/       Supervisor 调度、服务调查、专门任务、审批与历史
+  tools/          Tool Registry 与受控工具
+  mcp/            stdio Client / Server
+  security/       SQL Guard
+  routers/        HTTP / SSE 接口
+  schemas/        请求、工具、Agent 任务和结果契约
+  models/         SQLAlchemy 数据模型
+frontend/         Agent Trace Console
+scripts/          数据库初始化与演示数据
+eval/             数据集、对照运行、评分及结果
+tests/            自动化验证
+```
+
+## 部署与使用范围
+
+提供 [Render 部署模板](render.yaml)，需要单独配置 MySQL 兼容数据库、TLS CA、模型和导入密钥。模板在启动阶段执行初始化与演示数据装载。当前 BackgroundTasks、SSE Broker 和 LangGraph InMemorySaver 使用进程内状态，适合单实例演示；多副本部署需要另外设计任务队列与事件共享。
+
+工具审计、Trace 和审批快照持久化到数据库。等待审批的专门任务可从数据库快照继续；已领取但执行结果不明的审批按失败处理，不自动重放。多 Agent 调查不提供完整的跨进程中断恢复。
+
+普通读取和 Agent 接口尚无用户认证、租户隔离及请求限流。当前版本用于授权的开发、实验和演示环境；不执行真实生产操作。.env、真实凭据与敏感日志不应提交到仓库。
+
+后续可按实际需求推进评分人工复核、对照消融和部署演示，现有实验结果及失败记录均保留。

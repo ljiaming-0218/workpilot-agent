@@ -40,6 +40,11 @@ _HIGH_RISK_ACTION_WORDS = (
 _TICKET_ID_PATTERN = re.compile(
     r"(?:工单|ticket)\s*(?:id|编号|#|：|:)?\s*(\d+)", re.IGNORECASE,
 )
+_RESTART_COMMAND_PATTERN = re.compile(
+    r"^(?:(?:请|帮我|帮忙|立即|现在|直接|please)\s*)*"
+    r"(?:重启|restart\b)\s*(?:一下\s*)?(?:服务\s*[:：]?\s*)?"
+    r"[a-z0-9][a-z0-9._-]*-service\b", re.IGNORECASE,
+)
 
 
 class IntentRouter:
@@ -76,9 +81,13 @@ class IntentRouter:
 
 def match_rule(query: str) -> RoutingDecision | None:
     """Return only high-confidence matches so ambiguous queries can reach the LLM."""
-    normalized = query.casefold()
+    normalized = query.strip().casefold()
     if any(word in normalized for word in _SIMULATION_WORDS) and any(
         word in normalized for word in _HIGH_RISK_ACTION_WORDS
+    ):
+        return RoutingDecision(intent=INTENT_OPERATION, confidence=0.99, source="rule")
+    if _RESTART_COMMAND_PATTERN.match(normalized) and not any(
+        word in normalized for word in (*_ANALYSIS_WORDS, *_KNOWLEDGE_WORDS, "失败", "failed")
     ):
         return RoutingDecision(intent=INTENT_OPERATION, confidence=0.99, source="rule")
     # Explicit document/ticket lookup may mention incident-analysis terminology.

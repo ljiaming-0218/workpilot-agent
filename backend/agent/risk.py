@@ -46,6 +46,8 @@ class RiskChecker:
                 reasons.append(
                     f"工具 {tool_name} 声明为 {definition.risk_level.value} 风险。"
                 )
+            if tool_name == "simulate_high_risk_operation":
+                reasons.append("当前仅支持模拟操作；批准后不会真实重启服务或修改真实系统。")
 
         if intent == "incident_analysis":
             if level == RiskLevel.LOW:

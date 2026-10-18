@@ -24,3 +24,17 @@ def test_existing_routing_cases(case):
 ])
 def test_incident_synonyms_and_adjacent_searches(query, intent):
     assert IntentRouter(None).route(query).intent == intent
+
+
+@pytest.mark.parametrize('query,intent', [
+    ('重启 order-service 和 inventory-service', 'operation'),
+    ('请立即重启 order-service', 'operation'),
+    ('重启服务 order-service', 'operation'),
+    ('please restart order-service', 'operation'),
+    ('分析重启 order-service 失败的原因', 'incident_analysis'),
+    ('重启 order-service 失败的原因是什么', 'incident_analysis'),
+    ('查询重启 order-service 的操作手册', 'knowledge_search'),
+    ('不要重启 order-service', 'general'),
+])
+def test_restart_command_is_distinct_from_diagnosis_and_document_search(query, intent):
+    assert IntentRouter(None).route(query).intent == intent

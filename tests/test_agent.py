@@ -76,3 +76,20 @@ def test_recovery_does_not_replay_expired_or_ambiguous_approval(session, state, 
     run = session.get(AgentRun, run_id)
     assert run.status == AgentRunStatus.FAILED and run.final_answer == error
     assert session.scalar(select(func.count()).select_from(ToolCallLog)) == 0
+
+
+def test_plain_two_service_restart_waits_for_approval_then_only_simulates(session):
+    query = '重启 order-service 和 inventory-service'
+    run_id, request_id = prepare_agent_run(session, query)
+    args = (create_default_registry(), IntentRouter(None), Planner(None), IncidentAnalyzer(None), RiskChecker())
+    result = execute_specialist_run(session, build_agent_graph(), *args, run_id, request_id, query)
+    assert result.intent == 'operation'
+    assert result.status == AgentRunStatus.WAITING_APPROVAL
+    assert len(result.plan) == 1 and result.plan[0].tool == 'simulate_high_risk_operation'
+    assert any('当前仅支持模拟操作' in reason for reason in result.risk_reasons)
+    assert session.scalar(select(func.count()).select_from(ToolCallLog)) == 0
+    approved = resume_specialist_run(session, build_agent_graph(), *args, run_id, 'approve')
+    assert approved.status == AgentRunStatus.COMPLETED
+    assert approved.tool_results[0]['output']['simulated'] is True
+    assert '已模拟执行' in approved.final_answer
+    assert session.scalar(select(func.count()).select_from(ToolCallLog)) == 1

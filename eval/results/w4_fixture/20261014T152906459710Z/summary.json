@@ -1,0 +1,2523 @@
+{
+  "provenance": {
+    "suite": "w4_fixture_v1",
+    "git_sha": "e208fad5cfc4d41dd2b859e96ea8fd4e96b93823",
+    "working_tree_dirty": true,
+    "cases_sha256": "2cf75ea5fd3b3e7d4f9ea80a9bdef769b1f4c1fe9005732c5727761bc796e180",
+    "source_sha256": "5fa5527f9a2d947f6ecc73a988992505d72a465b8bcaa206dc9950c0a7ea7ccd",
+    "historic_a": "eval\\results\\phase22-final-closeout-2026-09-25.json",
+    "comparison_rule": "A historical 5-step Single is separate; B/C use 9 tool attempts and 0 model calls.",
+    "fixture_only": true,
+    "mcp_transport": "direct_fixture_not_production_queue",
+    "latency_inference_allowed": false,
+    "human_review": "pending"
+  },
+  "historic_a": {
+    "baseline_business_success": "0/15",
+    "enhanced_business_success": "15/15",
+    "enhanced_gold_coverage": "15/15",
+    "enhanced_citation_correctness": "15/15",
+    "enhanced_service_completion": "15/15",
+    "safety_boundary": "15/15 in both variants"
+  },
+  "paired_runs": 63,
+  "cases": 21,
+  "variants": {
+    "enhanced_single_equal": {
+      "runs": 63,
+      "budget_violations": 0,
+      "read_only_violations": 0,
+      "scope_violations": 0,
+      "intent_correct": 63,
+      "mean_log_service_coverage": 0.8095238095238095,
+      "mean_tool_attempts": 4.761904761904762,
+      "supported_claims": 231,
+      "unsupported_claims": 6,
+      "injected_false_rejections": 3,
+      "model_calls": 0,
+      "tokens": 0
+    },
+    "multi": {
+      "runs": 63,
+      "budget_violations": 0,
+      "read_only_violations": 0,
+      "scope_violations": 0,
+      "intent_correct": 63,
+      "mean_log_service_coverage": 0.8095238095238095,
+      "mean_tool_attempts": 4.761904761904762,
+      "supported_claims": 231,
+      "unsupported_claims": 6,
+      "injected_false_rejections": 3,
+      "model_calls": 0,
+      "tokens": 0
+    }
+  },
+  "ablation_runs": 16,
+  "ablation_deltas": [
+    {
+      "case_id": "normal_two",
+      "ablation": "multi_serial",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "normal_two",
+      "ablation": "multi_no_verifier",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "skipped",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "normal_two",
+      "ablation": "multi_no_followup",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "normal_two",
+      "ablation": "multi_no_retry",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "followup_gain",
+      "ablation": "multi_serial",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "followup_gain",
+      "ablation": "multi_no_verifier",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "skipped",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "followup_gain",
+      "ablation": "multi_no_followup",
+      "tool_attempt_delta": -1,
+      "log_coverage_delta": -0.5,
+      "verifier_status": "completed",
+      "followup_delta": -1,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "followup_gain",
+      "ablation": "multi_no_retry",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "transient_once",
+      "ablation": "multi_serial",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "transient_once",
+      "ablation": "multi_no_verifier",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "skipped",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "transient_once",
+      "ablation": "multi_no_followup",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "transient_once",
+      "ablation": "multi_no_retry",
+      "tool_attempt_delta": -1,
+      "log_coverage_delta": -0.5,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": -1
+    },
+    {
+      "case_id": "ticket_failure",
+      "ablation": "multi_serial",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "ticket_failure",
+      "ablation": "multi_no_verifier",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "skipped",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "ticket_failure",
+      "ablation": "multi_no_followup",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "ticket_failure",
+      "ablation": "multi_no_retry",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    }
+  ],
+  "human_review_queue": [
+    {
+      "case_id": "normal_one",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10002:service-1:service-1-1:1"
+          ]
+        },
+        {
+          "text": "步骤 2 的工单 ID 81101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10002:service-1:service-1-2:1"
+          ]
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10002:service-1:service-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 81001,
+              "service_name": "order-service",
+              "level": "ERROR",
+              "error_type": "ORDER_TIMEOUT",
+              "message": "Order timed out while waiting for inventory reservation.",
+              "stack_trace": null,
+              "request_id": "phase22-order-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10002:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 81101,
+              "title": "Phase 22 incident for order-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "order-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "normal_two",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10004:service-1:service-1-1:1"
+          ]
+        },
+        {
+          "text": "步骤 2 的工单 ID 81101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10004:service-1:service-1-2:1"
+          ]
+        },
+        {
+          "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10004:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 4 的工单 ID 82101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10004:service-2:service-2-2:1"
+          ]
+        },
+        {
+          "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+          "type": "hypothesis",
+          "support": "unverified",
+          "evidence_ids": []
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10004:service-1:service-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 81001,
+              "service_name": "order-service",
+              "level": "ERROR",
+              "error_type": "ORDER_TIMEOUT",
+              "message": "Order timed out while waiting for inventory reservation.",
+              "stack_trace": null,
+              "request_id": "phase22-order-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10004:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 81101,
+              "title": "Phase 22 incident for order-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "order-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10004:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10004:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 82101,
+              "title": "Phase 22 incident for inventory-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "inventory-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "normal_three",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10006:service-1:service-1-1:1"
+          ]
+        },
+        {
+          "text": "步骤 2 的工单 ID 81101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10006:service-1:service-1-2:1"
+          ]
+        },
+        {
+          "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10006:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 4 的工单 ID 82101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10006:service-2:service-2-2:1"
+          ]
+        },
+        {
+          "text": "步骤 5 的日志 ID 83001 记录错误类型 DB_POOL_EXHAUSTED。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10006:service-3:service-3-1:1"
+          ]
+        },
+        {
+          "text": "步骤 6 的工单 ID 83101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10006:service-3:service-3-2:1"
+          ]
+        },
+        {
+          "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+          "type": "hypothesis",
+          "support": "unverified",
+          "evidence_ids": []
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10006:service-1:service-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 81001,
+              "service_name": "order-service",
+              "level": "ERROR",
+              "error_type": "ORDER_TIMEOUT",
+              "message": "Order timed out while waiting for inventory reservation.",
+              "stack_trace": null,
+              "request_id": "phase22-order-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10006:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 81101,
+              "title": "Phase 22 incident for order-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "order-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10006:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10006:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 82101,
+              "title": "Phase 22 incident for inventory-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "inventory-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10006:service-3:service-3-1:1",
+          "service": "payment-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 83001,
+              "service_name": "payment-service",
+              "level": "ERROR",
+              "error_type": "DB_POOL_EXHAUSTED",
+              "message": "Payment database connection pool checkout timed out.",
+              "stack_trace": null,
+              "request_id": "phase22-payment-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10006:service-3:service-3-2:1",
+          "service": "payment-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 83101,
+              "title": "Phase 22 incident for payment-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "payment-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "empty_tickets",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10008:service-1:service-1-1:1"
+          ]
+        },
+        {
+          "text": "步骤 2 的 search_tickets 返回 0 条匹配记录。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10008:service-1:service-1-2:1"
+          ]
+        },
+        {
+          "text": "步骤 4 的日志 ID 82001 记录错误类型 504。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10008:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 5 的 search_tickets 返回 0 条匹配记录。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10008:service-2:service-2-2:1"
+          ]
+        },
+        {
+          "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+          "type": "hypothesis",
+          "support": "unverified",
+          "evidence_ids": []
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10008:service-1:service-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 81001,
+              "service_name": "order-service",
+              "level": "ERROR",
+              "error_type": "ORDER_TIMEOUT",
+              "message": "Order timed out while waiting for inventory reservation.",
+              "stack_trace": null,
+              "request_id": "phase22-order-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10008:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": []
+        },
+        {
+          "evidence_id": "10008:service-1:service-1-3:1",
+          "service": "order-service",
+          "tool": "search_knowledge",
+          "items": [
+            {
+              "document_id": 84001,
+              "title": "Phase 22 cross-service incident runbook",
+              "excerpt": "Correlate order timeout, inventory 504, and payment pool exhaustion by trace and time.",
+              "category": "runbook",
+              "source": "eval://phase22/cross-service",
+              "score": 10.0
+            }
+          ]
+        },
+        {
+          "evidence_id": "10008:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10008:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": []
+        },
+        {
+          "evidence_id": "10008:service-2:service-2-3:1",
+          "service": "inventory-service",
+          "tool": "search_knowledge",
+          "items": [
+            {
+              "document_id": 84001,
+              "title": "Phase 22 cross-service incident runbook",
+              "excerpt": "Correlate order timeout, inventory 504, and payment pool exhaustion by trace and time.",
+              "category": "runbook",
+              "source": "eval://phase22/cross-service",
+              "score": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "followup_gain",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的 query_error_logs 返回 0 条匹配记录。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10010:service-1:service-1-1:1"
+          ]
+        },
+        {
+          "text": "步骤 2 的工单 ID 81101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10010:service-1:service-1-2:1"
+          ]
+        },
+        {
+          "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10010:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 4 的工单 ID 82101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10010:service-2:service-2-2:1"
+          ]
+        },
+        {
+          "text": "步骤 5 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10010:followup-1:followup-1-1:1"
+          ]
+        },
+        {
+          "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+          "type": "hypothesis",
+          "support": "unverified",
+          "evidence_ids": []
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10010:service-1:service-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": []
+        },
+        {
+          "evidence_id": "10010:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 81101,
+              "title": "Phase 22 incident for order-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "order-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10010:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10010:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 82101,
+              "title": "Phase 22 incident for inventory-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "inventory-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10010:followup-1:followup-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 81001,
+              "service_name": "order-service",
+              "level": "ERROR",
+              "error_type": "ORDER_TIMEOUT",
+              "message": "Order timed out while waiting for inventory reservation.",
+              "stack_trace": null,
+              "request_id": "phase22-order-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "followup_no_gain",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的 query_error_logs 返回 0 条匹配记录。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10012:service-1:service-1-1:1"
+          ]
+        },
+        {
+          "text": "步骤 2 的工单 ID 81101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10012:service-1:service-1-2:1"
+          ]
+        },
+        {
+          "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10012:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 4 的工单 ID 82101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10012:service-2:service-2-2:1"
+          ]
+        },
+        {
+          "text": "步骤 5 的 query_error_logs 返回 0 条匹配记录。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10012:followup-1:followup-1-1:1"
+          ]
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10012:service-1:service-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": []
+        },
+        {
+          "evidence_id": "10012:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 81101,
+              "title": "Phase 22 incident for order-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "order-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10012:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10012:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 82101,
+              "title": "Phase 22 incident for inventory-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "inventory-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10012:followup-1:followup-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": []
+        }
+      ]
+    },
+    {
+      "case_id": "transient_once",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10014:service-1:service-1-1:2"
+          ]
+        },
+        {
+          "text": "步骤 2 的工单 ID 81101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10014:service-1:service-1-2:1"
+          ]
+        },
+        {
+          "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10014:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 4 的工单 ID 82101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10014:service-2:service-2-2:1"
+          ]
+        },
+        {
+          "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+          "type": "hypothesis",
+          "support": "unverified",
+          "evidence_ids": []
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10014:service-1:service-1-1:2",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 81001,
+              "service_name": "order-service",
+              "level": "ERROR",
+              "error_type": "ORDER_TIMEOUT",
+              "message": "Order timed out while waiting for inventory reservation.",
+              "stack_trace": null,
+              "request_id": "phase22-order-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10014:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 81101,
+              "title": "Phase 22 incident for order-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "order-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10014:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10014:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 82101,
+              "title": "Phase 22 incident for inventory-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "inventory-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "transient_persistent",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的工单 ID 81101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10016:service-1:service-1-2:1"
+          ]
+        },
+        {
+          "text": "步骤 2 的日志 ID 82001 记录错误类型 504。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10016:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 3 的工单 ID 82101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10016:service-2:service-2-2:1"
+          ]
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10016:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 81101,
+              "title": "Phase 22 incident for order-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "order-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10016:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10016:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 82101,
+              "title": "Phase 22 incident for inventory-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "inventory-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "outcome_unknown",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的工单 ID 81101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10018:service-1:service-1-2:1"
+          ]
+        },
+        {
+          "text": "步骤 2 的日志 ID 82001 记录错误类型 504。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10018:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 3 的工单 ID 82101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10018:service-2:service-2-2:1"
+          ]
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10018:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 81101,
+              "title": "Phase 22 incident for order-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "order-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10018:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10018:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 82101,
+              "title": "Phase 22 incident for inventory-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "inventory-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "ticket_failure",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10020:service-1:service-1-1:1"
+          ]
+        },
+        {
+          "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10020:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 4 的工单 ID 82101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10020:service-2:service-2-2:1"
+          ]
+        },
+        {
+          "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+          "type": "hypothesis",
+          "support": "unverified",
+          "evidence_ids": []
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10020:service-1:service-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 81001,
+              "service_name": "order-service",
+              "level": "ERROR",
+              "error_type": "ORDER_TIMEOUT",
+              "message": "Order timed out while waiting for inventory reservation.",
+              "stack_trace": null,
+              "request_id": "phase22-order-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10020:service-1:service-1-3:1",
+          "service": "order-service",
+          "tool": "search_knowledge",
+          "items": [
+            {
+              "document_id": 84001,
+              "title": "Phase 22 cross-service incident runbook",
+              "excerpt": "Correlate order timeout, inventory 504, and payment pool exhaustion by trace and time.",
+              "category": "runbook",
+              "source": "eval://phase22/cross-service",
+              "score": 10.0
+            }
+          ]
+        },
+        {
+          "evidence_id": "10020:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10020:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 82101,
+              "title": "Phase 22 incident for inventory-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "inventory-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "knowledge_failure",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10022:service-1:service-1-1:1"
+          ]
+        },
+        {
+          "text": "步骤 2 的 search_tickets 返回 0 条匹配记录。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10022:service-1:service-1-2:1"
+          ]
+        },
+        {
+          "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10022:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 4 的 search_tickets 返回 0 条匹配记录。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10022:service-2:service-2-2:1"
+          ]
+        },
+        {
+          "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+          "type": "hypothesis",
+          "support": "unverified",
+          "evidence_ids": []
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10022:service-1:service-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 81001,
+              "service_name": "order-service",
+              "level": "ERROR",
+              "error_type": "ORDER_TIMEOUT",
+              "message": "Order timed out while waiting for inventory reservation.",
+              "stack_trace": null,
+              "request_id": "phase22-order-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10022:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": []
+        },
+        {
+          "evidence_id": "10022:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10022:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": []
+        }
+      ]
+    },
+    {
+      "case_id": "all_empty",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的 query_error_logs 返回 0 条匹配记录。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10024:service-1:service-1-1:1"
+          ]
+        },
+        {
+          "text": "步骤 2 的 search_tickets 返回 0 条匹配记录。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10024:service-1:service-1-2:1"
+          ]
+        },
+        {
+          "text": "步骤 3 的 search_knowledge 返回 0 条匹配记录。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10024:service-1:service-1-3:1"
+          ]
+        },
+        {
+          "text": "步骤 4 的 query_error_logs 返回 0 条匹配记录。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10024:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 5 的 search_tickets 返回 0 条匹配记录。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10024:service-2:service-2-2:1"
+          ]
+        },
+        {
+          "text": "步骤 6 的 search_knowledge 返回 0 条匹配记录。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10024:service-2:service-2-3:1"
+          ]
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10024:service-1:service-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": []
+        },
+        {
+          "evidence_id": "10024:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": []
+        },
+        {
+          "evidence_id": "10024:service-1:service-1-3:1",
+          "service": "order-service",
+          "tool": "search_knowledge",
+          "items": []
+        },
+        {
+          "evidence_id": "10024:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": []
+        },
+        {
+          "evidence_id": "10024:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": []
+        },
+        {
+          "evidence_id": "10024:service-2:service-2-3:1",
+          "service": "inventory-service",
+          "tool": "search_knowledge",
+          "items": []
+        }
+      ]
+    },
+    {
+      "case_id": "conflicting_signals",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10026:service-1:service-1-1:1"
+          ]
+        },
+        {
+          "text": "步骤 2 的工单 ID 81101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10026:service-1:service-1-2:1"
+          ]
+        },
+        {
+          "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10026:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 4 的工单 ID 82101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10026:service-2:service-2-2:1"
+          ]
+        },
+        {
+          "text": "步骤 5 的日志 ID 83001 记录错误类型 DB_POOL_EXHAUSTED。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10026:service-3:service-3-1:1"
+          ]
+        },
+        {
+          "text": "步骤 6 的工单 ID 83101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10026:service-3:service-3-2:1"
+          ]
+        },
+        {
+          "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+          "type": "hypothesis",
+          "support": "unverified",
+          "evidence_ids": []
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10026:service-1:service-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 81001,
+              "service_name": "order-service",
+              "level": "ERROR",
+              "error_type": "ORDER_TIMEOUT",
+              "message": "Order timed out while waiting for inventory reservation.",
+              "stack_trace": null,
+              "request_id": "phase22-order-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10026:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 81101,
+              "title": "Phase 22 incident for order-service",
+              "content": "Health checks recovered; this ticket does not establish a shared root cause.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "order-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10026:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10026:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 82101,
+              "title": "Phase 22 incident for inventory-service",
+              "content": "Health checks recovered; this ticket does not establish a shared root cause.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "inventory-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10026:service-3:service-3-1:1",
+          "service": "payment-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 83001,
+              "service_name": "payment-service",
+              "level": "ERROR",
+              "error_type": "DB_POOL_EXHAUSTED",
+              "message": "Payment database connection pool checkout timed out.",
+              "stack_trace": null,
+              "request_id": "phase22-payment-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10026:service-3:service-3-2:1",
+          "service": "payment-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 83101,
+              "title": "Phase 22 incident for payment-service",
+              "content": "Health checks recovered; this ticket does not establish a shared root cause.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "payment-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "wrong_service_record",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的工单 ID 81101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10028:service-1:service-1-2:1"
+          ]
+        },
+        {
+          "text": "步骤 2 的日志 ID 82001 记录错误类型 504。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10028:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 3 的工单 ID 82101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10028:service-2:service-2-2:1"
+          ]
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10028:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 81101,
+              "title": "Phase 22 incident for order-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "order-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10028:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10028:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 82101,
+              "title": "Phase 22 incident for inventory-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "inventory-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "verifier_timeout",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [],
+      "records": [
+        {
+          "evidence_id": "10030:service-1:service-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 81001,
+              "service_name": "order-service",
+              "level": "ERROR",
+              "error_type": "ORDER_TIMEOUT",
+              "message": "Order timed out while waiting for inventory reservation.",
+              "stack_trace": null,
+              "request_id": "phase22-order-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10030:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 81101,
+              "title": "Phase 22 incident for order-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "order-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10030:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10030:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 82101,
+              "title": "Phase 22 incident for inventory-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "inventory-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "verifier_failure",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [],
+      "records": [
+        {
+          "evidence_id": "10032:service-1:service-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 81001,
+              "service_name": "order-service",
+              "level": "ERROR",
+              "error_type": "ORDER_TIMEOUT",
+              "message": "Order timed out while waiting for inventory reservation.",
+              "stack_trace": null,
+              "request_id": "phase22-order-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10032:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 81101,
+              "title": "Phase 22 incident for order-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "order-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10032:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10032:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 82101,
+              "title": "Phase 22 incident for inventory-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "inventory-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "non_low_tool",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [],
+      "records": []
+    },
+    {
+      "case_id": "budget_competition",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10036:service-1:service-1-1:2"
+          ]
+        },
+        {
+          "text": "步骤 2 的 search_tickets 返回 0 条匹配记录。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10036:service-1:service-1-2:1"
+          ]
+        },
+        {
+          "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10036:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 4 的 search_tickets 返回 0 条匹配记录。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10036:service-2:service-2-2:1"
+          ]
+        },
+        {
+          "text": "步骤 6 的日志 ID 83001 记录错误类型 DB_POOL_EXHAUSTED。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10036:service-3:service-3-1:1"
+          ]
+        },
+        {
+          "text": "步骤 7 的 search_tickets 返回 0 条匹配记录。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10036:service-3:service-3-2:1"
+          ]
+        },
+        {
+          "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+          "type": "hypothesis",
+          "support": "unverified",
+          "evidence_ids": []
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10036:service-1:service-1-1:2",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 81001,
+              "service_name": "order-service",
+              "level": "ERROR",
+              "error_type": "ORDER_TIMEOUT",
+              "message": "Order timed out while waiting for inventory reservation.",
+              "stack_trace": null,
+              "request_id": "phase22-order-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10036:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": []
+        },
+        {
+          "evidence_id": "10036:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10036:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": []
+        },
+        {
+          "evidence_id": "10036:service-2:service-2-3:1",
+          "service": "inventory-service",
+          "tool": "search_knowledge",
+          "items": [
+            {
+              "document_id": 84001,
+              "title": "Phase 22 cross-service incident runbook",
+              "excerpt": "Correlate order timeout, inventory 504, and payment pool exhaustion by trace and time.",
+              "category": "runbook",
+              "source": "eval://phase22/cross-service",
+              "score": 10.0
+            }
+          ]
+        },
+        {
+          "evidence_id": "10036:service-3:service-3-1:1",
+          "service": "payment-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 83001,
+              "service_name": "payment-service",
+              "level": "ERROR",
+              "error_type": "DB_POOL_EXHAUSTED",
+              "message": "Payment database connection pool checkout timed out.",
+              "stack_trace": null,
+              "request_id": "phase22-payment-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10036:service-3:service-3-2:1",
+          "service": "payment-service",
+          "tool": "search_tickets",
+          "items": []
+        },
+        {
+          "evidence_id": "10036:service-3:service-3-3:1",
+          "service": "payment-service",
+          "tool": "search_knowledge",
+          "items": [
+            {
+              "document_id": 84001,
+              "title": "Phase 22 cross-service incident runbook",
+              "excerpt": "Correlate order timeout, inventory 504, and payment pool exhaustion by trace and time.",
+              "category": "runbook",
+              "source": "eval://phase22/cross-service",
+              "score": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "routing_ambiguity",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10038:service-1:service-1-1:1"
+          ]
+        },
+        {
+          "text": "步骤 2 的工单 ID 81101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10038:service-1:service-1-2:1"
+          ]
+        },
+        {
+          "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10038:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 4 的工单 ID 82101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10038:service-2:service-2-2:1"
+          ]
+        },
+        {
+          "text": "步骤 5 的日志 ID 83001 记录错误类型 DB_POOL_EXHAUSTED。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10038:service-3:service-3-1:1"
+          ]
+        },
+        {
+          "text": "步骤 6 的工单 ID 83101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10038:service-3:service-3-2:1"
+          ]
+        },
+        {
+          "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+          "type": "hypothesis",
+          "support": "unverified",
+          "evidence_ids": []
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10038:service-1:service-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 81001,
+              "service_name": "order-service",
+              "level": "ERROR",
+              "error_type": "ORDER_TIMEOUT",
+              "message": "Order timed out while waiting for inventory reservation.",
+              "stack_trace": null,
+              "request_id": "phase22-order-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10038:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 81101,
+              "title": "Phase 22 incident for order-service",
+              "content": "Health checks recovered; this ticket does not establish a shared root cause.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "order-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10038:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10038:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 82101,
+              "title": "Phase 22 incident for inventory-service",
+              "content": "Health checks recovered; this ticket does not establish a shared root cause.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "inventory-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10038:service-3:service-3-1:1",
+          "service": "payment-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 83001,
+              "service_name": "payment-service",
+              "level": "ERROR",
+              "error_type": "DB_POOL_EXHAUSTED",
+              "message": "Payment database connection pool checkout timed out.",
+              "stack_trace": null,
+              "request_id": "phase22-payment-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10038:service-3:service-3-2:1",
+          "service": "payment-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 83101,
+              "title": "Phase 22 incident for payment-service",
+              "content": "Health checks recovered; this ticket does not establish a shared root cause.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "payment-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "overreach_claim",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10040:service-1:service-1-1:1"
+          ]
+        },
+        {
+          "text": "步骤 2 的工单 ID 81101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10040:service-1:service-1-2:1"
+          ]
+        },
+        {
+          "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10040:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 4 的工单 ID 82101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10040:service-2:service-2-2:1"
+          ]
+        },
+        {
+          "text": "超时日志证明服务发生了内存泄漏。",
+          "type": "fact",
+          "support": "unsupported",
+          "evidence_ids": []
+        },
+        {
+          "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+          "type": "hypothesis",
+          "support": "unverified",
+          "evidence_ids": []
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10040:service-1:service-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 81001,
+              "service_name": "order-service",
+              "level": "ERROR",
+              "error_type": "ORDER_TIMEOUT",
+              "message": "Order timed out while waiting for inventory reservation.",
+              "stack_trace": null,
+              "request_id": "phase22-order-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10040:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 81101,
+              "title": "Phase 22 incident for order-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "order-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10040:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10040:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 82101,
+              "title": "Phase 22 incident for inventory-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "inventory-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "verifier_false_reject",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断",
+      "claims": [
+        {
+          "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+          "type": "fact",
+          "support": "unsupported",
+          "evidence_ids": [
+            "10042:service-1:service-1-1:1"
+          ]
+        },
+        {
+          "text": "步骤 2 的工单 ID 81101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10042:service-1:service-1-2:1"
+          ]
+        },
+        {
+          "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10042:service-2:service-2-1:1"
+          ]
+        },
+        {
+          "text": "步骤 4 的工单 ID 82101 状态为 open。",
+          "type": "fact",
+          "support": "supported",
+          "evidence_ids": [
+            "10042:service-2:service-2-2:1"
+          ]
+        },
+        {
+          "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+          "type": "hypothesis",
+          "support": "unverified",
+          "evidence_ids": []
+        }
+      ],
+      "records": [
+        {
+          "evidence_id": "10042:service-1:service-1-1:1",
+          "service": "order-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 81001,
+              "service_name": "order-service",
+              "level": "ERROR",
+              "error_type": "ORDER_TIMEOUT",
+              "message": "Order timed out while waiting for inventory reservation.",
+              "stack_trace": null,
+              "request_id": "phase22-order-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10042:service-1:service-1-2:1",
+          "service": "order-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 81101,
+              "title": "Phase 22 incident for order-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "order-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10042:service-2:service-2-1:1",
+          "service": "inventory-service",
+          "tool": "query_error_logs",
+          "items": [
+            {
+              "id": 82001,
+              "service_name": "inventory-service",
+              "level": "ERROR",
+              "error_type": "504",
+              "message": "Inventory returned HTTP 504 from warehouse gateway.",
+              "stack_trace": null,
+              "request_id": "phase22-inventory-service",
+              "created_at": "2026-09-22T02:30:00Z"
+            }
+          ]
+        },
+        {
+          "evidence_id": "10042:service-2:service-2-2:1",
+          "service": "inventory-service",
+          "tool": "search_tickets",
+          "items": [
+            {
+              "id": 82101,
+              "title": "Phase 22 incident for inventory-service",
+              "content": "Ticket matches the fixed incident window.",
+              "category": "incident",
+              "priority": "high",
+              "status": "open",
+              "service_name": "inventory-service",
+              "resolution": null,
+              "created_at": "2026-09-22T02:32:00Z",
+              "updated_at": "2026-09-22T02:35:00Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "interpretation": "Fixture metrics check mechanics only; business success and causal support require human review.",
+  "paired_differences": {
+    "log_coverage_nonzero": 0,
+    "tool_attempt_nonzero": 0
+  }
+}

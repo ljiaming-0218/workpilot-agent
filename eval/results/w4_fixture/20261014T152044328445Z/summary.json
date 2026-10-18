@@ -1,0 +1,6136 @@
+{
+  "provenance": {
+    "suite": "w4_fixture_v1",
+    "git_sha": "e208fad5cfc4d41dd2b859e96ea8fd4e96b93823",
+    "working_tree_dirty": true,
+    "cases_sha256": "b69b7a484cb82a0778b6f4271c22434084b187952b90bd84f6e60666a94ee18a",
+    "historic_a": "eval\\results\\phase22-final-closeout-2026-09-25.json",
+    "comparison_rule": "A historical 5-step Single is separate; B/C use 9 tool attempts and 0 model calls.",
+    "fixture_only": true,
+    "human_review": "pending"
+  },
+  "historic_a": {
+    "baseline_business_success": "0/15",
+    "enhanced_business_success": "15/15",
+    "enhanced_gold_coverage": "15/15",
+    "enhanced_citation_correctness": "15/15",
+    "enhanced_service_completion": "15/15",
+    "safety_boundary": "15/15 in both variants"
+  },
+  "paired_runs": 18,
+  "cases": 18,
+  "variants": {
+    "enhanced_single_equal": {
+      "runs": 18,
+      "budget_violations": 0,
+      "read_only_violations": 0,
+      "scope_violations": 0,
+      "mean_log_service_coverage": 0.7777777777777778,
+      "mean_tool_attempts": 4.777777777777778,
+      "model_calls": 0,
+      "tokens": 0
+    },
+    "multi": {
+      "runs": 18,
+      "budget_violations": 0,
+      "read_only_violations": 0,
+      "scope_violations": 0,
+      "mean_log_service_coverage": 0.7777777777777778,
+      "mean_tool_attempts": 4.777777777777778,
+      "model_calls": 0,
+      "tokens": 0
+    }
+  },
+  "ablations": [
+    {
+      "case_id": "normal_two",
+      "variant": "multi_serial",
+      "result": {
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "10037:service-1:service-1-1:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "10037:service-1:service-1-2:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "order-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81101,
+                  "title": "Phase 22 incident for order-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "order-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "evidence_id": "10037:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "evidence_id": "10037:service-2:service-2-2:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "inventory-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82101,
+                  "title": "Phase 22 incident for inventory-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "inventory-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "tool_budget": {
+          "used": 4,
+          "limit": 9
+        },
+        "verifier": {
+          "status": "completed",
+          "claims": [
+            {
+              "claim_id": "claim-1",
+              "claim_type": "fact",
+              "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+              "evidence_ids": [
+                "10037:service-1:service-1-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-2",
+              "claim_type": "fact",
+              "text": "步骤 2 的工单 ID 81101 状态为 open。",
+              "evidence_ids": [
+                "10037:service-1:service-1-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-3",
+              "claim_type": "fact",
+              "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+              "evidence_ids": [
+                "10037:service-2:service-2-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-4",
+              "claim_type": "fact",
+              "text": "步骤 4 的工单 ID 82101 状态为 open。",
+              "evidence_ids": [
+                "10037:service-2:service-2-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-5",
+              "claim_type": "hypothesis",
+              "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+              "evidence_ids": [],
+              "support": "unverified",
+              "reason": "假设可作为排查方向，当前记录尚未证明因果关系。"
+            }
+          ],
+          "error": null
+        },
+        "service_status": {
+          "order-service": "completed",
+          "inventory-service": "completed"
+        },
+        "errors": [],
+        "followup_count": 0,
+        "retry_count": 0,
+        "agent_tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "order-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10037:service-1:service-1-1:1",
+              "10037:service-1:service-1-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "inventory-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10037:service-2:service-2-1:1",
+              "10037:service-2:service-2-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          }
+        ]
+      },
+      "fixture_calls": [
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "order-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "inventory-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "inventory-service",
+            "limit": 10
+          },
+          "attempt": 1
+        }
+      ],
+      "metrics": {
+        "tool_attempts": 4,
+        "tool_limit": 9,
+        "model_calls": 0,
+        "tokens": 0,
+        "fixture_latency_ms": 4.706,
+        "log_service_coverage": 1.0,
+        "supported_claims": 4,
+        "unsupported_claims": 0,
+        "hypotheses_unverified": 1,
+        "wrong_scope_evidence_ids": [],
+        "budget_ok": true,
+        "read_only_ok": true,
+        "retry_count": 0,
+        "followup_count": 0,
+        "verifier_status": "completed",
+        "human_claim_review": "pending"
+      }
+    },
+    {
+      "case_id": "normal_two",
+      "variant": "multi_no_verifier",
+      "result": {
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "10038:service-1:service-1-1:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "10038:service-1:service-1-2:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "order-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81101,
+                  "title": "Phase 22 incident for order-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "order-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "evidence_id": "10038:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "evidence_id": "10038:service-2:service-2-2:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "inventory-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82101,
+                  "title": "Phase 22 incident for inventory-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "inventory-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "tool_budget": {
+          "used": 4,
+          "limit": 9
+        },
+        "verifier": {
+          "status": "skipped",
+          "claims": [],
+          "error": "VERIFIER_DISABLED"
+        },
+        "service_status": {
+          "order-service": "completed",
+          "inventory-service": "completed"
+        },
+        "errors": [],
+        "followup_count": 0,
+        "retry_count": 0,
+        "agent_tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "order-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10038:service-1:service-1-1:1",
+              "10038:service-1:service-1-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "inventory-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10038:service-2:service-2-1:1",
+              "10038:service-2:service-2-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          }
+        ]
+      },
+      "fixture_calls": [
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "order-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "inventory-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "inventory-service",
+            "limit": 10
+          },
+          "attempt": 1
+        }
+      ],
+      "metrics": {
+        "tool_attempts": 4,
+        "tool_limit": 9,
+        "model_calls": 0,
+        "tokens": 0,
+        "fixture_latency_ms": 4.899,
+        "log_service_coverage": 1.0,
+        "supported_claims": 0,
+        "unsupported_claims": 0,
+        "hypotheses_unverified": 0,
+        "wrong_scope_evidence_ids": [],
+        "budget_ok": true,
+        "read_only_ok": true,
+        "retry_count": 0,
+        "followup_count": 0,
+        "verifier_status": "skipped",
+        "human_claim_review": "pending"
+      }
+    },
+    {
+      "case_id": "normal_two",
+      "variant": "multi_no_followup",
+      "result": {
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "10039:service-1:service-1-1:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "10039:service-1:service-1-2:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "order-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81101,
+                  "title": "Phase 22 incident for order-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "order-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "evidence_id": "10039:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "evidence_id": "10039:service-2:service-2-2:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "inventory-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82101,
+                  "title": "Phase 22 incident for inventory-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "inventory-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "tool_budget": {
+          "used": 4,
+          "limit": 9
+        },
+        "verifier": {
+          "status": "completed",
+          "claims": [
+            {
+              "claim_id": "claim-1",
+              "claim_type": "fact",
+              "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+              "evidence_ids": [
+                "10039:service-1:service-1-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-2",
+              "claim_type": "fact",
+              "text": "步骤 2 的工单 ID 81101 状态为 open。",
+              "evidence_ids": [
+                "10039:service-1:service-1-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-3",
+              "claim_type": "fact",
+              "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+              "evidence_ids": [
+                "10039:service-2:service-2-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-4",
+              "claim_type": "fact",
+              "text": "步骤 4 的工单 ID 82101 状态为 open。",
+              "evidence_ids": [
+                "10039:service-2:service-2-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-5",
+              "claim_type": "hypothesis",
+              "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+              "evidence_ids": [],
+              "support": "unverified",
+              "reason": "假设可作为排查方向，当前记录尚未证明因果关系。"
+            }
+          ],
+          "error": null
+        },
+        "service_status": {
+          "order-service": "completed",
+          "inventory-service": "completed"
+        },
+        "errors": [],
+        "followup_count": 0,
+        "retry_count": 0,
+        "agent_tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "order-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10039:service-1:service-1-1:1",
+              "10039:service-1:service-1-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "inventory-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10039:service-2:service-2-1:1",
+              "10039:service-2:service-2-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          }
+        ]
+      },
+      "fixture_calls": [
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "order-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "inventory-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "inventory-service",
+            "limit": 10
+          },
+          "attempt": 1
+        }
+      ],
+      "metrics": {
+        "tool_attempts": 4,
+        "tool_limit": 9,
+        "model_calls": 0,
+        "tokens": 0,
+        "fixture_latency_ms": 5.623,
+        "log_service_coverage": 1.0,
+        "supported_claims": 4,
+        "unsupported_claims": 0,
+        "hypotheses_unverified": 1,
+        "wrong_scope_evidence_ids": [],
+        "budget_ok": true,
+        "read_only_ok": true,
+        "retry_count": 0,
+        "followup_count": 0,
+        "verifier_status": "completed",
+        "human_claim_review": "pending"
+      }
+    },
+    {
+      "case_id": "normal_two",
+      "variant": "multi_no_retry",
+      "result": {
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "10040:service-1:service-1-1:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "10040:service-1:service-1-2:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "order-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81101,
+                  "title": "Phase 22 incident for order-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "order-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "evidence_id": "10040:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "evidence_id": "10040:service-2:service-2-2:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "inventory-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82101,
+                  "title": "Phase 22 incident for inventory-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "inventory-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "tool_budget": {
+          "used": 4,
+          "limit": 9
+        },
+        "verifier": {
+          "status": "completed",
+          "claims": [
+            {
+              "claim_id": "claim-1",
+              "claim_type": "fact",
+              "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+              "evidence_ids": [
+                "10040:service-1:service-1-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-2",
+              "claim_type": "fact",
+              "text": "步骤 2 的工单 ID 81101 状态为 open。",
+              "evidence_ids": [
+                "10040:service-1:service-1-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-3",
+              "claim_type": "fact",
+              "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+              "evidence_ids": [
+                "10040:service-2:service-2-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-4",
+              "claim_type": "fact",
+              "text": "步骤 4 的工单 ID 82101 状态为 open。",
+              "evidence_ids": [
+                "10040:service-2:service-2-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-5",
+              "claim_type": "hypothesis",
+              "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+              "evidence_ids": [],
+              "support": "unverified",
+              "reason": "假设可作为排查方向，当前记录尚未证明因果关系。"
+            }
+          ],
+          "error": null
+        },
+        "service_status": {
+          "order-service": "completed",
+          "inventory-service": "completed"
+        },
+        "errors": [],
+        "followup_count": 0,
+        "retry_count": 0,
+        "agent_tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "order-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10040:service-1:service-1-1:1",
+              "10040:service-1:service-1-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "inventory-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10040:service-2:service-2-1:1",
+              "10040:service-2:service-2-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          }
+        ]
+      },
+      "fixture_calls": [
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "order-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "inventory-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "inventory-service",
+            "limit": 10
+          },
+          "attempt": 1
+        }
+      ],
+      "metrics": {
+        "tool_attempts": 4,
+        "tool_limit": 9,
+        "model_calls": 0,
+        "tokens": 0,
+        "fixture_latency_ms": 4.677,
+        "log_service_coverage": 1.0,
+        "supported_claims": 4,
+        "unsupported_claims": 0,
+        "hypotheses_unverified": 1,
+        "wrong_scope_evidence_ids": [],
+        "budget_ok": true,
+        "read_only_ok": true,
+        "retry_count": 0,
+        "followup_count": 0,
+        "verifier_status": "completed",
+        "human_claim_review": "pending"
+      }
+    },
+    {
+      "case_id": "followup_gain",
+      "variant": "multi_serial",
+      "result": {
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "10041:service-1:service-1-1:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-1-attempt-1",
+            "result_status": "empty_success",
+            "source": "tool_registry",
+            "source_record_ids": [],
+            "output": {
+              "items": [],
+              "total": 0
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "10041:service-1:service-1-2:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "order-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81101,
+                  "title": "Phase 22 incident for order-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "order-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "evidence_id": "10041:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "evidence_id": "10041:service-2:service-2-2:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "inventory-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82101,
+                  "title": "Phase 22 incident for inventory-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "inventory-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 5,
+            "evidence_id": "10041:followup-1:followup-1-1:1",
+            "agent_id": "investigator-1",
+            "task_id": "followup-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 1440,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "followup-1-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "tool_budget": {
+          "used": 5,
+          "limit": 9
+        },
+        "verifier": {
+          "status": "completed",
+          "claims": [
+            {
+              "claim_id": "claim-1",
+              "claim_type": "fact",
+              "text": "步骤 1 的 query_error_logs 返回 0 条匹配记录。",
+              "evidence_ids": [
+                "10041:service-1:service-1-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-2",
+              "claim_type": "fact",
+              "text": "步骤 2 的工单 ID 81101 状态为 open。",
+              "evidence_ids": [
+                "10041:service-1:service-1-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-3",
+              "claim_type": "fact",
+              "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+              "evidence_ids": [
+                "10041:service-2:service-2-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-4",
+              "claim_type": "fact",
+              "text": "步骤 4 的工单 ID 82101 状态为 open。",
+              "evidence_ids": [
+                "10041:service-2:service-2-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-5",
+              "claim_type": "fact",
+              "text": "步骤 5 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+              "evidence_ids": [
+                "10041:followup-1:followup-1-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-6",
+              "claim_type": "hypothesis",
+              "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+              "evidence_ids": [],
+              "support": "unverified",
+              "reason": "假设可作为排查方向，当前记录尚未证明因果关系。"
+            }
+          ],
+          "error": null
+        },
+        "service_status": {
+          "order-service": "completed",
+          "inventory-service": "completed"
+        },
+        "errors": [],
+        "followup_count": 1,
+        "retry_count": 0,
+        "agent_tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "order-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10041:service-1:service-1-1:1",
+              "10041:service-1:service-1-2:1"
+            ],
+            "errors": [],
+            "gaps": [
+              "logs_empty_in_initial_window"
+            ],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "inventory-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10041:service-2:service-2-1:1",
+              "10041:service-2:service-2-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          },
+          {
+            "task_id": "followup-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "followup-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 1440,
+                  "limit": 20
+                },
+                "reason": "初始时间窗日志为空，扩大到 24 小时验证缺口"
+              }
+            ],
+            "evidence_ids": [
+              "10041:followup-1:followup-1-1:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "followup-1-1",
+                "attempt_id": "followup-1-1-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 1,
+            "stop_reason": "investigation_complete"
+          }
+        ]
+      },
+      "fixture_calls": [
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "order-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "inventory-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "inventory-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 1440,
+            "limit": 20
+          },
+          "attempt": 2
+        }
+      ],
+      "metrics": {
+        "tool_attempts": 5,
+        "tool_limit": 9,
+        "model_calls": 0,
+        "tokens": 0,
+        "fixture_latency_ms": 6.296,
+        "log_service_coverage": 1.0,
+        "supported_claims": 5,
+        "unsupported_claims": 0,
+        "hypotheses_unverified": 1,
+        "wrong_scope_evidence_ids": [],
+        "budget_ok": true,
+        "read_only_ok": true,
+        "retry_count": 0,
+        "followup_count": 1,
+        "verifier_status": "completed",
+        "human_claim_review": "pending"
+      }
+    },
+    {
+      "case_id": "followup_gain",
+      "variant": "multi_no_verifier",
+      "result": {
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "10042:service-1:service-1-1:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-1-attempt-1",
+            "result_status": "empty_success",
+            "source": "tool_registry",
+            "source_record_ids": [],
+            "output": {
+              "items": [],
+              "total": 0
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "10042:service-1:service-1-2:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "order-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81101,
+                  "title": "Phase 22 incident for order-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "order-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "evidence_id": "10042:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "evidence_id": "10042:service-2:service-2-2:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "inventory-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82101,
+                  "title": "Phase 22 incident for inventory-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "inventory-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 5,
+            "evidence_id": "10042:followup-1:followup-1-1:1",
+            "agent_id": "investigator-1",
+            "task_id": "followup-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 1440,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "followup-1-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "tool_budget": {
+          "used": 5,
+          "limit": 9
+        },
+        "verifier": {
+          "status": "skipped",
+          "claims": [],
+          "error": "VERIFIER_DISABLED"
+        },
+        "service_status": {
+          "order-service": "completed",
+          "inventory-service": "completed"
+        },
+        "errors": [],
+        "followup_count": 1,
+        "retry_count": 0,
+        "agent_tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "order-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10042:service-1:service-1-1:1",
+              "10042:service-1:service-1-2:1"
+            ],
+            "errors": [],
+            "gaps": [
+              "logs_empty_in_initial_window"
+            ],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "inventory-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10042:service-2:service-2-1:1",
+              "10042:service-2:service-2-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          },
+          {
+            "task_id": "followup-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "followup-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 1440,
+                  "limit": 20
+                },
+                "reason": "初始时间窗日志为空，扩大到 24 小时验证缺口"
+              }
+            ],
+            "evidence_ids": [
+              "10042:followup-1:followup-1-1:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "followup-1-1",
+                "attempt_id": "followup-1-1-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 1,
+            "stop_reason": "investigation_complete"
+          }
+        ]
+      },
+      "fixture_calls": [
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "order-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "inventory-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "inventory-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 1440,
+            "limit": 20
+          },
+          "attempt": 2
+        }
+      ],
+      "metrics": {
+        "tool_attempts": 5,
+        "tool_limit": 9,
+        "model_calls": 0,
+        "tokens": 0,
+        "fixture_latency_ms": 7.372,
+        "log_service_coverage": 1.0,
+        "supported_claims": 0,
+        "unsupported_claims": 0,
+        "hypotheses_unverified": 0,
+        "wrong_scope_evidence_ids": [],
+        "budget_ok": true,
+        "read_only_ok": true,
+        "retry_count": 0,
+        "followup_count": 1,
+        "verifier_status": "skipped",
+        "human_claim_review": "pending"
+      }
+    },
+    {
+      "case_id": "followup_gain",
+      "variant": "multi_no_followup",
+      "result": {
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "10043:service-1:service-1-1:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-1-attempt-1",
+            "result_status": "empty_success",
+            "source": "tool_registry",
+            "source_record_ids": [],
+            "output": {
+              "items": [],
+              "total": 0
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "10043:service-1:service-1-2:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "order-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81101,
+                  "title": "Phase 22 incident for order-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "order-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "evidence_id": "10043:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "evidence_id": "10043:service-2:service-2-2:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "inventory-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82101,
+                  "title": "Phase 22 incident for inventory-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "inventory-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "tool_budget": {
+          "used": 4,
+          "limit": 9
+        },
+        "verifier": {
+          "status": "completed",
+          "claims": [
+            {
+              "claim_id": "claim-1",
+              "claim_type": "fact",
+              "text": "步骤 1 的 query_error_logs 返回 0 条匹配记录。",
+              "evidence_ids": [
+                "10043:service-1:service-1-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-2",
+              "claim_type": "fact",
+              "text": "步骤 2 的工单 ID 81101 状态为 open。",
+              "evidence_ids": [
+                "10043:service-1:service-1-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-3",
+              "claim_type": "fact",
+              "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+              "evidence_ids": [
+                "10043:service-2:service-2-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-4",
+              "claim_type": "fact",
+              "text": "步骤 4 的工单 ID 82101 状态为 open。",
+              "evidence_ids": [
+                "10043:service-2:service-2-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            }
+          ],
+          "error": null
+        },
+        "service_status": {
+          "order-service": "completed",
+          "inventory-service": "completed"
+        },
+        "errors": [],
+        "followup_count": 0,
+        "retry_count": 0,
+        "agent_tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "order-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10043:service-1:service-1-1:1",
+              "10043:service-1:service-1-2:1"
+            ],
+            "errors": [],
+            "gaps": [
+              "logs_empty_in_initial_window"
+            ],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "inventory-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10043:service-2:service-2-1:1",
+              "10043:service-2:service-2-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          }
+        ]
+      },
+      "fixture_calls": [
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "order-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "inventory-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "inventory-service",
+            "limit": 10
+          },
+          "attempt": 1
+        }
+      ],
+      "metrics": {
+        "tool_attempts": 4,
+        "tool_limit": 9,
+        "model_calls": 0,
+        "tokens": 0,
+        "fixture_latency_ms": 4.836,
+        "log_service_coverage": 0.5,
+        "supported_claims": 4,
+        "unsupported_claims": 0,
+        "hypotheses_unverified": 0,
+        "wrong_scope_evidence_ids": [],
+        "budget_ok": true,
+        "read_only_ok": true,
+        "retry_count": 0,
+        "followup_count": 0,
+        "verifier_status": "completed",
+        "human_claim_review": "pending"
+      }
+    },
+    {
+      "case_id": "followup_gain",
+      "variant": "multi_no_retry",
+      "result": {
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "10044:service-1:service-1-1:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-1-attempt-1",
+            "result_status": "empty_success",
+            "source": "tool_registry",
+            "source_record_ids": [],
+            "output": {
+              "items": [],
+              "total": 0
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "10044:service-1:service-1-2:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "order-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81101,
+                  "title": "Phase 22 incident for order-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "order-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "evidence_id": "10044:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "evidence_id": "10044:service-2:service-2-2:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "inventory-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82101,
+                  "title": "Phase 22 incident for inventory-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "inventory-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 5,
+            "evidence_id": "10044:followup-1:followup-1-1:1",
+            "agent_id": "investigator-1",
+            "task_id": "followup-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 1440,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "followup-1-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "tool_budget": {
+          "used": 5,
+          "limit": 9
+        },
+        "verifier": {
+          "status": "completed",
+          "claims": [
+            {
+              "claim_id": "claim-1",
+              "claim_type": "fact",
+              "text": "步骤 1 的 query_error_logs 返回 0 条匹配记录。",
+              "evidence_ids": [
+                "10044:service-1:service-1-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-2",
+              "claim_type": "fact",
+              "text": "步骤 2 的工单 ID 81101 状态为 open。",
+              "evidence_ids": [
+                "10044:service-1:service-1-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-3",
+              "claim_type": "fact",
+              "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+              "evidence_ids": [
+                "10044:service-2:service-2-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-4",
+              "claim_type": "fact",
+              "text": "步骤 4 的工单 ID 82101 状态为 open。",
+              "evidence_ids": [
+                "10044:service-2:service-2-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-5",
+              "claim_type": "fact",
+              "text": "步骤 5 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+              "evidence_ids": [
+                "10044:followup-1:followup-1-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-6",
+              "claim_type": "hypothesis",
+              "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+              "evidence_ids": [],
+              "support": "unverified",
+              "reason": "假设可作为排查方向，当前记录尚未证明因果关系。"
+            }
+          ],
+          "error": null
+        },
+        "service_status": {
+          "order-service": "completed",
+          "inventory-service": "completed"
+        },
+        "errors": [],
+        "followup_count": 1,
+        "retry_count": 0,
+        "agent_tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "order-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10044:service-1:service-1-1:1",
+              "10044:service-1:service-1-2:1"
+            ],
+            "errors": [],
+            "gaps": [
+              "logs_empty_in_initial_window"
+            ],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "inventory-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10044:service-2:service-2-1:1",
+              "10044:service-2:service-2-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          },
+          {
+            "task_id": "followup-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "followup-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 1440,
+                  "limit": 20
+                },
+                "reason": "初始时间窗日志为空，扩大到 24 小时验证缺口"
+              }
+            ],
+            "evidence_ids": [
+              "10044:followup-1:followup-1-1:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "followup-1-1",
+                "attempt_id": "followup-1-1-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 1,
+            "stop_reason": "investigation_complete"
+          }
+        ]
+      },
+      "fixture_calls": [
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "order-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "inventory-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "inventory-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 1440,
+            "limit": 20
+          },
+          "attempt": 2
+        }
+      ],
+      "metrics": {
+        "tool_attempts": 5,
+        "tool_limit": 9,
+        "model_calls": 0,
+        "tokens": 0,
+        "fixture_latency_ms": 6.053,
+        "log_service_coverage": 1.0,
+        "supported_claims": 5,
+        "unsupported_claims": 0,
+        "hypotheses_unverified": 1,
+        "wrong_scope_evidence_ids": [],
+        "budget_ok": true,
+        "read_only_ok": true,
+        "retry_count": 0,
+        "followup_count": 1,
+        "verifier_status": "completed",
+        "human_claim_review": "pending"
+      }
+    },
+    {
+      "case_id": "transient_once",
+      "variant": "multi_serial",
+      "result": {
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "10045:service-1:service-1-1:2",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 2,
+            "attempt_id": "service-1-1-attempt-2",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "10045:service-1:service-1-2:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "order-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81101,
+                  "title": "Phase 22 incident for order-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "order-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "evidence_id": "10045:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "evidence_id": "10045:service-2:service-2-2:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "inventory-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82101,
+                  "title": "Phase 22 incident for inventory-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "inventory-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "tool_budget": {
+          "used": 5,
+          "limit": 9
+        },
+        "verifier": {
+          "status": "completed",
+          "claims": [
+            {
+              "claim_id": "claim-1",
+              "claim_type": "fact",
+              "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+              "evidence_ids": [
+                "10045:service-1:service-1-1:2"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-2",
+              "claim_type": "fact",
+              "text": "步骤 2 的工单 ID 81101 状态为 open。",
+              "evidence_ids": [
+                "10045:service-1:service-1-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-3",
+              "claim_type": "fact",
+              "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+              "evidence_ids": [
+                "10045:service-2:service-2-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-4",
+              "claim_type": "fact",
+              "text": "步骤 4 的工单 ID 82101 状态为 open。",
+              "evidence_ids": [
+                "10045:service-2:service-2-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-5",
+              "claim_type": "hypothesis",
+              "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+              "evidence_ids": [],
+              "support": "unverified",
+              "reason": "假设可作为排查方向，当前记录尚未证明因果关系。"
+            }
+          ],
+          "error": null
+        },
+        "service_status": {
+          "order-service": "completed",
+          "inventory-service": "completed"
+        },
+        "errors": [],
+        "followup_count": 0,
+        "retry_count": 1,
+        "agent_tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "order-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10045:service-1:service-1-1:2",
+              "10045:service-1:service-1-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "failed",
+                "error": "MCP_TRANSIENT_CONNECTION"
+              },
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-2",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 3,
+            "stop_reason": "investigation_complete"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "inventory-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10045:service-2:service-2-1:1",
+              "10045:service-2:service-2-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          }
+        ]
+      },
+      "fixture_calls": [
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 2
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "order-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "inventory-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "inventory-service",
+            "limit": 10
+          },
+          "attempt": 1
+        }
+      ],
+      "metrics": {
+        "tool_attempts": 5,
+        "tool_limit": 9,
+        "model_calls": 0,
+        "tokens": 0,
+        "fixture_latency_ms": 6.348,
+        "log_service_coverage": 1.0,
+        "supported_claims": 4,
+        "unsupported_claims": 0,
+        "hypotheses_unverified": 1,
+        "wrong_scope_evidence_ids": [],
+        "budget_ok": true,
+        "read_only_ok": true,
+        "retry_count": 1,
+        "followup_count": 0,
+        "verifier_status": "completed",
+        "human_claim_review": "pending"
+      }
+    },
+    {
+      "case_id": "transient_once",
+      "variant": "multi_no_verifier",
+      "result": {
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "10046:service-1:service-1-1:2",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 2,
+            "attempt_id": "service-1-1-attempt-2",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "10046:service-1:service-1-2:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "order-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81101,
+                  "title": "Phase 22 incident for order-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "order-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "evidence_id": "10046:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "evidence_id": "10046:service-2:service-2-2:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "inventory-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82101,
+                  "title": "Phase 22 incident for inventory-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "inventory-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "tool_budget": {
+          "used": 5,
+          "limit": 9
+        },
+        "verifier": {
+          "status": "skipped",
+          "claims": [],
+          "error": "VERIFIER_DISABLED"
+        },
+        "service_status": {
+          "order-service": "completed",
+          "inventory-service": "completed"
+        },
+        "errors": [],
+        "followup_count": 0,
+        "retry_count": 1,
+        "agent_tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "order-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10046:service-1:service-1-1:2",
+              "10046:service-1:service-1-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "failed",
+                "error": "MCP_TRANSIENT_CONNECTION"
+              },
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-2",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 3,
+            "stop_reason": "investigation_complete"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "inventory-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10046:service-2:service-2-1:1",
+              "10046:service-2:service-2-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          }
+        ]
+      },
+      "fixture_calls": [
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 2
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "order-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "inventory-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "inventory-service",
+            "limit": 10
+          },
+          "attempt": 1
+        }
+      ],
+      "metrics": {
+        "tool_attempts": 5,
+        "tool_limit": 9,
+        "model_calls": 0,
+        "tokens": 0,
+        "fixture_latency_ms": 5.121,
+        "log_service_coverage": 1.0,
+        "supported_claims": 0,
+        "unsupported_claims": 0,
+        "hypotheses_unverified": 0,
+        "wrong_scope_evidence_ids": [],
+        "budget_ok": true,
+        "read_only_ok": true,
+        "retry_count": 1,
+        "followup_count": 0,
+        "verifier_status": "skipped",
+        "human_claim_review": "pending"
+      }
+    },
+    {
+      "case_id": "transient_once",
+      "variant": "multi_no_followup",
+      "result": {
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "10047:service-1:service-1-1:2",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 2,
+            "attempt_id": "service-1-1-attempt-2",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "10047:service-1:service-1-2:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "order-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81101,
+                  "title": "Phase 22 incident for order-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "order-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "evidence_id": "10047:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "evidence_id": "10047:service-2:service-2-2:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "inventory-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82101,
+                  "title": "Phase 22 incident for inventory-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "inventory-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "tool_budget": {
+          "used": 5,
+          "limit": 9
+        },
+        "verifier": {
+          "status": "completed",
+          "claims": [
+            {
+              "claim_id": "claim-1",
+              "claim_type": "fact",
+              "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+              "evidence_ids": [
+                "10047:service-1:service-1-1:2"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-2",
+              "claim_type": "fact",
+              "text": "步骤 2 的工单 ID 81101 状态为 open。",
+              "evidence_ids": [
+                "10047:service-1:service-1-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-3",
+              "claim_type": "fact",
+              "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+              "evidence_ids": [
+                "10047:service-2:service-2-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-4",
+              "claim_type": "fact",
+              "text": "步骤 4 的工单 ID 82101 状态为 open。",
+              "evidence_ids": [
+                "10047:service-2:service-2-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-5",
+              "claim_type": "hypothesis",
+              "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+              "evidence_ids": [],
+              "support": "unverified",
+              "reason": "假设可作为排查方向，当前记录尚未证明因果关系。"
+            }
+          ],
+          "error": null
+        },
+        "service_status": {
+          "order-service": "completed",
+          "inventory-service": "completed"
+        },
+        "errors": [],
+        "followup_count": 0,
+        "retry_count": 1,
+        "agent_tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "order-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10047:service-1:service-1-1:2",
+              "10047:service-1:service-1-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "failed",
+                "error": "MCP_TRANSIENT_CONNECTION"
+              },
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-2",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 3,
+            "stop_reason": "investigation_complete"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "inventory-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10047:service-2:service-2-1:1",
+              "10047:service-2:service-2-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          }
+        ]
+      },
+      "fixture_calls": [
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 2
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "order-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "inventory-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "inventory-service",
+            "limit": 10
+          },
+          "attempt": 1
+        }
+      ],
+      "metrics": {
+        "tool_attempts": 5,
+        "tool_limit": 9,
+        "model_calls": 0,
+        "tokens": 0,
+        "fixture_latency_ms": 5.382,
+        "log_service_coverage": 1.0,
+        "supported_claims": 4,
+        "unsupported_claims": 0,
+        "hypotheses_unverified": 1,
+        "wrong_scope_evidence_ids": [],
+        "budget_ok": true,
+        "read_only_ok": true,
+        "retry_count": 1,
+        "followup_count": 0,
+        "verifier_status": "completed",
+        "human_claim_review": "pending"
+      }
+    },
+    {
+      "case_id": "transient_once",
+      "variant": "multi_no_retry",
+      "result": {
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "10048:service-1:service-1-2:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "order-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81101,
+                  "title": "Phase 22 incident for order-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "order-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "10048:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "evidence_id": "10048:service-2:service-2-2:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "inventory-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82101,
+                  "title": "Phase 22 incident for inventory-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "inventory-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "tool_budget": {
+          "used": 4,
+          "limit": 9
+        },
+        "verifier": {
+          "status": "completed",
+          "claims": [
+            {
+              "claim_id": "claim-1",
+              "claim_type": "fact",
+              "text": "步骤 1 的工单 ID 81101 状态为 open。",
+              "evidence_ids": [
+                "10048:service-1:service-1-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-2",
+              "claim_type": "fact",
+              "text": "步骤 2 的日志 ID 82001 记录错误类型 504。",
+              "evidence_ids": [
+                "10048:service-2:service-2-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-3",
+              "claim_type": "fact",
+              "text": "步骤 3 的工单 ID 82101 状态为 open。",
+              "evidence_ids": [
+                "10048:service-2:service-2-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            }
+          ],
+          "error": null
+        },
+        "service_status": {
+          "order-service": "partial",
+          "inventory-service": "completed"
+        },
+        "errors": [
+          "MCP_TRANSIENT_CONNECTION"
+        ],
+        "followup_count": 0,
+        "retry_count": 1,
+        "agent_tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "partial",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "order-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10048:service-1:service-1-2:1"
+            ],
+            "errors": [
+              "MCP_TRANSIENT_CONNECTION"
+            ],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "failed",
+                "error": "MCP_TRANSIENT_CONNECTION"
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "partial_failure"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "inventory-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10048:service-2:service-2-1:1",
+              "10048:service-2:service-2-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          }
+        ]
+      },
+      "fixture_calls": [
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "order-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "inventory-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "inventory-service",
+            "limit": 10
+          },
+          "attempt": 1
+        }
+      ],
+      "metrics": {
+        "tool_attempts": 4,
+        "tool_limit": 9,
+        "model_calls": 0,
+        "tokens": 0,
+        "fixture_latency_ms": 4.848,
+        "log_service_coverage": 0.5,
+        "supported_claims": 3,
+        "unsupported_claims": 0,
+        "hypotheses_unverified": 0,
+        "wrong_scope_evidence_ids": [],
+        "budget_ok": true,
+        "read_only_ok": true,
+        "retry_count": 1,
+        "followup_count": 0,
+        "verifier_status": "completed",
+        "human_claim_review": "pending"
+      }
+    },
+    {
+      "case_id": "ticket_failure",
+      "variant": "multi_serial",
+      "result": {
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "10049:service-1:service-1-1:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "10049:service-1:service-1-3:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "search_knowledge",
+            "inputs": {
+              "query": "order-service 故障排查",
+              "limit": 5
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-3-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              84001
+            ],
+            "output": {
+              "items": [
+                {
+                  "document_id": 84001,
+                  "title": "Phase 22 cross-service incident runbook",
+                  "excerpt": "Correlate order timeout, inventory 504, and payment pool exhaustion by trace and time.",
+                  "category": "runbook",
+                  "source": "eval://phase22/cross-service",
+                  "score": 10.0
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "evidence_id": "10049:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "evidence_id": "10049:service-2:service-2-2:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "inventory-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82101,
+                  "title": "Phase 22 incident for inventory-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "inventory-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "tool_budget": {
+          "used": 5,
+          "limit": 9
+        },
+        "verifier": {
+          "status": "completed",
+          "claims": [
+            {
+              "claim_id": "claim-1",
+              "claim_type": "fact",
+              "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+              "evidence_ids": [
+                "10049:service-1:service-1-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-2",
+              "claim_type": "fact",
+              "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+              "evidence_ids": [
+                "10049:service-2:service-2-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-3",
+              "claim_type": "fact",
+              "text": "步骤 4 的工单 ID 82101 状态为 open。",
+              "evidence_ids": [
+                "10049:service-2:service-2-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-4",
+              "claim_type": "hypothesis",
+              "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+              "evidence_ids": [],
+              "support": "unverified",
+              "reason": "假设可作为排查方向，当前记录尚未证明因果关系。"
+            }
+          ],
+          "error": null
+        },
+        "service_status": {
+          "order-service": "partial",
+          "inventory-service": "completed"
+        },
+        "errors": [
+          "TOOL_EXECUTION_ERROR"
+        ],
+        "followup_count": 0,
+        "retry_count": 0,
+        "agent_tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "partial",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "order-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              },
+              {
+                "step_id": "service-1-3",
+                "tool": "search_knowledge",
+                "inputs": {
+                  "query": "order-service 故障排查",
+                  "limit": 5
+                },
+                "reason": "前序证据不足，检索只读知识"
+              }
+            ],
+            "evidence_ids": [
+              "10049:service-1:service-1-1:1",
+              "10049:service-1:service-1-3:1"
+            ],
+            "errors": [
+              "TOOL_EXECUTION_ERROR"
+            ],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "failed",
+                "error": "TOOL_EXECUTION_ERROR"
+              },
+              {
+                "step_id": "service-1-3",
+                "attempt_id": "service-1-3-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 3,
+            "stop_reason": "partial_failure"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "inventory-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10049:service-2:service-2-1:1",
+              "10049:service-2:service-2-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          }
+        ]
+      },
+      "fixture_calls": [
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "order-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_knowledge",
+          "inputs": {
+            "query": "order-service 故障排查",
+            "category": null,
+            "limit": 5
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "inventory-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "inventory-service",
+            "limit": 10
+          },
+          "attempt": 1
+        }
+      ],
+      "metrics": {
+        "tool_attempts": 5,
+        "tool_limit": 9,
+        "model_calls": 0,
+        "tokens": 0,
+        "fixture_latency_ms": 6.548,
+        "log_service_coverage": 1.0,
+        "supported_claims": 3,
+        "unsupported_claims": 0,
+        "hypotheses_unverified": 1,
+        "wrong_scope_evidence_ids": [],
+        "budget_ok": true,
+        "read_only_ok": true,
+        "retry_count": 0,
+        "followup_count": 0,
+        "verifier_status": "completed",
+        "human_claim_review": "pending"
+      }
+    },
+    {
+      "case_id": "ticket_failure",
+      "variant": "multi_no_verifier",
+      "result": {
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "10050:service-1:service-1-1:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "10050:service-1:service-1-3:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "search_knowledge",
+            "inputs": {
+              "query": "order-service 故障排查",
+              "limit": 5
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-3-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              84001
+            ],
+            "output": {
+              "items": [
+                {
+                  "document_id": 84001,
+                  "title": "Phase 22 cross-service incident runbook",
+                  "excerpt": "Correlate order timeout, inventory 504, and payment pool exhaustion by trace and time.",
+                  "category": "runbook",
+                  "source": "eval://phase22/cross-service",
+                  "score": 10.0
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "evidence_id": "10050:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "evidence_id": "10050:service-2:service-2-2:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "inventory-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82101,
+                  "title": "Phase 22 incident for inventory-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "inventory-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "tool_budget": {
+          "used": 5,
+          "limit": 9
+        },
+        "verifier": {
+          "status": "skipped",
+          "claims": [],
+          "error": "VERIFIER_DISABLED"
+        },
+        "service_status": {
+          "order-service": "partial",
+          "inventory-service": "completed"
+        },
+        "errors": [
+          "TOOL_EXECUTION_ERROR"
+        ],
+        "followup_count": 0,
+        "retry_count": 0,
+        "agent_tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "partial",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "order-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              },
+              {
+                "step_id": "service-1-3",
+                "tool": "search_knowledge",
+                "inputs": {
+                  "query": "order-service 故障排查",
+                  "limit": 5
+                },
+                "reason": "前序证据不足，检索只读知识"
+              }
+            ],
+            "evidence_ids": [
+              "10050:service-1:service-1-1:1",
+              "10050:service-1:service-1-3:1"
+            ],
+            "errors": [
+              "TOOL_EXECUTION_ERROR"
+            ],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "failed",
+                "error": "TOOL_EXECUTION_ERROR"
+              },
+              {
+                "step_id": "service-1-3",
+                "attempt_id": "service-1-3-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 3,
+            "stop_reason": "partial_failure"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "inventory-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10050:service-2:service-2-1:1",
+              "10050:service-2:service-2-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          }
+        ]
+      },
+      "fixture_calls": [
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "order-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_knowledge",
+          "inputs": {
+            "query": "order-service 故障排查",
+            "category": null,
+            "limit": 5
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "inventory-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "inventory-service",
+            "limit": 10
+          },
+          "attempt": 1
+        }
+      ],
+      "metrics": {
+        "tool_attempts": 5,
+        "tool_limit": 9,
+        "model_calls": 0,
+        "tokens": 0,
+        "fixture_latency_ms": 4.806,
+        "log_service_coverage": 1.0,
+        "supported_claims": 0,
+        "unsupported_claims": 0,
+        "hypotheses_unverified": 0,
+        "wrong_scope_evidence_ids": [],
+        "budget_ok": true,
+        "read_only_ok": true,
+        "retry_count": 0,
+        "followup_count": 0,
+        "verifier_status": "skipped",
+        "human_claim_review": "pending"
+      }
+    },
+    {
+      "case_id": "ticket_failure",
+      "variant": "multi_no_followup",
+      "result": {
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "10051:service-1:service-1-1:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "10051:service-1:service-1-3:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "search_knowledge",
+            "inputs": {
+              "query": "order-service 故障排查",
+              "limit": 5
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-3-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              84001
+            ],
+            "output": {
+              "items": [
+                {
+                  "document_id": 84001,
+                  "title": "Phase 22 cross-service incident runbook",
+                  "excerpt": "Correlate order timeout, inventory 504, and payment pool exhaustion by trace and time.",
+                  "category": "runbook",
+                  "source": "eval://phase22/cross-service",
+                  "score": 10.0
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "evidence_id": "10051:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "evidence_id": "10051:service-2:service-2-2:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "inventory-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82101,
+                  "title": "Phase 22 incident for inventory-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "inventory-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "tool_budget": {
+          "used": 5,
+          "limit": 9
+        },
+        "verifier": {
+          "status": "completed",
+          "claims": [
+            {
+              "claim_id": "claim-1",
+              "claim_type": "fact",
+              "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+              "evidence_ids": [
+                "10051:service-1:service-1-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-2",
+              "claim_type": "fact",
+              "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+              "evidence_ids": [
+                "10051:service-2:service-2-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-3",
+              "claim_type": "fact",
+              "text": "步骤 4 的工单 ID 82101 状态为 open。",
+              "evidence_ids": [
+                "10051:service-2:service-2-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-4",
+              "claim_type": "hypothesis",
+              "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+              "evidence_ids": [],
+              "support": "unverified",
+              "reason": "假设可作为排查方向，当前记录尚未证明因果关系。"
+            }
+          ],
+          "error": null
+        },
+        "service_status": {
+          "order-service": "partial",
+          "inventory-service": "completed"
+        },
+        "errors": [
+          "TOOL_EXECUTION_ERROR"
+        ],
+        "followup_count": 0,
+        "retry_count": 0,
+        "agent_tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "partial",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "order-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              },
+              {
+                "step_id": "service-1-3",
+                "tool": "search_knowledge",
+                "inputs": {
+                  "query": "order-service 故障排查",
+                  "limit": 5
+                },
+                "reason": "前序证据不足，检索只读知识"
+              }
+            ],
+            "evidence_ids": [
+              "10051:service-1:service-1-1:1",
+              "10051:service-1:service-1-3:1"
+            ],
+            "errors": [
+              "TOOL_EXECUTION_ERROR"
+            ],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "failed",
+                "error": "TOOL_EXECUTION_ERROR"
+              },
+              {
+                "step_id": "service-1-3",
+                "attempt_id": "service-1-3-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 3,
+            "stop_reason": "partial_failure"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "inventory-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10051:service-2:service-2-1:1",
+              "10051:service-2:service-2-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          }
+        ]
+      },
+      "fixture_calls": [
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "order-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_knowledge",
+          "inputs": {
+            "query": "order-service 故障排查",
+            "category": null,
+            "limit": 5
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "inventory-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "inventory-service",
+            "limit": 10
+          },
+          "attempt": 1
+        }
+      ],
+      "metrics": {
+        "tool_attempts": 5,
+        "tool_limit": 9,
+        "model_calls": 0,
+        "tokens": 0,
+        "fixture_latency_ms": 5.393,
+        "log_service_coverage": 1.0,
+        "supported_claims": 3,
+        "unsupported_claims": 0,
+        "hypotheses_unverified": 1,
+        "wrong_scope_evidence_ids": [],
+        "budget_ok": true,
+        "read_only_ok": true,
+        "retry_count": 0,
+        "followup_count": 0,
+        "verifier_status": "completed",
+        "human_claim_review": "pending"
+      }
+    },
+    {
+      "case_id": "ticket_failure",
+      "variant": "multi_no_retry",
+      "result": {
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "10052:service-1:service-1-1:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "order-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              81001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 81001,
+                  "service_name": "order-service",
+                  "level": "ERROR",
+                  "error_type": "ORDER_TIMEOUT",
+                  "message": "Order timed out while waiting for inventory reservation.",
+                  "stack_trace": null,
+                  "request_id": "phase22-order-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "10052:service-1:service-1-3:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "order-service",
+            "tool": "search_knowledge",
+            "inputs": {
+              "query": "order-service 故障排查",
+              "limit": 5
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-3-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              84001
+            ],
+            "output": {
+              "items": [
+                {
+                  "document_id": 84001,
+                  "title": "Phase 22 cross-service incident runbook",
+                  "excerpt": "Correlate order timeout, inventory 504, and payment pool exhaustion by trace and time.",
+                  "category": "runbook",
+                  "source": "eval://phase22/cross-service",
+                  "score": 10.0
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 3,
+            "evidence_id": "10052:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "inventory-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82001
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82001,
+                  "service_name": "inventory-service",
+                  "level": "ERROR",
+                  "error_type": "504",
+                  "message": "Inventory returned HTTP 504 from warehouse gateway.",
+                  "stack_trace": null,
+                  "request_id": "phase22-inventory-service",
+                  "created_at": "2026-09-22T02:30:00Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 4,
+            "evidence_id": "10052:service-2:service-2-2:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "inventory-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "inventory-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              82101
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 82101,
+                  "title": "Phase 22 incident for inventory-service",
+                  "content": "Ticket matches the fixed incident window.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "open",
+                  "service_name": "inventory-service",
+                  "resolution": null,
+                  "created_at": "2026-09-22T02:32:00Z",
+                  "updated_at": "2026-09-22T02:35:00Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "tool_budget": {
+          "used": 5,
+          "limit": 9
+        },
+        "verifier": {
+          "status": "completed",
+          "claims": [
+            {
+              "claim_id": "claim-1",
+              "claim_type": "fact",
+              "text": "步骤 1 的日志 ID 81001 记录错误类型 ORDER_TIMEOUT。",
+              "evidence_ids": [
+                "10052:service-1:service-1-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-2",
+              "claim_type": "fact",
+              "text": "步骤 3 的日志 ID 82001 记录错误类型 504。",
+              "evidence_ids": [
+                "10052:service-2:service-2-1:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-3",
+              "claim_type": "fact",
+              "text": "步骤 4 的工单 ID 82101 状态为 open。",
+              "evidence_ids": [
+                "10052:service-2:service-2-2:1"
+              ],
+              "support": "supported",
+              "reason": "工具成功返回，该断言与对应记录字段一致。"
+            },
+            {
+              "claim_id": "claim-4",
+              "claim_type": "hypothesis",
+              "text": "多个服务的错误可能相关，需核对同一请求的调用链；现有记录未证明共同根因。",
+              "evidence_ids": [],
+              "support": "unverified",
+              "reason": "假设可作为排查方向，当前记录尚未证明因果关系。"
+            }
+          ],
+          "error": null
+        },
+        "service_status": {
+          "order-service": "partial",
+          "inventory-service": "completed"
+        },
+        "errors": [
+          "TOOL_EXECUTION_ERROR"
+        ],
+        "followup_count": 0,
+        "retry_count": 0,
+        "agent_tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "order-service",
+            "status": "partial",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "order-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "order-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              },
+              {
+                "step_id": "service-1-3",
+                "tool": "search_knowledge",
+                "inputs": {
+                  "query": "order-service 故障排查",
+                  "limit": 5
+                },
+                "reason": "前序证据不足，检索只读知识"
+              }
+            ],
+            "evidence_ids": [
+              "10052:service-1:service-1-1:1",
+              "10052:service-1:service-1-3:1"
+            ],
+            "errors": [
+              "TOOL_EXECUTION_ERROR"
+            ],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "failed",
+                "error": "TOOL_EXECUTION_ERROR"
+              },
+              {
+                "step_id": "service-1-3",
+                "attempt_id": "service-1-3-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 3,
+            "stop_reason": "partial_failure"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "inventory-service",
+            "status": "completed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "inventory-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              }
+            ],
+            "evidence_ids": [
+              "10052:service-2:service-2-1:1",
+              "10052:service-2:service-2-2:1"
+            ],
+            "errors": [],
+            "gaps": [],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "completed",
+                "error": null
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "completed",
+                "error": null
+              }
+            ],
+            "attempts_used": 2,
+            "stop_reason": "investigation_complete"
+          }
+        ]
+      },
+      "fixture_calls": [
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "order-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "order-service",
+            "limit": 10
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_knowledge",
+          "inputs": {
+            "query": "order-service 故障排查",
+            "category": null,
+            "limit": 5
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "query_error_logs",
+          "inputs": {
+            "service_name": "inventory-service",
+            "error_type": null,
+            "minutes": 60,
+            "limit": 20
+          },
+          "attempt": 1
+        },
+        {
+          "tool": "search_tickets",
+          "inputs": {
+            "keyword": null,
+            "service_name": "inventory-service",
+            "limit": 10
+          },
+          "attempt": 1
+        }
+      ],
+      "metrics": {
+        "tool_attempts": 5,
+        "tool_limit": 9,
+        "model_calls": 0,
+        "tokens": 0,
+        "fixture_latency_ms": 6.281,
+        "log_service_coverage": 1.0,
+        "supported_claims": 3,
+        "unsupported_claims": 0,
+        "hypotheses_unverified": 1,
+        "wrong_scope_evidence_ids": [],
+        "budget_ok": true,
+        "read_only_ok": true,
+        "retry_count": 0,
+        "followup_count": 0,
+        "verifier_status": "completed",
+        "human_claim_review": "pending"
+      }
+    }
+  ],
+  "interpretation": "Fixture metrics check mechanics only; business success and causal support require human review."
+}

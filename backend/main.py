@@ -12,6 +12,7 @@ from sqlalchemy.orm import sessionmaker
 
 from backend.agent import build_agent_graph
 from backend.agent.analyzer import IncidentAnalyzer
+from backend.agent.diagnostic_agents import DiagnosticAgents
 from backend.agent.router import IntentRouter
 from backend.agent.planner import Planner
 from backend.agent.risk import RiskChecker
@@ -83,6 +84,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             app.state.intent_router = IntentRouter(llm_service)
             app.state.planner = Planner(llm_service, max_steps=5)
             app.state.incident_analyzer = IncidentAnalyzer(llm_service)
+            app.state.diagnostic_agents = (
+                DiagnosticAgents(llm_service.with_request_limits(timeout=30, max_retries=0))
+                if llm_service is not None else None
+            )
             app.state.risk_checker = RiskChecker()
             app.state.run_event_broker = RunEventBroker()
             app.state.agent_checkpointer = InMemorySaver()

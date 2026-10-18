@@ -1,0 +1,46 @@
+{
+  "suite": "controlled-live-replay-v1",
+  "database": "workpilot_acceptance_20261016",
+  "anchor_utc": "2026-10-15T16:44:23.377465",
+  "cases_sha256": "dde108b244c2d13d989f0bb7df5e80b1df7928843e0ca3304e129c3aadb87956",
+  "source_sha256": {
+    "eval/incident_replay.py": "4af9d25db215c57fa04fe54a3f7c52016a9380666875401eabc1bd07a9e3007b",
+    "eval/replay_cases.json": "dde108b244c2d13d989f0bb7df5e80b1df7928843e0ca3304e129c3aadb87956",
+    "eval/w4_fixture.py": "beb3a6ce77f3be0e93393c491e110ba7296c54b24dcc39ff8d47a83afa9020d1",
+    "backend/services/multi_agent_service.py": "f2977a3b2cfd951da9b28c0fbb5d3ed761e3c6af36f92770fe199389612ca6a7",
+    "backend/services/multi_agent_runtime.py": "2862d780895279f8014b28c3730d63f8ecbe3ab0ada08af931c81f824234af15",
+    "backend/agent/evidence_verifier.py": "bc7927eb7ac7932729ea84da88507770e5413272be8c3f99019a49b33c2bfcf6",
+    "backend/agent/analyzer.py": "3eb99159c08632270eb01418748b387f3193a9086eb6ea25a330e21b6b70936d",
+    "backend/mcp/client.py": "d427e8eb2c250c52653ef73f154e3e0aa2e193bc1b05c5c3cd03729f28097736"
+  },
+  "tool_limit": 9,
+  "per_service_limit": 3,
+  "global_deadline_s": 180,
+  "task_deadline_s": 90,
+  "transport": "real MCP stdio single queue",
+  "model_calls_per_variant": 0,
+  "analyzer": "shared rule fallback and exact-field verifier",
+  "synthetic_data": true,
+  "diagnosis_metric": "term presence only; never reported as causal accuracy",
+  "latency_scope": "orchestration + real MCP + TiDB tool audit + final run persistence",
+  "latency_excludes": "run creation and final audit-count probe",
+  "p95_interpretation": "not estimated: small per-scenario sample",
+  "gold_log_ids": {
+    "confirmed_config": [
+      30001
+    ],
+    "confirmed_dependency": [
+      30002,
+      30003
+    ],
+    "conflicting_evidence": [
+      30004,
+      30005
+    ],
+    "empty_logs": [],
+    "isolated_tool_failure": [
+      30006,
+      30007
+    ]
+  }
+}

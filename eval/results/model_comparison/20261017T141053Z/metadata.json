@@ -1,0 +1,24 @@
+{
+  "source_mode": "synthetic_fixture_online_model",
+  "model": "Qwen/Qwen3.5-35B-A3B",
+  "model_call_limit": 7,
+  "tool_limit": 9,
+  "per_service_tool_limit": 3,
+  "token_limit": 64000,
+  "max_output_tokens": 2048,
+  "input_char_limit": 96000,
+  "timeout_seconds": 30,
+  "sdk_retries": 0,
+  "prompt_hashes": {
+    "single": "bc1b53e3ac810ae53d57d2f1304dded706200cbce7afc7577f45af8cdd39e658",
+    "final_answer.txt": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126",
+    "incident_analysis.txt": "196e2d6365d3edaa73e0e5818958fdd461485c6c04dbb2c920bfa0d0a3099c53",
+    "planner.txt": "81974b250a1b8b1bb64c8f6e05373ac645e203a098de47c6308d7effa9d1deea",
+    "router.txt": "c9e97d185aabb51a25a26e9bf5ab8cc2d21d900a89115472a3a74f0e1197940d",
+    "semantic_verifier.txt": "d5d9dc52efc2ef1b5a75e46468748ee02b9564bb885502864b55d1ad2141f65f",
+    "service_investigator.txt": "9f30dd443f27712d7f63f3d61603459fa1746be1199e62d41f32575407b14348",
+    "text2sql.txt": "5ac39ed30e99b547fcc772e13c8319252200f10bca36364cc7680b4c35a89abc"
+  },
+  "limits": "Byte-based conservative token reservation; actual usage also recorded. Fixture, not live MCP/TiDB. No quality superiority claim.",
+  "historic_A": "eval/results/phase22-final-closeout-2026-09-25.json"
+}

@@ -1,10 +1,11 @@
 """Read contracts for persisted Agent runs and their audited history."""
 
-from typing import Any
+from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from backend.models.enums import AgentRunStatus, RiskLevel
+from backend.schemas.agent import VerifierReport
 from backend.schemas.common import UtcDatetime
 
 
@@ -31,3 +32,9 @@ class AgentRunDetail(AgentRunSummary):
     risk_level: RiskLevel | None
     risk_reasons: list[str]
     steps_executed: int
+    mode: Literal["single", "multi"] = "single"
+    agent_tasks: list[dict[str, Any]] = Field(default_factory=list)
+    investigation_status: Literal["completed", "partial", "failed"] | None = None
+    tool_budget: dict[str, int] | None = None
+    verifier: VerifierReport | None = None
+    model_budget: dict[str, int] | None = None

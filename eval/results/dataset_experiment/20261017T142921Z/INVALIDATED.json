@@ -1,0 +1,4 @@
+{
+  "status": "invalidated_preflight",
+  "reason": "Legacy scorer required analysis.summary missing from online Single response; valid unknown-cause answers were overwritten as KeyError failures. All runs excluded from formal comparison. Dataset and agent prompts unchanged; scorer adapter corrected before full restart."
+}

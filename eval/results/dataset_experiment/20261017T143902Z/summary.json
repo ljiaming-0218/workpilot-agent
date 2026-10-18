@@ -1,0 +1,243 @@
+{
+  "dataset_version": "w4-synthetic-v1",
+  "case_count": 18,
+  "grading": "Independent model judgments plus frozen citation/bound checks; not human accuracy.",
+  "variants": {
+    "enhanced_single_equal": {
+      "runs": 18,
+      "execution_completed": 18,
+      "investigation_completed": 7,
+      "model_graded": 7,
+      "rubric_checked_model_pass": 1,
+      "ungraded": 11,
+      "mean_latency_ms": 13460.55,
+      "median_latency_ms": 8385.83,
+      "model_calls": 72,
+      "tokens": null,
+      "tool_attempts": 66,
+      "fault_exercised_runs": 3
+    },
+    "multi": {
+      "runs": 18,
+      "execution_completed": 18,
+      "investigation_completed": 8,
+      "model_graded": 7,
+      "rubric_checked_model_pass": 3,
+      "ungraded": 11,
+      "mean_latency_ms": 11246.4,
+      "median_latency_ms": 7050.84,
+      "model_calls": 77,
+      "tokens": null,
+      "tool_attempts": 71,
+      "fault_exercised_runs": 3
+    }
+  },
+  "paired_outcomes": {
+    "multi_only": 3,
+    "single_only": 1,
+    "both_fail": 3
+  },
+  "judge_failed": 11,
+  "failures": [
+    {
+      "case_id": "cfg_workers",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "fail",
+      "citations": "pass",
+      "completeness": "pass",
+      "unsupported_assertions": [
+        "错误日志明确指出配置干预导致max_workers=0禁用了处理功能，这直接支持了故障原因是配置值被错误应用的假设。"
+      ],
+      "reason": "答案正确识别了原因和修复步骤，但未能满足‘保留其他服务证据’的完整性要求（无缺失源需披露）。更关键的是，它未体现对‘观察到的恢复值非通用保证’这一不确定性的处理，将历史受控结果表述为确定的当前故障原因，违反了rubric中关于不确定性必须保留的要求。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "three_service_chain",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "fail",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [],
+      "reason": "答案错误地报告 lab-edge-service 和 lab-store-service 状态为 partial 并声称失败 INVESTIGATOR_LLM_FAILED，但 retrieved_evidence 显示所有工具调用均成功（result_status: success_with_data）。此外，答案以‘本次不输出已核验事实’为由拒绝提供核心结论，违反了必须识别 cause (queue_capacity=0) 和 propose action (restore to 64) 的 rubric 要求。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "dependency_stock",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "fail",
+      "citations": "pass",
+      "completeness": "pass",
+      "unsupported_assertions": [
+        "将受控复现的单一案例直接陈述为导致当前上游超时的'直接原因'，忽略了参考场景中强调的'仅确立观察到的恢复值'的不确定性。"
+      ],
+      "reason": "X 在证据支持的原因分析中错误地将受控实验结果（queue_capacity=0）表述为当前故障的确定事实（'直接原因'），违反了 rubric 中关于因果推断局限性的要求。虽然 X 正确识别了服务并给出了建议，但在不确定性处理上失败，未能严格区分历史受控案例与当前未证实状态的界限。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "dependency_price",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "pass",
+      "unsupported_assertions": [
+        "建议立即验证 lab-price-service 当前的 worker_limit 配置是否已稳定在 6 或更高"
+      ],
+      "reason": "答案正确识别了原因（worker_limit=0）并保留了不确定性。但在行动建议中，引用工单明确说明“仅建立观察值而非最小保证”的证据，却提出了“6 或更高”的数值下限要求，这直接违反了 rubric 中“不得发明数值最小/最大值”的规则。证据不支持将 6 设定为通用最小值。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": [
+        {
+          "claim_id": "enhanced-single:service-1:3",
+          "issue": "quantitative_bound_not_found_in_cited_records",
+          "kind": "lower_bound",
+          "value": "6",
+          "excerpt": "6 或更高",
+          "app_verifier_support": "supported",
+          "review_status": "pending"
+        },
+        {
+          "claim_id": "enhanced-single:service-2:3",
+          "issue": "quantitative_bound_not_found_in_cited_records",
+          "kind": "lower_bound",
+          "value": "6",
+          "excerpt": "6 或更高",
+          "app_verifier_support": "supported",
+          "review_status": "pending"
+        }
+      ]
+    },
+    {
+      "case_id": "dependency_cache",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "fail",
+      "citations": "pass",
+      "completeness": "pass",
+      "unsupported_assertions": [
+        "现有证据不足以将当前故障极可能归因于资源耗尽，尚未证实共同根因。"
+      ],
+      "reason": "答案在待验证假设部分错误地声称‘现有证据不足以将当前故障极可能归因于资源耗尽’，这直接违背了参考记录中明确指出的受控复现结果（connection_limit=0 是已知原因）。虽然答案正确识别了原因和修复步骤，但这一关于证据不足的断言是不支持的，因为它忽略了工单中已确立的因果联系。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "historical_ticket",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "fail",
+      "completeness": "pass",
+      "unsupported_assertions": [],
+      "reason": "答案正确陈述了原因未知并建议了检查步骤，但引用证据ID '800015:service-1:service-1-1:1' 与检索记录中的实际证据ID（如 '800015:service-1:service-1-1:1'）在格式上看似一致，然而答案中声称 '已核验事实...系统报告未收集到内存和配置指标' 直接引用了日志内容，但该引用并未明确区分这是日志原文还是模型推断。更关键的是，答案中 '服务状态：lab-history-service: completed' 这一表述具有误导性，因为日志显示的是 'READ_TIMEOUT' 错误，服务并未成功完成请求，这属于对服务状态的错误断言。此外，虽然提到了历史工单，但未明确说明该工单不能作为当前诊断依据的因果隔离逻辑，仅说 '无法排除其他潜在共因'，略显模糊。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "cfg_connections",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "fail",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "pass",
+      "unsupported_assertions": [
+        "推测当前故障可能仍由 pool_capacity 配置为 0 引起"
+      ],
+      "reason": "回答在待验证假设部分声称'推测当前故障可能仍由 pool_capacity 配置为 0 引起'，这违反了'未知原因需保持限定'及'无证据不建立关联'的原则。现有日志仅记录历史受控事件，无法证实当前故障仍由相同原因引起，该表述构成了未经证实的因果推断。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "three_service_chain",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "not_applicable",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [],
+      "reason": "虽然正确报告了服务状态为 completed 且证据检索完整，但答案仅陈述‘本次不输出已核验事实’，完全未执行 rubric 要求的‘Identify lab-store-service and queue_capacity=0 as the controlled cause’以及‘Propose restoring or checking queue_capacity=64’。缺乏对根本原因的具体识别和恢复建议，导致回答不完整。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "dependency_price",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "not_applicable",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "pass",
+      "unsupported_assertions": [],
+      "reason": "答案未能满足 rubric 必须包含“确认 lab-price-service 和 worker_limit=0 为受控原因”的要求。它反复强调这是“历史受控实验结果”，不能证实当前状态，从而回避了对已知事实的定性确认，导致原因分析部分未达标。虽然其行动建议合理且未越界，但核心任务未完成。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "historical_ticket",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "fail",
+      "completeness": "pass",
+      "unsupported_assertions": [
+        "服务lab-history-service在2026-10-17T00:00:00Z发生READ_TIMEOUT错误，请求ID为historical_ticket-request-0，系统报告未能收集内存和配置指标。"
+      ],
+      "reason": "答案同样存在引用证据ID与实际检索记录不匹配的问题（使用了 '800014' 而非 '800015'）。最严重的错误在于 '另有 1 条结论缺乏逐条支持，详见核验意见' 这句话，这是一个幻觉或无效的自我指涉，因为答案内部并没有提供所谓的 '核验意见' 来解释哪条结论缺乏支持，这违反了完整性要求。此外，将 'completed' 作为服务状态也是错误的，因为发生了超时错误。答案虽然提出了假设，但没有像参考标准那样明确强调 '没有建立根本原因或共享因果联系' 这一核心不确定性要求，而是侧重于验证假设。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    }
+  ],
+  "by_split": {
+    "development": {
+      "enhanced_single_equal": {
+        "graded": 2,
+        "passed": 0
+      },
+      "multi": {
+        "graded": 2,
+        "passed": 2
+      }
+    },
+    "holdout": {
+      "enhanced_single_equal": {
+        "graded": 5,
+        "passed": 1
+      },
+      "multi": {
+        "graded": 5,
+        "passed": 1
+      }
+    }
+  },
+  "judge_tokens": 32537,
+  "limitations": [
+    "One run per case and arm; no stable P95 or production accuracy claim.",
+    "Synthetic records include explicit controlled interventions in known-cause tasks.",
+    "Same model family used for investigation and independent judging; judging errors/bias remain possible.",
+    "Tool calls and audit sessions are fixtures; only LLM requests are online."
+  ]
+}

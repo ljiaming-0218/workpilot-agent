@@ -37,7 +37,7 @@ def get_agent_run_detail(session: Session, run_id: int) -> AgentRunDetail:
         select(AgentTraceEvent)
         .where(AgentTraceEvent.agent_run_id == run_id)
         .order_by(AgentTraceEvent.step)
-    )
+    ).all()
     node_outputs = {
         event.node: event.output_json
         for event in events
@@ -48,20 +48,74 @@ def get_agent_run_detail(session: Session, run_id: int) -> AgentRunDetail:
     risk = node_outputs.get("risk_checker") or {}
     plan = planning.get("plan")
     reasons = risk.get("risk_reasons")
+    merged = next((
+        event.output_json for event in events
+        if event.node == "supervisor" and event.event_type == "results_merged"
+        and isinstance(event.output_json, dict)
+    ), None)
+    specialist = next((
+        event.output_json for event in reversed(events)
+        if event.node == "supervisor" and event.event_type == "specialist_result"
+        and isinstance(event.output_json, dict)
+    ), None)
+    coordinated = any(
+        event.node == "supervisor" and event.event_type in {
+            "tasks_dispatched", "specialist_dispatched",
+        }
+        for event in events
+    )
+    task_events = [
+        event for event in events
+        if event.node == "service_investigator" and event.event_type == "tool_completed"
+    ]
 
     calls = session.scalars(
         select(ToolCallLog)
         .where(ToolCallLog.agent_run_id == run_id)
         .order_by(ToolCallLog.id)
-    )
+    ).all()
     evidence = []
-    steps_executed = 0
-    for call in calls:
-        if call.status != ToolCallStatus.COMPLETED:
-            continue
-        steps_executed += 1
-        if isinstance(call.output_json, dict):
-            evidence.append({"tool": call.tool_name, "output": call.output_json})
+    completed = [
+        call for call in calls
+        if call.status == ToolCallStatus.COMPLETED and isinstance(call.output_json, dict)
+    ]
+    if merged is None:
+        evidence = [{"tool": call.tool_name, "output": call.output_json} for call in completed]
+    else:
+        events_by_id = {
+            (event.output_json or {}).get("evidence_id"): event
+            for event in task_events
+        }
+        available = list(completed)
+        for evidence_id in merged.get("evidence_ids", []):
+            event = events_by_id.get(evidence_id)
+            if event is None:
+                continue
+            scope = event.input_json or {}
+            match_index = next((
+                index for index, call in enumerate(available)
+                if call.tool_name == scope.get("tool")
+                and {key: value for key, value in call.input_json.items() if value is not None}
+                == {key: value for key, value in (scope.get("inputs") or {}).items() if value is not None}
+            ), None)
+            if match_index is None:
+                continue
+            call = available.pop(match_index)
+            output = call.output_json
+            evidence.append({
+                "step": len(evidence) + 1,
+                "evidence_id": evidence_id,
+                "result_status": (event.output_json or {}).get("result_status"),
+                "agent_id": scope.get("agent_id"),
+                "task_id": scope.get("task_id"),
+                "service": call.input_json.get("service_name") or scope.get("service"),
+                "tool": call.tool_name,
+                "source_record_ids": [
+                    item.get("id", item.get("document_id"))
+                    for item in output.get("items", []) if isinstance(item, dict)
+                ],
+                "output": output,
+            })
 
     return AgentRunDetail.model_validate({
         **AgentRunSummary.model_validate(run).model_dump(),
@@ -73,5 +127,13 @@ def get_agent_run_detail(session: Session, run_id: int) -> AgentRunDetail:
         "planner_source": planning.get("planner_source"),
         "risk_level": risk.get("risk_level"),
         "risk_reasons": reasons if isinstance(reasons, list) else [],
-        "steps_executed": steps_executed,
+        "steps_executed": merged.get("tool_budget", {}).get("used", 0)
+        if merged is not None else len(completed),
+        "mode": "multi" if coordinated or merged is not None or specialist is not None else "single",
+        "agent_tasks": merged.get("tasks", []) if merged is not None else
+        [specialist["task"]] if specialist is not None else [],
+        "investigation_status": merged.get("investigation_status") if merged is not None else None,
+        "tool_budget": merged.get("tool_budget") if merged is not None else None,
+        "verifier": merged.get("verifier") if merged is not None else None,
+        "model_budget": merged.get("model_budget") if merged is not None else None,
     })

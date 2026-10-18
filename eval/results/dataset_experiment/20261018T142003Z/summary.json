@@ -1,0 +1,456 @@
+{
+  "dataset_version": "w4-synthetic-v1",
+  "case_count": 18,
+  "grading": "Independent model judgments plus frozen citation/bound checks; not human accuracy.",
+  "variants": {
+    "enhanced_single_equal": {
+      "runs": 18,
+      "execution_completed": 18,
+      "investigation_completed": 8,
+      "model_graded": 16,
+      "rubric_checked_model_pass": 5,
+      "ungraded": 2,
+      "mean_latency_ms": 27619.45,
+      "median_latency_ms": 24058.97,
+      "model_calls": 80,
+      "tokens": 175860,
+      "tool_attempts": 68,
+      "fault_exercised_runs": 4
+    },
+    "multi": {
+      "runs": 18,
+      "execution_completed": 18,
+      "investigation_completed": 15,
+      "model_graded": 16,
+      "rubric_checked_model_pass": 1,
+      "ungraded": 2,
+      "mean_latency_ms": 22059.43,
+      "median_latency_ms": 21886.42,
+      "model_calls": 87,
+      "tokens": 185483,
+      "tool_attempts": 74,
+      "fault_exercised_runs": 4
+    }
+  },
+  "paired_outcomes": {
+    "single_only": 5,
+    "multi_only": 1,
+    "both_fail": 10
+  },
+  "judge_failed": 2,
+  "failures": [
+    {
+      "case_id": "three_service_chain",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "fail",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [],
+      "reason": "回答以'核验未完成（VERIFIER_FAILED）；本次不输出已核验事实'为由拒绝给出结论，未能履行必须识别根因（queue_capacity=0）和提出恢复建议（恢复至64）的强制要求。尽管检索到了包含明确因果关系的工单证据，但模型未将其转化为 actionable advice，导致答案不完整且无效。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "dependency_cache",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "fail",
+      "completeness": "pass",
+      "unsupported_assertions": [],
+      "reason": "答案正确识别了原因和恢复值，但在引用证据时存在严重错误。它多次使用 '800011:service-1:service-1-2:1' 来支持关于 lab-cache-service 日志的陈述（如 'lab-cache-service 在...记录了一条 CONFIG_REJECTED 错误'），但该证据 ID 实际指向的是 lab-pay-service 的工单搜索记录。这种服务与证据的不匹配违反了引用必须准确支持声明的要求。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "conflict_request_ids",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [],
+      "reason": "答案正确陈述了记录未建立共同原因（符合must_include），并给出了基于证据的后续检查。但完整性失败，因为答案声称“本次不输出已核验事实”且状态为“核验未完成”，这违反了rubric中“Retain other-service evidence when a local tool fails; disclose missing sources”的要求。尽管有检索到的日志和工单记录，回答却拒绝输出任何已核验事实，导致未能保留和利用已有的跨服务证据。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "historical_ticket",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [],
+      "reason": "原因判定正确，明确未确定根因。但行动建议不完整：仅要求核对调用链和补齐查询，未针对日志中明确指出的‘内存和配置指标未收集’这一关键缺口提出具体的验证或获取措施（如检查当前配置快照、重试采集指标），不符合‘证据驱动的后续检查’要求。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "empty_logs",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "pass",
+      "unsupported_assertions": [],
+      "reason": "答案正确识别了原因未知并引用了工单禁止推断健康的指令。但在“建议的后续检查”中，仅提到检查日志采集和补充指标，未明确包含必须执行的“保留其他服务证据”这一动作（尽管本地工具失败，但任务要求披露缺失来源并保留其他服务证据，此处未体现对其他服务的处理或明确说明无其他服务可查）。此外，答案声称“另有 1 条结论缺乏逐条支持”，但未在文本中具体指出是哪一条，导致该声明本身成为无法验证的断言，且未提供具体的下一步行动来填补证据缺口。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "empty_tickets",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "pass",
+      "unsupported_assertions": [],
+      "reason": "建议步骤仅提及查询通用指南，未提供针对当前超时事件的具体、可执行的下一步检查（如检查特定配置或依赖），不符合'具体证据驱动的下一步检查'要求。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "all_empty",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "fail",
+      "completeness": "pass",
+      "unsupported_assertions": [],
+      "reason": "答案正确指出记录无法确立根因，并给出了具体的后续检查建议。但存在严重引用错误：引用的证据ID（800023）与检索到的实际证据ID（800023:service-1...）不匹配，且未包含知识库检索（search_knowledge）的证据引用，尽管该工具在检索结果中已执行并返回空值。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "ticket_tool_failure",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [],
+      "reason": "答案正确陈述了原因未知并给出了具体建议。但在完整性上失败，因为它错误地声称 lab-fail-b-service 的证据状态为 'completed'（实际该服务在检索中未查询到工单记录，且参考场景要求披露缺失来源），同时未明确说明为何对 lab-fail-a-service 的工单搜索失败导致无法确认其工单状态，违反了‘保留其他服务证据并披露缺失来源’的要求。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "knowledge_tool_failure",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [],
+      "reason": "原因分析正确，不确定性表述恰当。但行动建议失败：建议检查下游依赖和网络丢包率仅引用了产生超时日志的证据（如[证据 800028:service-1:service-1-1:1]），该证据本身不包含下游指标数据，无法支持‘验证’这一动作的可行性；且未针对已知的搜索知识工具失败（INJECTED_KNOWLEDGE_FAILURE）提供具体的替代方案或说明，违反了必须包含具体证据动机的要求。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "followup_finds_logs",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "fail",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [
+        "Asserting 'completed' status for lab-window-service based on empty logs violates the must_not rule against asserting health from an empty window."
+      ],
+      "reason": "Answer X explicitly states 'lab-window-service: completed', which directly violates the rubric's 'must_not' constraint to not assert health from an initial empty window. The reference scenario establishes that the cause is known (worker_slots=0) and a specific fix exists, yet X fails to diagnose this or mention the restoration action found in the source records, instead focusing on generic missing evidence. While it lists gaps correctly, the false positive on service status is a critical failure.",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "followup_stays_empty",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "fail",
+      "completeness": "pass",
+      "unsupported_assertions": [],
+      "reason": "答案正确陈述了无法确定根因并给出了具体建议。但存在严重引用错误：声称服务状态为'partial'且失败原因为'INVESTIGATOR_LLM_FAILED'，而检索证据显示所有工具调用均为'empty_success'（成功返回空结果），并非工具失败。此外，引用的证据ID (800035) 与提供的检索记录一致，但将成功的空查询描述为'失败'属于事实性错误，导致对证据状态的解读不准确。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "cfg_workers",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "fail",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [
+        "未检索到相关工单以验证该事件是否已被正式记录或处理"
+      ],
+      "reason": "在'待核实的证据缺口'中声称'未检索到相关工单'，但随后在'已核验事实'中明确引用了工单100的内容，且retrieved_evidence显示search_tickets成功返回了该工单。这一自相矛盾构成了对证据的误读，导致完整性评估失败。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "cfg_connections",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "fail",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "pass",
+      "unsupported_assertions": [
+        "日志记录显示 controlled intervention 将 cfg_connections-request 的 pool_capacity 设为 0"
+      ],
+      "reason": "错误地将日志中的受控干预描述为导致故障的原因（日志明确说明是 pool_capacity=0 禁用了处理，而非干预本身设为了 0）。虽然建议步骤正确，但因果陈述与证据不符。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "dependency_stock",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "fail",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "fail",
+      "completeness": "pass",
+      "unsupported_assertions": [
+        "声称缺少对历史故障的交叉验证（实际已查询工单）",
+        "声称无法确认操作者记录（非任务必需且无此字段）",
+        "声称缺乏非受控环境复现数据（非任务必需）",
+        "错误引用服务状态为 completed 但证据显示部分缺失"
+      ],
+      "reason": "虽然提出了正确的修复步骤，但存在多处事实性错误：1. 声称'未查询相关工单'，但 retrieved_evidence 中包含了 search_tickets 的成功调用；2. 错误引用了不存在的证据 ID (800006:service-2:service-2-3:1) 来支持'请求链成功恢复'的陈述，而该 ID 对应的内容在源数据中并未直接包含此特定结论（仅包含恢复动作描述）；3. 列出了大量非必需的'证据缺口'（如操作者、非受控环境），导致 completeness 虽通过但逻辑冗余。最关键的失败在于 citations 环节，将不存在的证据 ID 作为支撑依据。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "dependency_price",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "fail",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "fail",
+      "completeness": "fail",
+      "unsupported_assertions": [
+        "引用不存在的工单101作为证据来源",
+        "声称必须将参数恢复为6（若不为6），暗示6是通用最小值或强制标准"
+      ],
+      "reason": "答案虚构了证据ID '800009:service-2:service-2-2:1' 指向不存在的工单101（源记录仅含100）。此外，建议中称'若不为6则应将其恢复为6'，违反了不得建立非观察到的最小/最大界限的准则，且该行动建议缺乏对当前实际值的验证前提。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "dependency_cache",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "fail",
+      "completeness": "pass",
+      "unsupported_assertions": [],
+      "reason": "答案同样犯了引用错误。它声称 '日志记录显示 controlled intervention 将 dependency_cache-request 的 connection_limit 设为 0' 并引用 '800010:service-2:service-2-1:1'。然而，该证据 ID 对应的源记录是 lab-cache-service 的日志，其中消息明确提到的是 'connection_limit=0 disabled processing'，并未提及 'dependency_cache-request 的 connection_limit'（请求本身没有连接限制参数，这是服务的）。此外，它还引用了一个不存在的知识检索结果（步骤3为空）作为事实依据的一部分，尽管未直接用于核心断言，但整体引用链混乱。最关键的失败在于将服务级别的配置描述错误地归因于请求级别，且引用的证据内容并不完全支持其文字表述的精确性。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "conflict_request_ids",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [],
+      "reason": "与X类似，Y也正确表达了不确定性并提供了建议。但同样存在完整性问题：它声明“核验未完成”且“不输出已核验事实”，未能履行rubric要求的“保留其他服务证据”。虽然检索到了两个服务的日志和工单数据，回答却以未完成为由拒绝输出这些已获取的事实，导致未能有效利用现有证据来支持分析。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "historical_ticket",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "fail",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "pass",
+      "unsupported_assertions": [
+        "当前超时可能由运行时资源（如内存）不足或配置参数异常导致"
+      ],
+      "reason": "虽然列出了大量待核实项并给出了具体行动，但在‘待验证假设’部分断言超时‘可能由...内存不足或配置参数异常导致’，这构成了对特定原因的推测性肯定。参考记录明确指出‘未收集到内存和配置指标’且工单说明历史案例‘不构成诊断’，因此将缺乏数据的内存/配置问题作为主要假设方向属于无证据支持的推断，违反了‘不得解释缺失检索为健康或独立’及‘不得在无支持证据下断言根因’的准则。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "empty_logs",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "pass",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [
+        "缺少与 lab-empty-service 相关的工单记录以确认是否已有已知问题"
+      ],
+      "reason": "答案在“待核实的证据缺口”中错误地声称“缺少与 lab-empty-service 相关的工单记录”，这与检索到的证据（证据 800018:service-1:service-1-2:1）直接矛盾，该证据明确显示存在 ID 为 100 的高优先级工单。这是一个事实性错误。此外，答案同样未能满足“保留其他服务证据”的要求，未提及如何处理本地工具失败时的其他服务证据保留问题，且未提供足够具体的、基于证据的下一步检查行动（如具体的查询命令或配置项），仅泛泛建议检查指标。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "empty_tickets",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "pass",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "pass",
+      "unsupported_assertions": [],
+      "reason": "建议步骤提到'恢复至已知正常值'，但检索记录中没有任何关于'已知正常值'的证据支持，属于无依据的断言；且未提供具体的验证动作来替代这种假设性操作。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "all_empty",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "fail",
+      "completeness": "pass",
+      "unsupported_assertions": [],
+      "reason": "答案正确表达了不确定性并提供了行动建议。主要失败在于引用错误：声称的Evidence ID为800022，但检索到的证据ID均为800022:service-1...，格式不一致。此外，虽然列出了大量待核实缺口，但未明确引用知识库检索（search_knowledge）的结果作为事实依据，仅笼统提及。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "ticket_tool_failure",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [],
+      "reason": "答案同样正确处理了不确定性并提供了建议。但在完整性上失败，因为它将 lab-fail-b-service 标记为 'completed'，而实际上该服务的工单检索虽然成功但并未包含针对 lab-fail-a-service 的工单信息（该服务检索失败），且未像参考场景要求的那样显式披露因工具故障导致的特定服务（lab-fail-a-service）工单数据缺失情况，仅笼统列出缺口而未区分服务间的数据获取差异。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "knowledge_tool_failure",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "pass",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [],
+      "reason": "原因和不确定性处理正确。行动建议失败：建议中明确提到‘需等待工具权限恢复后执行’，这属于无效行动，因为任务要求的是基于现有证据的具体下一步检查，而非等待未知条件；同时，建议检查链路追踪和监控数据的行动同样缺乏对应的成功检索证据支持，未能体现‘证据动机’。此外，未充分披露知识库搜索失败对获取已知解决方案的影响。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "transient_read_retry",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "fail",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "pass",
+      "unsupported_assertions": [
+        "日志记录显示 controlled intervention 将 consumer_count 设为 0 导致处理被禁用"
+      ],
+      "reason": "在'已核验事实'中错误地将日志中的'Controlled intervention... Restoring...'（恢复操作）表述为'controlled intervention 将 consumer_count 设为 0'（导致故障的操作）。日志明确说明是恢复操作恢复了服务，而非干预导致了0值；0值是隔离出的原因，但干预本身是修复动作。此因果描述与证据文本不符。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "followup_finds_logs",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "not_applicable",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [],
+      "reason": "Answer Y correctly avoids asserting service health but fails the 'must_include' requirement to diagnose worker_slots=0 and propose checking/restoring 10 when wider logs are retrieved (or state the gap). It claims 'NO_DIAGNOSTIC_CLAIMS' and provides no concrete diagnostic path related to the known root cause (worker_slots) or the specific restoration value (10) established in the source ticket. The suggested action is too vague ('check log collection') and does not address the specific configuration parameter identified in the reference truth.",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "followup_stays_empty",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "fail",
+      "completeness": "pass",
+      "unsupported_assertions": [],
+      "reason": "答案逻辑清晰，正确表达了不确定性并给出建议。主要缺陷在于引用不匹配：答案中多次引用证据ID '800034'，但提供的检索证据列表中实际包含的是 '800035'。这种ID不一致使得引用无法对应到具体的源记录，违反了引用必须支持声明的要求。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    }
+  ],
+  "by_split": {
+    "development": {
+      "enhanced_single_equal": {
+        "graded": 6,
+        "passed": 3
+      },
+      "multi": {
+        "graded": 6,
+        "passed": 0
+      }
+    },
+    "holdout": {
+      "enhanced_single_equal": {
+        "graded": 10,
+        "passed": 2
+      },
+      "multi": {
+        "graded": 10,
+        "passed": 1
+      }
+    }
+  },
+  "judge_tokens": 80650,
+  "limitations": [
+    "One run per case and arm; no stable P95 or production accuracy claim.",
+    "Synthetic records include explicit controlled interventions in known-cause tasks.",
+    "Same model family used for investigation and independent judging; judging errors/bias remain possible.",
+    "Tool calls and audit sessions are fixtures; only LLM requests are online."
+  ]
+}

@@ -1,0 +1,484 @@
+{
+  "metadata": {
+    "suite": "controlled-live-replay-v1",
+    "database": "workpilot_acceptance_20261016",
+    "anchor_utc": "2026-10-15T16:44:23.377465",
+    "cases_sha256": "dde108b244c2d13d989f0bb7df5e80b1df7928843e0ca3304e129c3aadb87956",
+    "source_sha256": {
+      "eval/incident_replay.py": "4af9d25db215c57fa04fe54a3f7c52016a9380666875401eabc1bd07a9e3007b",
+      "eval/replay_cases.json": "dde108b244c2d13d989f0bb7df5e80b1df7928843e0ca3304e129c3aadb87956",
+      "eval/w4_fixture.py": "beb3a6ce77f3be0e93393c491e110ba7296c54b24dcc39ff8d47a83afa9020d1",
+      "backend/services/multi_agent_service.py": "f2977a3b2cfd951da9b28c0fbb5d3ed761e3c6af36f92770fe199389612ca6a7",
+      "backend/services/multi_agent_runtime.py": "2862d780895279f8014b28c3730d63f8ecbe3ab0ada08af931c81f824234af15",
+      "backend/agent/evidence_verifier.py": "bc7927eb7ac7932729ea84da88507770e5413272be8c3f99019a49b33c2bfcf6",
+      "backend/agent/analyzer.py": "3eb99159c08632270eb01418748b387f3193a9086eb6ea25a330e21b6b70936d",
+      "backend/mcp/client.py": "d427e8eb2c250c52653ef73f154e3e0aa2e193bc1b05c5c3cd03729f28097736"
+    },
+    "tool_limit": 9,
+    "per_service_limit": 3,
+    "global_deadline_s": 180,
+    "task_deadline_s": 90,
+    "transport": "real MCP stdio single queue",
+    "model_calls_per_variant": 0,
+    "analyzer": "shared rule fallback and exact-field verifier",
+    "synthetic_data": true,
+    "diagnosis_metric": "term presence only; never reported as causal accuracy",
+    "latency_scope": "orchestration + real MCP + TiDB tool audit + final run persistence",
+    "latency_excludes": "run creation and final audit-count probe",
+    "p95_interpretation": "not estimated: small per-scenario sample",
+    "gold_log_ids": {
+      "confirmed_config": [
+        30001
+      ],
+      "confirmed_dependency": [
+        30002,
+        30003
+      ],
+      "conflicting_evidence": [
+        30004,
+        30005
+      ],
+      "empty_logs": [],
+      "isolated_tool_failure": [
+        30006,
+        30007
+      ]
+    }
+  },
+  "pairs": [
+    {
+      "case_id": "confirmed_config",
+      "repeat": 1,
+      "same_mcp_responses": true,
+      "same_tool_attempts": true
+    },
+    {
+      "case_id": "confirmed_dependency",
+      "repeat": 1,
+      "same_mcp_responses": true,
+      "same_tool_attempts": true
+    },
+    {
+      "case_id": "conflicting_evidence",
+      "repeat": 1,
+      "same_mcp_responses": true,
+      "same_tool_attempts": true
+    },
+    {
+      "case_id": "empty_logs",
+      "repeat": 1,
+      "same_mcp_responses": true,
+      "same_tool_attempts": true
+    },
+    {
+      "case_id": "isolated_tool_failure",
+      "repeat": 1,
+      "same_mcp_responses": true,
+      "same_tool_attempts": true
+    },
+    {
+      "case_id": "confirmed_config",
+      "repeat": 2,
+      "same_mcp_responses": true,
+      "same_tool_attempts": true
+    },
+    {
+      "case_id": "confirmed_dependency",
+      "repeat": 2,
+      "same_mcp_responses": true,
+      "same_tool_attempts": true
+    },
+    {
+      "case_id": "conflicting_evidence",
+      "repeat": 2,
+      "same_mcp_responses": true,
+      "same_tool_attempts": true
+    },
+    {
+      "case_id": "empty_logs",
+      "repeat": 2,
+      "same_mcp_responses": true,
+      "same_tool_attempts": true
+    },
+    {
+      "case_id": "isolated_tool_failure",
+      "repeat": 2,
+      "same_mcp_responses": true,
+      "same_tool_attempts": true
+    }
+  ],
+  "variants": {
+    "enhanced_single_equal": {
+      "runs": 10,
+      "mean_latency_ms": 14274.8,
+      "median_latency_ms": 13315.4,
+      "p95_latency_ms": null,
+      "tool_attempts": 36,
+      "model_calls": 0,
+      "tokens": 0,
+      "scope_violations": 0,
+      "audit_failures": 0,
+      "specific_diagnosis_delivered": 0,
+      "diagnosable_runs": 4,
+      "cases": {
+        "confirmed_config": [
+          {
+            "run_id": 30001,
+            "latency_ms": 13400.5,
+            "scores": {
+              "gold_log_recall": 1.0,
+              "scope_ok": true,
+              "cause_available_in_evidence": true,
+              "specific_cause_terms_present": false,
+              "specific_action_terms_present": false,
+              "diagnostic_delivery": "missing_specific_diagnosis",
+              "uncertainty_in_summary": null,
+              "empty_logs_handled_as_absence": null,
+              "failure_isolated": null,
+              "causal_correctness_human_review": "pending"
+            }
+          },
+          {
+            "run_id": 30012,
+            "latency_ms": 8190.84,
+            "scores": {
+              "gold_log_recall": 1.0,
+              "scope_ok": true,
+              "cause_available_in_evidence": true,
+              "specific_cause_terms_present": false,
+              "specific_action_terms_present": false,
+              "diagnostic_delivery": "missing_specific_diagnosis",
+              "uncertainty_in_summary": null,
+              "empty_logs_handled_as_absence": null,
+              "failure_isolated": null,
+              "causal_correctness_human_review": "pending"
+            }
+          }
+        ],
+        "confirmed_dependency": [
+          {
+            "run_id": 30003,
+            "latency_ms": 15279.35,
+            "scores": {
+              "gold_log_recall": 1.0,
+              "scope_ok": true,
+              "cause_available_in_evidence": true,
+              "specific_cause_terms_present": false,
+              "specific_action_terms_present": false,
+              "diagnostic_delivery": "missing_specific_diagnosis",
+              "uncertainty_in_summary": null,
+              "empty_logs_handled_as_absence": null,
+              "failure_isolated": null,
+              "causal_correctness_human_review": "pending"
+            }
+          },
+          {
+            "run_id": 30014,
+            "latency_ms": 14206.37,
+            "scores": {
+              "gold_log_recall": 1.0,
+              "scope_ok": true,
+              "cause_available_in_evidence": true,
+              "specific_cause_terms_present": false,
+              "specific_action_terms_present": false,
+              "diagnostic_delivery": "missing_specific_diagnosis",
+              "uncertainty_in_summary": null,
+              "empty_logs_handled_as_absence": null,
+              "failure_isolated": null,
+              "causal_correctness_human_review": "pending"
+            }
+          }
+        ],
+        "conflicting_evidence": [
+          {
+            "run_id": 30005,
+            "latency_ms": 13160.84,
+            "scores": {
+              "gold_log_recall": 1.0,
+              "scope_ok": true,
+              "cause_available_in_evidence": null,
+              "specific_cause_terms_present": null,
+              "specific_action_terms_present": null,
+              "diagnostic_delivery": "not_applicable",
+              "uncertainty_in_summary": true,
+              "empty_logs_handled_as_absence": null,
+              "failure_isolated": null,
+              "causal_correctness_human_review": "pending"
+            }
+          },
+          {
+            "run_id": 30016,
+            "latency_ms": 12616.58,
+            "scores": {
+              "gold_log_recall": 1.0,
+              "scope_ok": true,
+              "cause_available_in_evidence": null,
+              "specific_cause_terms_present": null,
+              "specific_action_terms_present": null,
+              "diagnostic_delivery": "not_applicable",
+              "uncertainty_in_summary": true,
+              "empty_logs_handled_as_absence": null,
+              "failure_isolated": null,
+              "causal_correctness_human_review": "pending"
+            }
+          }
+        ],
+        "empty_logs": [
+          {
+            "run_id": 30007,
+            "latency_ms": 17296.82,
+            "scores": {
+              "gold_log_recall": null,
+              "scope_ok": true,
+              "cause_available_in_evidence": null,
+              "specific_cause_terms_present": null,
+              "specific_action_terms_present": null,
+              "diagnostic_delivery": "not_applicable",
+              "uncertainty_in_summary": null,
+              "empty_logs_handled_as_absence": true,
+              "failure_isolated": null,
+              "causal_correctness_human_review": "pending"
+            }
+          },
+          {
+            "run_id": 30018,
+            "latency_ms": 12547.72,
+            "scores": {
+              "gold_log_recall": null,
+              "scope_ok": true,
+              "cause_available_in_evidence": null,
+              "specific_cause_terms_present": null,
+              "specific_action_terms_present": null,
+              "diagnostic_delivery": "not_applicable",
+              "uncertainty_in_summary": null,
+              "empty_logs_handled_as_absence": true,
+              "failure_isolated": null,
+              "causal_correctness_human_review": "pending"
+            }
+          }
+        ],
+        "isolated_tool_failure": [
+          {
+            "run_id": 30009,
+            "latency_ms": 22818.66,
+            "scores": {
+              "gold_log_recall": 1.0,
+              "scope_ok": true,
+              "cause_available_in_evidence": null,
+              "specific_cause_terms_present": null,
+              "specific_action_terms_present": null,
+              "diagnostic_delivery": "not_applicable",
+              "uncertainty_in_summary": null,
+              "empty_logs_handled_as_absence": null,
+              "failure_isolated": true,
+              "causal_correctness_human_review": "pending"
+            }
+          },
+          {
+            "run_id": 30020,
+            "latency_ms": 13230.29,
+            "scores": {
+              "gold_log_recall": 1.0,
+              "scope_ok": true,
+              "cause_available_in_evidence": null,
+              "specific_cause_terms_present": null,
+              "specific_action_terms_present": null,
+              "diagnostic_delivery": "not_applicable",
+              "uncertainty_in_summary": null,
+              "empty_logs_handled_as_absence": null,
+              "failure_isolated": true,
+              "causal_correctness_human_review": "pending"
+            }
+          }
+        ]
+      }
+    },
+    "multi": {
+      "runs": 10,
+      "mean_latency_ms": 16030.02,
+      "median_latency_ms": 14949.51,
+      "p95_latency_ms": null,
+      "tool_attempts": 36,
+      "model_calls": 0,
+      "tokens": 0,
+      "scope_violations": 0,
+      "audit_failures": 0,
+      "specific_diagnosis_delivered": 0,
+      "diagnosable_runs": 4,
+      "cases": {
+        "confirmed_config": [
+          {
+            "run_id": 30002,
+            "latency_ms": 10119.2,
+            "scores": {
+              "gold_log_recall": 1.0,
+              "scope_ok": true,
+              "cause_available_in_evidence": true,
+              "specific_cause_terms_present": false,
+              "specific_action_terms_present": false,
+              "diagnostic_delivery": "missing_specific_diagnosis",
+              "uncertainty_in_summary": null,
+              "empty_logs_handled_as_absence": null,
+              "failure_isolated": null,
+              "causal_correctness_human_review": "pending"
+            }
+          },
+          {
+            "run_id": 30011,
+            "latency_ms": 10829.11,
+            "scores": {
+              "gold_log_recall": 1.0,
+              "scope_ok": true,
+              "cause_available_in_evidence": true,
+              "specific_cause_terms_present": false,
+              "specific_action_terms_present": false,
+              "diagnostic_delivery": "missing_specific_diagnosis",
+              "uncertainty_in_summary": null,
+              "empty_logs_handled_as_absence": null,
+              "failure_isolated": null,
+              "causal_correctness_human_review": "pending"
+            }
+          }
+        ],
+        "confirmed_dependency": [
+          {
+            "run_id": 30004,
+            "latency_ms": 14112.09,
+            "scores": {
+              "gold_log_recall": 1.0,
+              "scope_ok": true,
+              "cause_available_in_evidence": true,
+              "specific_cause_terms_present": false,
+              "specific_action_terms_present": false,
+              "diagnostic_delivery": "missing_specific_diagnosis",
+              "uncertainty_in_summary": null,
+              "empty_logs_handled_as_absence": null,
+              "failure_isolated": null,
+              "causal_correctness_human_review": "pending"
+            }
+          },
+          {
+            "run_id": 30013,
+            "latency_ms": 12428.36,
+            "scores": {
+              "gold_log_recall": 1.0,
+              "scope_ok": true,
+              "cause_available_in_evidence": true,
+              "specific_cause_terms_present": false,
+              "specific_action_terms_present": false,
+              "diagnostic_delivery": "missing_specific_diagnosis",
+              "uncertainty_in_summary": null,
+              "empty_logs_handled_as_absence": null,
+              "failure_isolated": null,
+              "causal_correctness_human_review": "pending"
+            }
+          }
+        ],
+        "conflicting_evidence": [
+          {
+            "run_id": 30006,
+            "latency_ms": 21192.23,
+            "scores": {
+              "gold_log_recall": 1.0,
+              "scope_ok": true,
+              "cause_available_in_evidence": null,
+              "specific_cause_terms_present": null,
+              "specific_action_terms_present": null,
+              "diagnostic_delivery": "not_applicable",
+              "uncertainty_in_summary": true,
+              "empty_logs_handled_as_absence": null,
+              "failure_isolated": null,
+              "causal_correctness_human_review": "pending"
+            }
+          },
+          {
+            "run_id": 30015,
+            "latency_ms": 15786.93,
+            "scores": {
+              "gold_log_recall": 1.0,
+              "scope_ok": true,
+              "cause_available_in_evidence": null,
+              "specific_cause_terms_present": null,
+              "specific_action_terms_present": null,
+              "diagnostic_delivery": "not_applicable",
+              "uncertainty_in_summary": true,
+              "empty_logs_handled_as_absence": null,
+              "failure_isolated": null,
+              "causal_correctness_human_review": "pending"
+            }
+          }
+        ],
+        "empty_logs": [
+          {
+            "run_id": 30008,
+            "latency_ms": 22045.71,
+            "scores": {
+              "gold_log_recall": null,
+              "scope_ok": true,
+              "cause_available_in_evidence": null,
+              "specific_cause_terms_present": null,
+              "specific_action_terms_present": null,
+              "diagnostic_delivery": "not_applicable",
+              "uncertainty_in_summary": null,
+              "empty_logs_handled_as_absence": true,
+              "failure_isolated": null,
+              "causal_correctness_human_review": "pending"
+            }
+          },
+          {
+            "run_id": 30017,
+            "latency_ms": 13415.92,
+            "scores": {
+              "gold_log_recall": null,
+              "scope_ok": true,
+              "cause_available_in_evidence": null,
+              "specific_cause_terms_present": null,
+              "specific_action_terms_present": null,
+              "diagnostic_delivery": "not_applicable",
+              "uncertainty_in_summary": null,
+              "empty_logs_handled_as_absence": true,
+              "failure_isolated": null,
+              "causal_correctness_human_review": "pending"
+            }
+          }
+        ],
+        "isolated_tool_failure": [
+          {
+            "run_id": 30010,
+            "latency_ms": 23643.09,
+            "scores": {
+              "gold_log_recall": 1.0,
+              "scope_ok": true,
+              "cause_available_in_evidence": null,
+              "specific_cause_terms_present": null,
+              "specific_action_terms_present": null,
+              "diagnostic_delivery": "not_applicable",
+              "uncertainty_in_summary": null,
+              "empty_logs_handled_as_absence": null,
+              "failure_isolated": true,
+              "causal_correctness_human_review": "pending"
+            }
+          },
+          {
+            "run_id": 30019,
+            "latency_ms": 16727.56,
+            "scores": {
+              "gold_log_recall": 1.0,
+              "scope_ok": true,
+              "cause_available_in_evidence": null,
+              "specific_cause_terms_present": null,
+              "specific_action_terms_present": null,
+              "diagnostic_delivery": "not_applicable",
+              "uncertainty_in_summary": null,
+              "empty_logs_handled_as_absence": null,
+              "failure_isolated": true,
+              "causal_correctness_human_review": "pending"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "all_pairs_evidence_equal": true,
+  "all_runs_within_budget": true
+}

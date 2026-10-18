@@ -301,6 +301,7 @@ async function runAgent(event) {
       risk_level: null,
       risk_reasons: [],
       steps_executed: 0,
+      mode: "multi",
     }, query);
     const result = await streamAgentRun(accepted, query);
     await loadRunHistory();
@@ -376,12 +377,17 @@ function renderResult() {
 
   const currentRun = state.runs.find((item) => (item.result?.run_id || item.summary?.id) === result.run_id);
   ui.runTitle.textContent = currentRun?.query || `Agent Run #${result.run_id}`;
-  ui.runStatus.textContent = String(result.status).replaceAll("_", " ").toUpperCase();
+  const reviewState = result.verifier?.status !== "completed" && result.verifier
+    ? "REVIEW UNAVAILABLE"
+    : result.verifier?.claims?.some((claim) => claim.support === "unsupported")
+      ? "REVIEW ISSUES" : null;
+  ui.runStatus.textContent = [result.status, result.investigation_status === "partial" ? "PARTIAL" : null, reviewState]
+    .filter(Boolean).join(" · ").replaceAll("_", " ").toUpperCase();
   ui.runStatus.className = `status-badge ${statusClass(result.status)}`;
   ui.runRisk.textContent = `${result.risk_level || "—"} RISK`;
   ui.runRisk.className = `risk-badge ${(result.risk_level || "").toLowerCase()}`;
   ui.runId.textContent = result.run_id;
-  ui.runIntent.textContent = result.intent || "—";
+  ui.runIntent.textContent = `${result.intent || "—"} · ${result.mode || "multi"}`;
   ui.runRouting.textContent = `${result.routing_source || "—"} · ${formatConfidence(result.routing_confidence)}`;
   ui.runSteps.textContent = `${result.steps_executed || 0} / ${(result.plan || []).length}`;
   ui.planCount.textContent = (result.plan || []).length;
@@ -407,7 +413,7 @@ function renderRunContent() {
   if (!result) return;
 
   if (state.activeContent === "plan") {
-    renderPlan(result.plan || []);
+    renderPlan(result.plan || [], result.agent_tasks || [], result.tool_budget, result.verifier);
   } else if (state.activeContent === "evidence") {
     renderEvidence(result.evidence || []);
   } else {
@@ -416,7 +422,30 @@ function renderRunContent() {
   }
 }
 
-function renderPlan(plan) {
+function renderPlan(plan, tasks = [], budget = null, verifier = null) {
+  if (tasks.length) {
+    const section = createElement("div", "task-summary");
+    section.append(createElement("strong", "", "Agent 任务"));
+    if (budget) section.append(createElement("p", "", `工具预算：${budget.used} / ${budget.limit} 次尝试`));
+    tasks.forEach((task) => {
+      const detail = task.agent_id === "workflow_specialist"
+        ? `执行 ${task.attempts_used} 步`
+        : `证据 ${task.evidence_ids.length} 条 · 尝试 ${task.attempts_used} 次`;
+      const row = createElement("p", "", `${task.agent_id} → ${task.service} · ${task.status} · ${task.stop_reason} · ${detail}`);
+      if (task.errors.length) row.append(createElement("span", "", ` · 错误 ${task.errors.join(", ")}`));
+      section.append(row);
+    });
+    ui.contentView.append(section);
+  }
+  if (verifier) {
+    const section = createElement("div", "task-summary");
+    section.append(createElement("strong", "", `证据核验：${verifier.status}`));
+    if (verifier.error) section.append(createElement("p", "", verifier.error));
+    (verifier.claims || []).forEach((claim) => {
+      section.append(createElement("p", "", `${claim.claim_id} · ${claim.claim_type} · ${claim.support} · ${claim.text} · ${claim.reason} · ${claim.evidence_ids.join(", ")}`));
+    });
+    ui.contentView.append(section);
+  }
   if (!plan.length) {
     ui.contentView.append(emptyBlock("当前任务不需要调用工具。"));
     return;
@@ -442,7 +471,7 @@ function renderEvidence(evidence) {
   const list = createElement("div", "evidence-list");
   evidence.forEach((item, index) => {
     const row = createElement("article", "evidence-item");
-    row.append(createElement("strong", "", `Evidence ${index + 1} · ${humanize(item.tool || item.source || "result")}`));
+    row.append(createElement("strong", "", `${item.evidence_id || `Evidence ${index + 1}`} · ${item.service || ""} · ${humanize(item.tool || item.source || "result")}`));
     const pre = createElement("pre", "", prettyJson(item));
     row.append(pre);
     list.append(row);
@@ -534,6 +563,11 @@ function resultFromRunDetail(detail) {
     risk_level: detail.risk_level,
     risk_reasons: detail.risk_reasons,
     steps_executed: detail.steps_executed,
+    mode: detail.mode,
+    agent_tasks: detail.agent_tasks,
+    investigation_status: detail.investigation_status,
+    tool_budget: detail.tool_budget,
+    verifier: detail.verifier,
   };
 }
 

@@ -1,0 +1,1282 @@
+{
+  "summary": {
+    "source_mode": "captured_real_MCP_replay",
+    "fresh_mcp": false,
+    "mysql_persistence": false,
+    "source_run_id": 30004,
+    "status": "failed",
+    "analysis_source": "llm",
+    "tools": {
+      "used": 6,
+      "limit": 9
+    },
+    "models": {
+      "used": 6,
+      "limit": 7
+    },
+    "verifier_status": "failed",
+    "cause_present": false,
+    "repair_present": false,
+    "tasks": [
+      {
+        "agent_id": "investigator-1",
+        "service": "replay-edge-service",
+        "source": "llm",
+        "findings": 0,
+        "errors": [
+          "TOOL_EXECUTION_ERROR",
+          "INVESTIGATOR_LLM_FAILED",
+          "TOOL_EXECUTION_ERROR",
+          "INVESTIGATOR_LLM_FAILED",
+          "TOOL_EXECUTION_ERROR"
+        ]
+      },
+      {
+        "agent_id": "investigator-2",
+        "service": "replay-stock-service",
+        "source": "llm",
+        "findings": 0,
+        "errors": [
+          "TOOL_EXECUTION_ERROR",
+          "TOOL_EXECUTION_ERROR",
+          "TOOL_EXECUTION_ERROR"
+        ]
+      }
+    ],
+    "model_events": [
+      {
+        "node": "service_investigator",
+        "status": "failed",
+        "error": "SCHEMA_VALIDATION_ERROR",
+        "tokens": {
+          "input": 706,
+          "output": 246,
+          "total": 952
+        }
+      },
+      {
+        "node": "service_investigator",
+        "status": "success",
+        "error": null,
+        "tokens": {
+          "input": 706,
+          "output": 162,
+          "total": 868
+        }
+      },
+      {
+        "node": "service_investigator",
+        "status": "failed",
+        "error": "SCHEMA_VALIDATION_ERROR",
+        "tokens": {
+          "input": 718,
+          "output": 328,
+          "total": 1046
+        }
+      },
+      {
+        "node": "service_investigator",
+        "status": "success",
+        "error": null,
+        "tokens": {
+          "input": 709,
+          "output": 178,
+          "total": 887
+        }
+      },
+      {
+        "node": "service_investigator",
+        "status": "success",
+        "error": null,
+        "tokens": {
+          "input": 729,
+          "output": 136,
+          "total": 865
+        }
+      },
+      {
+        "node": "service_investigator",
+        "status": "success",
+        "error": null,
+        "tokens": {
+          "input": 711,
+          "output": 136,
+          "total": 847
+        }
+      }
+    ]
+  },
+  "result": {
+    "run_id": 41001,
+    "request_id": "diagnostic-canary-41001",
+    "intent": "incident_analysis",
+    "routing_source": "rule",
+    "routing_confidence": 0.98,
+    "plan": [
+      {
+        "tool": "query_error_logs",
+        "inputs": {
+          "service_name": "replay-edge-service",
+          "minutes": 60,
+          "limit": 20
+        }
+      },
+      {
+        "tool": "search_tickets",
+        "inputs": {
+          "service_name": "replay-edge-service",
+          "limit": 10
+        }
+      },
+      {
+        "tool": "search_knowledge",
+        "inputs": {
+          "query": "replay-edge-service 故障排查",
+          "limit": 5
+        }
+      },
+      {
+        "tool": "query_error_logs",
+        "inputs": {
+          "service_name": "replay-stock-service",
+          "minutes": 60,
+          "limit": 20
+        }
+      },
+      {
+        "tool": "search_tickets",
+        "inputs": {
+          "service_name": "replay-stock-service",
+          "limit": 10
+        }
+      },
+      {
+        "tool": "search_knowledge",
+        "inputs": {
+          "query": "replay-stock-service 故障排查",
+          "limit": 5
+        }
+      }
+    ],
+    "planner_source": "rule",
+    "steps_executed": 6,
+    "selected_tool": "search_knowledge",
+    "final_answer": "服务调查与诊断：\n诊断核验未完成，当前不能给出已核验的故障原因。\n服务状态：\n- replay-edge-service: failed，证据 0 条；失败 TOOL_EXECUTION_ERROR, INVESTIGATOR_LLM_FAILED, TOOL_EXECUTION_ERROR, INVESTIGATOR_LLM_FAILED, TOOL_EXECUTION_ERROR\n- replay-stock-service: failed，证据 0 条；失败 TOOL_EXECUTION_ERROR, TOOL_EXECUTION_ERROR, TOOL_EXECUTION_ERROR\n核验未完成（NO_DIAGNOSTIC_CLAIMS）；本次不输出已核验事实。",
+    "tool_results": [],
+    "evidence": [],
+    "service_investigations": [
+      {
+        "service": "replay-edge-service",
+        "status": "failed",
+        "evidence": [],
+        "error": "TOOL_EXECUTION_ERROR, INVESTIGATOR_LLM_FAILED, TOOL_EXECUTION_ERROR, INVESTIGATOR_LLM_FAILED, TOOL_EXECUTION_ERROR",
+        "citations": []
+      },
+      {
+        "service": "replay-stock-service",
+        "status": "failed",
+        "evidence": [],
+        "error": "TOOL_EXECUTION_ERROR, TOOL_EXECUTION_ERROR, TOOL_EXECUTION_ERROR",
+        "citations": []
+      }
+    ],
+    "analysis": {
+      "summary": "诊断核验未完成，当前不能给出已核验的故障原因。",
+      "confirmed_facts": [
+        "本次没有通过逐条核验的事实；请核对原始工具记录。"
+      ],
+      "hypotheses": [],
+      "recommended_actions": [
+        "先核对引用记录与未解决缺口，再决定处理措施。"
+      ],
+      "evidence_steps": []
+    },
+    "analysis_source": "llm",
+    "risk_level": "MEDIUM",
+    "requires_approval": false,
+    "risk_reasons": [
+      "故障分析会生成运维操作建议，执行前需要人工核对。"
+    ],
+    "status": "failed",
+    "approval_status": null,
+    "error": "NO_USABLE_EVIDENCE",
+    "mode": "multi",
+    "agent_tasks": [
+      {
+        "task_id": "service-1",
+        "parent_task_id": "supervisor",
+        "agent_id": "investigator-1",
+        "service": "replay-edge-service",
+        "status": "failed",
+        "decisions": [
+          {
+            "step_id": "service-1-1",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "replay-edge-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "reason": "先检查本服务近期错误日志"
+          },
+          {
+            "step_id": "service-1-2",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "replay-edge-service",
+              "limit": 10
+            },
+            "reason": "核对本服务历史工单"
+          },
+          {
+            "step_id": "service-1-3",
+            "tool": "search_knowledge",
+            "inputs": {
+              "query": "replay-edge-service 故障排查",
+              "limit": 5
+            },
+            "reason": "前序证据不足，检索只读知识",
+            "next_tool": "stop",
+            "next_reason": "所有可用工具均已失败，剩余尝试次数为0，无法继续收集证据。"
+          }
+        ],
+        "evidence_ids": [],
+        "errors": [
+          "TOOL_EXECUTION_ERROR",
+          "INVESTIGATOR_LLM_FAILED",
+          "TOOL_EXECUTION_ERROR",
+          "INVESTIGATOR_LLM_FAILED",
+          "TOOL_EXECUTION_ERROR"
+        ],
+        "gaps": [
+          "缺少服务日志或错误记录以确认超时原因",
+          "缺乏网络或依赖服务的健康状态数据",
+          "无相关工单或知识库记录支持故障分析"
+        ],
+        "attempts": [
+          {
+            "step_id": "service-1-1",
+            "attempt_id": "service-1-1-attempt-1",
+            "status": "failed",
+            "error": "TOOL_EXECUTION_ERROR"
+          },
+          {
+            "step_id": "service-1-2",
+            "attempt_id": "service-1-2-attempt-1",
+            "status": "failed",
+            "error": "TOOL_EXECUTION_ERROR"
+          },
+          {
+            "step_id": "service-1-3",
+            "attempt_id": "service-1-3-attempt-1",
+            "status": "failed",
+            "error": "TOOL_EXECUTION_ERROR"
+          }
+        ],
+        "attempts_used": 3,
+        "stop_reason": "partial_failure",
+        "summary": "由于工具执行错误和调查员LLM失败导致无法获取任何有效证据，且剩余工具尝试次数为0，无法对replay-edge-service的超时故障进行具体分析。",
+        "findings": [],
+        "model_source": "llm"
+      },
+      {
+        "task_id": "service-2",
+        "parent_task_id": "supervisor",
+        "agent_id": "investigator-2",
+        "service": "replay-stock-service",
+        "status": "failed",
+        "decisions": [
+          {
+            "step_id": "service-2-1",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "replay-stock-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "reason": "先检查本服务近期错误日志",
+            "next_tool": "search_tickets",
+            "next_reason": "由于当前快照中没有任何有效观察数据，必须通过搜索工单来获取历史故障记录和可能的根本原因线索，这是获取相关证据的唯一可行路径。"
+          },
+          {
+            "step_id": "service-2-2",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "replay-stock-service",
+              "limit": 10
+            },
+            "reason": "由于当前快照中没有任何有效观察数据，必须通过搜索工单来获取历史故障记录和可能的根本原因线索，这是获取相关证据的唯一可行路径。",
+            "next_tool": "search_knowledge",
+            "next_reason": "剩余唯一可用工具为 search_knowledge，优先尝试从知识库中查找已知的超时问题及修复方案，以弥补当前证据缺失。"
+          },
+          {
+            "step_id": "service-2-3",
+            "tool": "search_knowledge",
+            "inputs": {
+              "query": "replay-stock-service 故障排查",
+              "limit": 5
+            },
+            "reason": "剩余唯一可用工具为 search_knowledge，优先尝试从知识库中查找已知的超时问题及修复方案，以弥补当前证据缺失。",
+            "next_tool": "stop",
+            "next_reason": "剩余工具尝试次数已耗尽，无法执行进一步调查，必须停止。"
+          }
+        ],
+        "evidence_ids": [],
+        "errors": [
+          "TOOL_EXECUTION_ERROR",
+          "TOOL_EXECUTION_ERROR",
+          "TOOL_EXECUTION_ERROR"
+        ],
+        "gaps": [
+          "缺少服务日志或错误堆栈以确认超时发生的具体时间点",
+          "缺少数据库查询记录以验证是否存在慢查询导致的阻塞",
+          "缺少上游依赖（如 replay-edge-service）的调用追踪信息",
+          "缺少服务日志以确认超时发生的具体时间和上下文",
+          "缺少相关工单记录以了解历史故障模式",
+          "缺少知识库中关于该服务超时问题的已知解决方案",
+          "缺少服务日志以分析超时根本原因",
+          "缺少相关错误工单记录",
+          "缺少知识库中的已知解决方案"
+        ],
+        "attempts": [
+          {
+            "step_id": "service-2-1",
+            "attempt_id": "service-2-1-attempt-1",
+            "status": "failed",
+            "error": "TOOL_EXECUTION_ERROR"
+          },
+          {
+            "step_id": "service-2-2",
+            "attempt_id": "service-2-2-attempt-1",
+            "status": "failed",
+            "error": "TOOL_EXECUTION_ERROR"
+          },
+          {
+            "step_id": "service-2-3",
+            "attempt_id": "service-2-3-attempt-1",
+            "status": "failed",
+            "error": "TOOL_EXECUTION_ERROR"
+          }
+        ],
+        "attempts_used": 3,
+        "stop_reason": "partial_failure",
+        "summary": "由于所有工具调用尝试均失败且剩余尝试次数为0，无法获取任何关于 replay-stock-service 超时故障的有效证据、日志或工单记录。因此，无法确定具体原因、提供修复建议或引用相关证据。",
+        "findings": [],
+        "model_source": "llm"
+      }
+    ],
+    "investigation_status": "failed",
+    "tool_budget": {
+      "used": 6,
+      "limit": 9
+    },
+    "verifier": {
+      "status": "failed",
+      "claims": [],
+      "error": "NO_DIAGNOSTIC_CLAIMS"
+    },
+    "model_budget": {
+      "used": 6,
+      "limit": 7
+    }
+  },
+  "events": [
+    {
+      "node": "intent_router",
+      "event_type": "node_completed",
+      "output_json": {
+        "intent": "incident_analysis",
+        "routing_source": "rule",
+        "routing_confidence": 0.98
+      }
+    },
+    {
+      "node": "planner",
+      "event_type": "node_completed",
+      "output_json": {
+        "planner_source": "rule",
+        "plan": [
+          {
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "replay-edge-service",
+              "minutes": 60,
+              "limit": 20
+            }
+          },
+          {
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "replay-edge-service",
+              "limit": 10
+            }
+          },
+          {
+            "tool": "search_knowledge",
+            "inputs": {
+              "query": "replay-edge-service 故障排查",
+              "limit": 5
+            }
+          },
+          {
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "replay-stock-service",
+              "minutes": 60,
+              "limit": 20
+            }
+          },
+          {
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "replay-stock-service",
+              "limit": 10
+            }
+          },
+          {
+            "tool": "search_knowledge",
+            "inputs": {
+              "query": "replay-stock-service 故障排查",
+              "limit": 5
+            }
+          }
+        ],
+        "services": [
+          "replay-edge-service",
+          "replay-stock-service"
+        ],
+        "mode": "multi",
+        "version": "w3"
+      }
+    },
+    {
+      "node": "risk_checker",
+      "event_type": "node_completed",
+      "output_json": {
+        "risk_level": "MEDIUM",
+        "risk_reasons": [
+          "故障分析会生成运维操作建议，执行前需要人工核对。"
+        ]
+      }
+    },
+    {
+      "node": "supervisor",
+      "event_type": "tasks_dispatched",
+      "output_json": {
+        "services": [
+          "replay-edge-service",
+          "replay-stock-service"
+        ],
+        "budget": 9,
+        "concurrency": 2,
+        "followup_enabled": true,
+        "retry_enabled": true,
+        "verifier_enabled": true,
+        "mcp_transport": "single_queue",
+        "mode": "multi",
+        "version": "w3"
+      }
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "task_started",
+      "input_json": {
+        "agent_id": "investigator-1",
+        "task_id": "service-1",
+        "service": "replay-edge-service",
+        "followup": false
+      },
+      "output_json": null,
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "tool_selected",
+      "input_json": null,
+      "output_json": {
+        "agent_id": "investigator-1",
+        "task_id": "service-1",
+        "step_id": "service-1-1",
+        "tool": "query_error_logs",
+        "inputs": {
+          "service_name": "replay-edge-service",
+          "minutes": 60,
+          "limit": 20
+        },
+        "reason": "先检查本服务近期错误日志"
+      },
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "tool_failed",
+      "input_json": {
+        "agent_id": "investigator-1",
+        "task_id": "service-1",
+        "tool": "query_error_logs",
+        "inputs": {
+          "service_name": "replay-edge-service",
+          "minutes": 60,
+          "limit": 20
+        },
+        "step_id": "service-1-1",
+        "attempt_id": "service-1-1-attempt-1"
+      },
+      "output_json": null,
+      "error": "TOOL_EXECUTION_ERROR"
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "task_started",
+      "input_json": {
+        "agent_id": "investigator-2",
+        "task_id": "service-2",
+        "service": "replay-stock-service",
+        "followup": false
+      },
+      "output_json": null,
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "tool_selected",
+      "input_json": null,
+      "output_json": {
+        "agent_id": "investigator-2",
+        "task_id": "service-2",
+        "step_id": "service-2-1",
+        "tool": "query_error_logs",
+        "inputs": {
+          "service_name": "replay-stock-service",
+          "minutes": 60,
+          "limit": 20
+        },
+        "reason": "先检查本服务近期错误日志"
+      },
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "tool_failed",
+      "input_json": {
+        "agent_id": "investigator-2",
+        "task_id": "service-2",
+        "tool": "query_error_logs",
+        "inputs": {
+          "service_name": "replay-stock-service",
+          "minutes": 60,
+          "limit": 20
+        },
+        "step_id": "service-2-1",
+        "attempt_id": "service-2-1-attempt-1"
+      },
+      "output_json": null,
+      "error": "TOOL_EXECUTION_ERROR"
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "llm_call",
+      "model": "Qwen/Qwen3.5-35B-A3B",
+      "latency_ms": 6467,
+      "tokens_json": {
+        "input": 706,
+        "output": 246,
+        "total": 952
+      },
+      "input_json": {
+        "agent_id": "investigator-1",
+        "task_id": "service-1",
+        "response_schema": "InvestigatorDecision"
+      },
+      "error": "SCHEMA_VALIDATION_ERROR"
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "decision_failed",
+      "input_json": {
+        "agent_id": "investigator-1",
+        "task_id": "service-1"
+      },
+      "output_json": null,
+      "error": "INVESTIGATOR_LLM_FAILED"
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "tool_selected",
+      "input_json": null,
+      "output_json": {
+        "agent_id": "investigator-1",
+        "task_id": "service-1",
+        "step_id": "service-1-2",
+        "tool": "search_tickets",
+        "inputs": {
+          "service_name": "replay-edge-service",
+          "limit": 10
+        },
+        "reason": "核对本服务历史工单"
+      },
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "tool_failed",
+      "input_json": {
+        "agent_id": "investigator-1",
+        "task_id": "service-1",
+        "tool": "search_tickets",
+        "inputs": {
+          "service_name": "replay-edge-service",
+          "limit": 10
+        },
+        "step_id": "service-1-2",
+        "attempt_id": "service-1-2-attempt-1"
+      },
+      "output_json": null,
+      "error": "TOOL_EXECUTION_ERROR"
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "llm_call",
+      "model": "Qwen/Qwen3.5-35B-A3B",
+      "latency_ms": 2615,
+      "tokens_json": {
+        "input": 706,
+        "output": 162,
+        "total": 868
+      },
+      "input_json": {
+        "agent_id": "investigator-2",
+        "task_id": "service-2",
+        "response_schema": "InvestigatorDecision"
+      },
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "investigation_decision",
+      "input_json": null,
+      "output_json": {
+        "agent_id": "investigator-2",
+        "task_id": "service-2",
+        "summary": "当前针对 replay-stock-service 的超时故障分析无法进行，因为提供的观察数据为空（observations: []），且没有可用的证据记录来支持任何事实陈述、假设或修复建议。",
+        "claims": [],
+        "gaps": [
+          "缺少服务日志或错误堆栈以确认超时发生的具体时间点",
+          "缺少数据库查询记录以验证是否存在慢查询导致的阻塞",
+          "缺少上游依赖（如 replay-edge-service）的调用追踪信息"
+        ],
+        "next_tool": "search_tickets",
+        "reason": "由于当前快照中没有任何有效观察数据，必须通过搜索工单来获取历史故障记录和可能的根本原因线索，这是获取相关证据的唯一可行路径。"
+      },
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "tool_selected",
+      "input_json": null,
+      "output_json": {
+        "agent_id": "investigator-2",
+        "task_id": "service-2",
+        "step_id": "service-2-2",
+        "tool": "search_tickets",
+        "inputs": {
+          "service_name": "replay-stock-service",
+          "limit": 10
+        },
+        "reason": "由于当前快照中没有任何有效观察数据，必须通过搜索工单来获取历史故障记录和可能的根本原因线索，这是获取相关证据的唯一可行路径。"
+      },
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "tool_failed",
+      "input_json": {
+        "agent_id": "investigator-2",
+        "task_id": "service-2",
+        "tool": "search_tickets",
+        "inputs": {
+          "service_name": "replay-stock-service",
+          "limit": 10
+        },
+        "step_id": "service-2-2",
+        "attempt_id": "service-2-2-attempt-1"
+      },
+      "output_json": null,
+      "error": "TOOL_EXECUTION_ERROR"
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "llm_call",
+      "model": "Qwen/Qwen3.5-35B-A3B",
+      "latency_ms": 3912,
+      "tokens_json": {
+        "input": 718,
+        "output": 328,
+        "total": 1046
+      },
+      "input_json": {
+        "agent_id": "investigator-1",
+        "task_id": "service-1",
+        "response_schema": "InvestigatorDecision"
+      },
+      "error": "SCHEMA_VALIDATION_ERROR"
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "decision_failed",
+      "input_json": {
+        "agent_id": "investigator-1",
+        "task_id": "service-1"
+      },
+      "output_json": null,
+      "error": "INVESTIGATOR_LLM_FAILED"
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "tool_selected",
+      "input_json": null,
+      "output_json": {
+        "agent_id": "investigator-1",
+        "task_id": "service-1",
+        "step_id": "service-1-3",
+        "tool": "search_knowledge",
+        "inputs": {
+          "query": "replay-edge-service 故障排查",
+          "limit": 5
+        },
+        "reason": "前序证据不足，检索只读知识"
+      },
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "tool_failed",
+      "input_json": {
+        "agent_id": "investigator-1",
+        "task_id": "service-1",
+        "tool": "search_knowledge",
+        "inputs": {
+          "query": "replay-edge-service 故障排查",
+          "limit": 5
+        },
+        "step_id": "service-1-3",
+        "attempt_id": "service-1-3-attempt-1"
+      },
+      "output_json": null,
+      "error": "TOOL_EXECUTION_ERROR"
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "llm_call",
+      "model": "Qwen/Qwen3.5-35B-A3B",
+      "latency_ms": 2910,
+      "tokens_json": {
+        "input": 709,
+        "output": 178,
+        "total": 887
+      },
+      "input_json": {
+        "agent_id": "investigator-2",
+        "task_id": "service-2",
+        "response_schema": "InvestigatorDecision"
+      },
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "investigation_decision",
+      "input_json": null,
+      "output_json": {
+        "agent_id": "investigator-2",
+        "task_id": "service-2",
+        "summary": "在尝试分析 replay-stock-service 的超时故障时，前两次工具调用均失败。当前剩余一次工具调用机会，且允许的工具为 search_knowledge 或 stop。由于尚未获取到任何有效证据（如日志、工单或知识库记录），无法确认具体原因或提供修复建议。",
+        "claims": [],
+        "gaps": [
+          "缺少服务日志以确认超时发生的具体时间和上下文",
+          "缺少相关工单记录以了解历史故障模式",
+          "缺少知识库中关于该服务超时问题的已知解决方案"
+        ],
+        "next_tool": "search_knowledge",
+        "reason": "剩余唯一可用工具为 search_knowledge，优先尝试从知识库中查找已知的超时问题及修复方案，以弥补当前证据缺失。"
+      },
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "tool_selected",
+      "input_json": null,
+      "output_json": {
+        "agent_id": "investigator-2",
+        "task_id": "service-2",
+        "step_id": "service-2-3",
+        "tool": "search_knowledge",
+        "inputs": {
+          "query": "replay-stock-service 故障排查",
+          "limit": 5
+        },
+        "reason": "剩余唯一可用工具为 search_knowledge，优先尝试从知识库中查找已知的超时问题及修复方案，以弥补当前证据缺失。"
+      },
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "tool_failed",
+      "input_json": {
+        "agent_id": "investigator-2",
+        "task_id": "service-2",
+        "tool": "search_knowledge",
+        "inputs": {
+          "query": "replay-stock-service 故障排查",
+          "limit": 5
+        },
+        "step_id": "service-2-3",
+        "attempt_id": "service-2-3-attempt-1"
+      },
+      "output_json": null,
+      "error": "TOOL_EXECUTION_ERROR"
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "llm_call",
+      "model": "Qwen/Qwen3.5-35B-A3B",
+      "latency_ms": 2287,
+      "tokens_json": {
+        "input": 729,
+        "output": 136,
+        "total": 865
+      },
+      "input_json": {
+        "agent_id": "investigator-1",
+        "task_id": "service-1",
+        "response_schema": "InvestigatorDecision"
+      },
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "investigation_decision",
+      "input_json": null,
+      "output_json": {
+        "agent_id": "investigator-1",
+        "task_id": "service-1",
+        "summary": "由于工具执行错误和调查员LLM失败导致无法获取任何有效证据，且剩余工具尝试次数为0，无法对replay-edge-service的超时故障进行具体分析。",
+        "claims": [],
+        "gaps": [
+          "缺少服务日志或错误记录以确认超时原因",
+          "缺乏网络或依赖服务的健康状态数据",
+          "无相关工单或知识库记录支持故障分析"
+        ],
+        "next_tool": "stop",
+        "reason": "所有可用工具均已失败，剩余尝试次数为0，无法继续收集证据。"
+      },
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "task_finished",
+      "input_json": null,
+      "output_json": {
+        "task_id": "service-1",
+        "parent_task_id": "supervisor",
+        "agent_id": "investigator-1",
+        "service": "replay-edge-service",
+        "status": "failed",
+        "decisions": [
+          {
+            "step_id": "service-1-1",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "replay-edge-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "reason": "先检查本服务近期错误日志"
+          },
+          {
+            "step_id": "service-1-2",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "replay-edge-service",
+              "limit": 10
+            },
+            "reason": "核对本服务历史工单"
+          },
+          {
+            "step_id": "service-1-3",
+            "tool": "search_knowledge",
+            "inputs": {
+              "query": "replay-edge-service 故障排查",
+              "limit": 5
+            },
+            "reason": "前序证据不足，检索只读知识",
+            "next_tool": "stop",
+            "next_reason": "所有可用工具均已失败，剩余尝试次数为0，无法继续收集证据。"
+          }
+        ],
+        "evidence_ids": [],
+        "errors": [
+          "TOOL_EXECUTION_ERROR",
+          "INVESTIGATOR_LLM_FAILED",
+          "TOOL_EXECUTION_ERROR",
+          "INVESTIGATOR_LLM_FAILED",
+          "TOOL_EXECUTION_ERROR"
+        ],
+        "gaps": [
+          "缺少服务日志或错误记录以确认超时原因",
+          "缺乏网络或依赖服务的健康状态数据",
+          "无相关工单或知识库记录支持故障分析"
+        ],
+        "attempts": [
+          {
+            "step_id": "service-1-1",
+            "attempt_id": "service-1-1-attempt-1",
+            "status": "failed",
+            "error": "TOOL_EXECUTION_ERROR"
+          },
+          {
+            "step_id": "service-1-2",
+            "attempt_id": "service-1-2-attempt-1",
+            "status": "failed",
+            "error": "TOOL_EXECUTION_ERROR"
+          },
+          {
+            "step_id": "service-1-3",
+            "attempt_id": "service-1-3-attempt-1",
+            "status": "failed",
+            "error": "TOOL_EXECUTION_ERROR"
+          }
+        ],
+        "attempts_used": 3,
+        "stop_reason": "partial_failure",
+        "summary": "由于工具执行错误和调查员LLM失败导致无法获取任何有效证据，且剩余工具尝试次数为0，无法对replay-edge-service的超时故障进行具体分析。",
+        "findings": [],
+        "model_source": "llm"
+      },
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "llm_call",
+      "model": "Qwen/Qwen3.5-35B-A3B",
+      "latency_ms": 1996,
+      "tokens_json": {
+        "input": 711,
+        "output": 136,
+        "total": 847
+      },
+      "input_json": {
+        "agent_id": "investigator-2",
+        "task_id": "service-2",
+        "response_schema": "InvestigatorDecision"
+      },
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "investigation_decision",
+      "input_json": null,
+      "output_json": {
+        "agent_id": "investigator-2",
+        "task_id": "service-2",
+        "summary": "由于所有工具调用尝试均失败且剩余尝试次数为0，无法获取任何关于 replay-stock-service 超时故障的有效证据、日志或工单记录。因此，无法确定具体原因、提供修复建议或引用相关证据。",
+        "claims": [],
+        "gaps": [
+          "缺少服务日志以分析超时根本原因",
+          "缺少相关错误工单记录",
+          "缺少知识库中的已知解决方案"
+        ],
+        "next_tool": "stop",
+        "reason": "剩余工具尝试次数已耗尽，无法执行进一步调查，必须停止。"
+      },
+      "error": null
+    },
+    {
+      "node": "service_investigator",
+      "event_type": "task_finished",
+      "input_json": null,
+      "output_json": {
+        "task_id": "service-2",
+        "parent_task_id": "supervisor",
+        "agent_id": "investigator-2",
+        "service": "replay-stock-service",
+        "status": "failed",
+        "decisions": [
+          {
+            "step_id": "service-2-1",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "replay-stock-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "reason": "先检查本服务近期错误日志",
+            "next_tool": "search_tickets",
+            "next_reason": "由于当前快照中没有任何有效观察数据，必须通过搜索工单来获取历史故障记录和可能的根本原因线索，这是获取相关证据的唯一可行路径。"
+          },
+          {
+            "step_id": "service-2-2",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "replay-stock-service",
+              "limit": 10
+            },
+            "reason": "由于当前快照中没有任何有效观察数据，必须通过搜索工单来获取历史故障记录和可能的根本原因线索，这是获取相关证据的唯一可行路径。",
+            "next_tool": "search_knowledge",
+            "next_reason": "剩余唯一可用工具为 search_knowledge，优先尝试从知识库中查找已知的超时问题及修复方案，以弥补当前证据缺失。"
+          },
+          {
+            "step_id": "service-2-3",
+            "tool": "search_knowledge",
+            "inputs": {
+              "query": "replay-stock-service 故障排查",
+              "limit": 5
+            },
+            "reason": "剩余唯一可用工具为 search_knowledge，优先尝试从知识库中查找已知的超时问题及修复方案，以弥补当前证据缺失。",
+            "next_tool": "stop",
+            "next_reason": "剩余工具尝试次数已耗尽，无法执行进一步调查，必须停止。"
+          }
+        ],
+        "evidence_ids": [],
+        "errors": [
+          "TOOL_EXECUTION_ERROR",
+          "TOOL_EXECUTION_ERROR",
+          "TOOL_EXECUTION_ERROR"
+        ],
+        "gaps": [
+          "缺少服务日志或错误堆栈以确认超时发生的具体时间点",
+          "缺少数据库查询记录以验证是否存在慢查询导致的阻塞",
+          "缺少上游依赖（如 replay-edge-service）的调用追踪信息",
+          "缺少服务日志以确认超时发生的具体时间和上下文",
+          "缺少相关工单记录以了解历史故障模式",
+          "缺少知识库中关于该服务超时问题的已知解决方案",
+          "缺少服务日志以分析超时根本原因",
+          "缺少相关错误工单记录",
+          "缺少知识库中的已知解决方案"
+        ],
+        "attempts": [
+          {
+            "step_id": "service-2-1",
+            "attempt_id": "service-2-1-attempt-1",
+            "status": "failed",
+            "error": "TOOL_EXECUTION_ERROR"
+          },
+          {
+            "step_id": "service-2-2",
+            "attempt_id": "service-2-2-attempt-1",
+            "status": "failed",
+            "error": "TOOL_EXECUTION_ERROR"
+          },
+          {
+            "step_id": "service-2-3",
+            "attempt_id": "service-2-3-attempt-1",
+            "status": "failed",
+            "error": "TOOL_EXECUTION_ERROR"
+          }
+        ],
+        "attempts_used": 3,
+        "stop_reason": "partial_failure",
+        "summary": "由于所有工具调用尝试均失败且剩余尝试次数为0，无法获取任何关于 replay-stock-service 超时故障的有效证据、日志或工单记录。因此，无法确定具体原因、提供修复建议或引用相关证据。",
+        "findings": [],
+        "model_source": "llm"
+      },
+      "error": null
+    },
+    {
+      "node": "evidence_verifier",
+      "event_type": "review_failed",
+      "output_json": {
+        "status": "failed",
+        "claims": [],
+        "error": "NO_DIAGNOSTIC_CLAIMS"
+      },
+      "error": "NO_DIAGNOSTIC_CLAIMS"
+    },
+    {
+      "node": "supervisor",
+      "event_type": "results_merged",
+      "output_json": {
+        "mode": "multi",
+        "tasks": [
+          {
+            "task_id": "service-1",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-1",
+            "service": "replay-edge-service",
+            "status": "failed",
+            "decisions": [
+              {
+                "step_id": "service-1-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "replay-edge-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志"
+              },
+              {
+                "step_id": "service-1-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "replay-edge-service",
+                  "limit": 10
+                },
+                "reason": "核对本服务历史工单"
+              },
+              {
+                "step_id": "service-1-3",
+                "tool": "search_knowledge",
+                "inputs": {
+                  "query": "replay-edge-service 故障排查",
+                  "limit": 5
+                },
+                "reason": "前序证据不足，检索只读知识",
+                "next_tool": "stop",
+                "next_reason": "所有可用工具均已失败，剩余尝试次数为0，无法继续收集证据。"
+              }
+            ],
+            "evidence_ids": [],
+            "errors": [
+              "TOOL_EXECUTION_ERROR",
+              "INVESTIGATOR_LLM_FAILED",
+              "TOOL_EXECUTION_ERROR",
+              "INVESTIGATOR_LLM_FAILED",
+              "TOOL_EXECUTION_ERROR"
+            ],
+            "gaps": [
+              "缺少服务日志或错误记录以确认超时原因",
+              "缺乏网络或依赖服务的健康状态数据",
+              "无相关工单或知识库记录支持故障分析"
+            ],
+            "attempts": [
+              {
+                "step_id": "service-1-1",
+                "attempt_id": "service-1-1-attempt-1",
+                "status": "failed",
+                "error": "TOOL_EXECUTION_ERROR"
+              },
+              {
+                "step_id": "service-1-2",
+                "attempt_id": "service-1-2-attempt-1",
+                "status": "failed",
+                "error": "TOOL_EXECUTION_ERROR"
+              },
+              {
+                "step_id": "service-1-3",
+                "attempt_id": "service-1-3-attempt-1",
+                "status": "failed",
+                "error": "TOOL_EXECUTION_ERROR"
+              }
+            ],
+            "attempts_used": 3,
+            "stop_reason": "partial_failure",
+            "summary": "由于工具执行错误和调查员LLM失败导致无法获取任何有效证据，且剩余工具尝试次数为0，无法对replay-edge-service的超时故障进行具体分析。",
+            "findings": [],
+            "model_source": "llm"
+          },
+          {
+            "task_id": "service-2",
+            "parent_task_id": "supervisor",
+            "agent_id": "investigator-2",
+            "service": "replay-stock-service",
+            "status": "failed",
+            "decisions": [
+              {
+                "step_id": "service-2-1",
+                "tool": "query_error_logs",
+                "inputs": {
+                  "service_name": "replay-stock-service",
+                  "minutes": 60,
+                  "limit": 20
+                },
+                "reason": "先检查本服务近期错误日志",
+                "next_tool": "search_tickets",
+                "next_reason": "由于当前快照中没有任何有效观察数据，必须通过搜索工单来获取历史故障记录和可能的根本原因线索，这是获取相关证据的唯一可行路径。"
+              },
+              {
+                "step_id": "service-2-2",
+                "tool": "search_tickets",
+                "inputs": {
+                  "service_name": "replay-stock-service",
+                  "limit": 10
+                },
+                "reason": "由于当前快照中没有任何有效观察数据，必须通过搜索工单来获取历史故障记录和可能的根本原因线索，这是获取相关证据的唯一可行路径。",
+                "next_tool": "search_knowledge",
+                "next_reason": "剩余唯一可用工具为 search_knowledge，优先尝试从知识库中查找已知的超时问题及修复方案，以弥补当前证据缺失。"
+              },
+              {
+                "step_id": "service-2-3",
+                "tool": "search_knowledge",
+                "inputs": {
+                  "query": "replay-stock-service 故障排查",
+                  "limit": 5
+                },
+                "reason": "剩余唯一可用工具为 search_knowledge，优先尝试从知识库中查找已知的超时问题及修复方案，以弥补当前证据缺失。",
+                "next_tool": "stop",
+                "next_reason": "剩余工具尝试次数已耗尽，无法执行进一步调查，必须停止。"
+              }
+            ],
+            "evidence_ids": [],
+            "errors": [
+              "TOOL_EXECUTION_ERROR",
+              "TOOL_EXECUTION_ERROR",
+              "TOOL_EXECUTION_ERROR"
+            ],
+            "gaps": [
+              "缺少服务日志或错误堆栈以确认超时发生的具体时间点",
+              "缺少数据库查询记录以验证是否存在慢查询导致的阻塞",
+              "缺少上游依赖（如 replay-edge-service）的调用追踪信息",
+              "缺少服务日志以确认超时发生的具体时间和上下文",
+              "缺少相关工单记录以了解历史故障模式",
+              "缺少知识库中关于该服务超时问题的已知解决方案",
+              "缺少服务日志以分析超时根本原因",
+              "缺少相关错误工单记录",
+              "缺少知识库中的已知解决方案"
+            ],
+            "attempts": [
+              {
+                "step_id": "service-2-1",
+                "attempt_id": "service-2-1-attempt-1",
+                "status": "failed",
+                "error": "TOOL_EXECUTION_ERROR"
+              },
+              {
+                "step_id": "service-2-2",
+                "attempt_id": "service-2-2-attempt-1",
+                "status": "failed",
+                "error": "TOOL_EXECUTION_ERROR"
+              },
+              {
+                "step_id": "service-2-3",
+                "attempt_id": "service-2-3-attempt-1",
+                "status": "failed",
+                "error": "TOOL_EXECUTION_ERROR"
+              }
+            ],
+            "attempts_used": 3,
+            "stop_reason": "partial_failure",
+            "summary": "由于所有工具调用尝试均失败且剩余尝试次数为0，无法获取任何关于 replay-stock-service 超时故障的有效证据、日志或工单记录。因此，无法确定具体原因、提供修复建议或引用相关证据。",
+            "findings": [],
+            "model_source": "llm"
+          }
+        ],
+        "evidence_ids": [],
+        "status": "failed",
+        "investigation_status": "failed",
+        "tool_budget": {
+          "used": 6,
+          "limit": 9
+        },
+        "model_budget": {
+          "used": 6,
+          "limit": 7
+        },
+        "verifier": {
+          "status": "failed",
+          "claims": [],
+          "error": "NO_DIAGNOSTIC_CLAIMS"
+        }
+      }
+    }
+  ]
+}

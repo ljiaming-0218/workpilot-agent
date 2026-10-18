@@ -1,0 +1,48 @@
+{
+  "runs": [
+    {
+      "variant": "enhanced_single_equal",
+      "repeat": 1,
+      "status": "completed",
+      "investigation_status": "completed",
+      "latency_ms": 29864.33,
+      "tool_attempts": 3,
+      "calls": 4,
+      "call_limit": 7,
+      "tokens": 11935,
+      "token_limit": 64000,
+      "reserved_token_allowance": 42555,
+      "input_chars": 31799,
+      "input_char_limit": 96000,
+      "budget_checks_pass": true
+    },
+    {
+      "variant": "multi",
+      "repeat": 1,
+      "status": "completed",
+      "investigation_status": "completed",
+      "latency_ms": 24667.51,
+      "tool_attempts": 5,
+      "calls": 6,
+      "call_limit": 7,
+      "tokens": 14476,
+      "token_limit": 64000,
+      "reserved_token_allowance": 57120,
+      "input_chars": 42338,
+      "input_char_limit": 96000,
+      "budget_checks_pass": true
+    }
+  ],
+  "pairs": [
+    {
+      "repeat": 1,
+      "compared_with": "multi",
+      "same_fixture_hash": true,
+      "common_tool_requests": 3,
+      "common_responses_identical": true
+    }
+  ],
+  "human_review": "pending",
+  "score_warning": "Inherited lexical marker checks are not semantic diagnosis grades.",
+  "conclusion": "Pilot only; no architecture superiority or stable latency claim."
+}

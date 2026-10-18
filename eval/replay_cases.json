@@ -1,0 +1,47 @@
+[
+  {
+    "id": "confirmed_config",
+    "services": ["replay-config-service"],
+    "logs": [{"service": "replay-config-service", "error_type": "WORKER_TIMEOUT", "message": "Controlled replay: runtime max_workers=0 stopped all workers. Restoring max_workers=8 cleared this exact failure without other changes.", "request_id": "replay-config-001"}],
+    "ticket": "Controlled intervention confirmed max_workers=0; restoring max_workers=8 resolved the timeout.",
+    "truth": {"cause_known": true, "cause_marker": "max_workers=0", "action_marker": "max_workers=8"}
+  },
+  {
+    "id": "confirmed_dependency",
+    "services": ["replay-edge-service", "replay-stock-service"],
+    "logs": [
+      {"service": "replay-edge-service", "error_type": "UPSTREAM_TIMEOUT", "message": "Request replay-shared-001 waited for replay-stock-service; the edge process was healthy.", "request_id": "replay-shared-001"},
+      {"service": "replay-stock-service", "error_type": "QUEUE_REJECTED", "message": "Same request replay-shared-001: queue_capacity=0 rejected all reservations. Restoring queue_capacity=32 recovered the upstream and edge together in a controlled intervention.", "request_id": "replay-shared-001"}
+    ],
+    "ticket": "The controlled replay isolated queue_capacity=0 in replay-stock-service. Restoring queue_capacity=32 cleared both services; the edge timeout was a downstream symptom.",
+    "truth": {"cause_known": true, "cause_marker": "queue_capacity=0", "action_marker": "queue_capacity=32"}
+  },
+  {
+    "id": "conflicting_evidence",
+    "services": ["replay-conflict-a-service", "replay-conflict-b-service"],
+    "logs": [
+      {"service": "replay-conflict-a-service", "error_type": "HTTP_TIMEOUT", "message": "conflict: this timeout has request conflict-a; no correlation with conflict-b has been established.", "request_id": "replay-conflict-a"},
+      {"service": "replay-conflict-b-service", "error_type": "POOL_TIMEOUT", "message": "conflict: this timeout has request conflict-b; temporal proximity does not establish shared causality.", "request_id": "replay-conflict-b"}
+    ],
+    "ticket": "conflict: service A recovered before service B failed. Available records do not establish a common root cause.",
+    "truth": {"cause_known": false, "require_uncertainty": true}
+  },
+  {
+    "id": "empty_logs",
+    "services": ["replay-empty-service"],
+    "logs": [],
+    "ticket": "A user reported slowness, but no logs are available. Absence of retrieved logs does not prove service health or absence of an incident.",
+    "truth": {"cause_known": false, "expect_empty_logs": true}
+  },
+  {
+    "id": "isolated_tool_failure",
+    "services": ["replay-fail-a-service", "replay-fail-b-service"],
+    "logs": [
+      {"service": "replay-fail-a-service", "error_type": "READ_TIMEOUT", "message": "A read timed out; its cause has not been determined.", "request_id": "replay-fail-a"},
+      {"service": "replay-fail-b-service", "error_type": "CACHE_TIMEOUT", "message": "A cache call timed out; its cause has not been determined.", "request_id": "replay-fail-b"}
+    ],
+    "ticket": "This report is contextual evidence only; a timeout does not establish its cause.",
+    "fault": "ticket_failure",
+    "truth": {"cause_known": false, "failed_tool": "search_tickets", "unaffected_service": "replay-fail-b-service"}
+  }
+]

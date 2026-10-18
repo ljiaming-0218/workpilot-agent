@@ -1,0 +1,711 @@
+{
+  "raw_sha256": "412f90ea1dd064d53a91042da52ce0ff760c543c846e87e0e2387f04e1c4ed1b",
+  "dataset_hash_matches_manifest": true,
+  "variants": {
+    "enhanced_single_equal": {
+      "runs": 18,
+      "execution_completed": 18,
+      "verifier_completed": 14,
+      "mean_latency_seconds": 27.619,
+      "model_calls": 80,
+      "observed_tokens": 175860,
+      "token_usage_complete": true,
+      "tool_attempts": 68,
+      "model_judge_pass": 5,
+      "model_judged": 16,
+      "ungraded": 2
+    },
+    "multi": {
+      "runs": 18,
+      "execution_completed": 18,
+      "verifier_completed": 14,
+      "mean_latency_seconds": 22.059,
+      "model_calls": 87,
+      "observed_tokens": 185483,
+      "token_usage_complete": true,
+      "tool_attempts": 74,
+      "model_judge_pass": 1,
+      "model_judged": 16,
+      "ungraded": 2
+    }
+  },
+  "paired_fixture_checks": [
+    {
+      "case_id": "cfg_workers",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 2,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "cfg_connections",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 2,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "three_service_chain",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 5,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "dependency_stock",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 3,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "dependency_price",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 3,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "dependency_cache",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 3,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "conflict_request_ids",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 6,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "historical_ticket",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 2,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "conflict_ticket_log",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 6,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "empty_logs",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 3,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "empty_tickets",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 3,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "all_empty",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 3,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "ticket_tool_failure",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 5,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "log_tool_failure",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 4,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "knowledge_tool_failure",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 4,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "transient_read_retry",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 2,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "followup_finds_logs",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 3,
+      "same_common_responses": true
+    },
+    {
+      "case_id": "followup_stays_empty",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 3,
+      "same_common_responses": true
+    }
+  ],
+  "budget_checks": [
+    {
+      "case_id": "cfg_workers",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "cfg_workers",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "cfg_connections",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "cfg_connections",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "three_service_chain",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "three_service_chain",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "dependency_stock",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "dependency_stock",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "dependency_price",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "dependency_price",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "dependency_cache",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "dependency_cache",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "conflict_request_ids",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "conflict_request_ids",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "historical_ticket",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "historical_ticket",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "conflict_ticket_log",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "conflict_ticket_log",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "empty_logs",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "empty_logs",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "empty_tickets",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "empty_tickets",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "all_empty",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "all_empty",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "ticket_tool_failure",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "ticket_tool_failure",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "log_tool_failure",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "log_tool_failure",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "knowledge_tool_failure",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "knowledge_tool_failure",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "transient_read_retry",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "transient_read_retry",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "followup_finds_logs",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "followup_finds_logs",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "followup_stays_empty",
+      "variant": "multi",
+      "passed": true
+    },
+    {
+      "case_id": "followup_stays_empty",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    }
+  ],
+  "feature_observations": [
+    {
+      "case_id": "cfg_workers",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "cfg_workers",
+      "variant": "multi",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "cfg_connections",
+      "variant": "multi",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "cfg_connections",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "three_service_chain",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "three_service_chain",
+      "variant": "multi",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "dependency_stock",
+      "variant": "multi",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "dependency_stock",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {
+        "SCHEMA_VALIDATION_ERROR": 1
+      }
+    },
+    {
+      "case_id": "dependency_price",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "dependency_price",
+      "variant": "multi",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "dependency_cache",
+      "variant": "multi",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "dependency_cache",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "conflict_request_ids",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "conflict_request_ids",
+      "variant": "multi",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "historical_ticket",
+      "variant": "multi",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "historical_ticket",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {
+        "SCHEMA_VALIDATION_ERROR": 2
+      }
+    },
+    {
+      "case_id": "conflict_ticket_log",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "conflict_ticket_log",
+      "variant": "multi",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "empty_logs",
+      "variant": "multi",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "empty_logs",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {
+        "SCHEMA_VALIDATION_ERROR": 1
+      }
+    },
+    {
+      "case_id": "empty_tickets",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "empty_tickets",
+      "variant": "multi",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "all_empty",
+      "variant": "multi",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "all_empty",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {
+        "SCHEMA_VALIDATION_ERROR": 2
+      }
+    },
+    {
+      "case_id": "ticket_tool_failure",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [
+        "INJECTED_TICKET_FAILURE"
+      ],
+      "other_service_evidence_retained": true,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {
+        "SCHEMA_VALIDATION_ERROR": 2
+      }
+    },
+    {
+      "case_id": "ticket_tool_failure",
+      "variant": "multi",
+      "injected_faults": [
+        "INJECTED_TICKET_FAILURE"
+      ],
+      "other_service_evidence_retained": true,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "log_tool_failure",
+      "variant": "multi",
+      "injected_faults": [
+        "INJECTED_LOG_FAILURE"
+      ],
+      "other_service_evidence_retained": true,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "log_tool_failure",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [
+        "INJECTED_LOG_FAILURE"
+      ],
+      "other_service_evidence_retained": true,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {
+        "SCHEMA_VALIDATION_ERROR": 1
+      }
+    },
+    {
+      "case_id": "knowledge_tool_failure",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [
+        "INJECTED_KNOWLEDGE_FAILURE"
+      ],
+      "other_service_evidence_retained": true,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {
+        "SCHEMA_VALIDATION_ERROR": 2
+      }
+    },
+    {
+      "case_id": "knowledge_tool_failure",
+      "variant": "multi",
+      "injected_faults": [
+        "INJECTED_KNOWLEDGE_FAILURE"
+      ],
+      "other_service_evidence_retained": true,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "transient_read_retry",
+      "variant": "multi",
+      "injected_faults": [
+        "INJECTED_TRANSIENT_ONCE"
+      ],
+      "other_service_evidence_retained": false,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "transient_read_retry",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [
+        "INJECTED_TRANSIENT_ONCE"
+      ],
+      "other_service_evidence_retained": false,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "followup_finds_logs",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "followup_finds_logs",
+      "variant": "multi",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "followup_stays_empty",
+      "variant": "multi",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {}
+    },
+    {
+      "case_id": "followup_stays_empty",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 0,
+      "wider_window_records": 0,
+      "model_errors": {
+        "SCHEMA_VALIDATION_ERROR": 2
+      }
+    }
+  ],
+  "judge_failed_cases": [
+    "conflict_ticket_log",
+    "log_tool_failure"
+  ],
+  "judge_tokens": 80650,
+  "limits": [
+    "Synthetic fixture tools and online model; one repetition.",
+    "Model judge verdicts are not human accuracy; schema failures and grading disagreements are retained.",
+    "Code changes after this batch require a separate result directory.",
+    "USD cost unknown; no price assumption."
+  ]
+}

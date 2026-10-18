@@ -238,7 +238,10 @@ def run_live_agent(
         for case in cases:
             started = perf_counter()
             try:
-                response = client.post("/agent/runs", json={"query": case.query})
+                response = client.post(
+                    "/agent/runs", json={"query": case.query},
+                    headers={"X-WorkPilot-Comparison-Mode": "single"},
+                )
                 response.raise_for_status()
                 envelope = SuccessResponse[AgentResult].model_validate(response.json())
                 latency_ms = max(0, int((perf_counter() - started) * 1_000))
@@ -530,7 +533,10 @@ def run_representative_agent(
                 )
 
             started = perf_counter()
-            response = client.post("/agent/runs", json={"query": case.query})
+            response = client.post(
+                "/agent/runs", json={"query": case.query},
+                headers={"X-WorkPilot-Comparison-Mode": "single"},
+            )
             result: AgentResult | None = None
             run_id: int | None = None
             if response.status_code == 200:

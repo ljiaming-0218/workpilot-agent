@@ -1,0 +1,30 @@
+{
+  "dataset_sha256": "518c4dbf640abba9e20915ca3fbd0f33c29ae769d00afdec3ac5e79e88c10e94",
+  "model": "Qwen/Qwen3.5-35B-A3B",
+  "cases": 1,
+  "case_ids": [
+    "followup_finds_logs"
+  ],
+  "repeats": 1,
+  "tool_limit": 9,
+  "per_service_tool_limit": 3,
+  "model_call_limit": "3 * number_of_services + 1",
+  "token_reservation_limit": 64000,
+  "input_char_limit": 96000,
+  "max_output_tokens": 2048,
+  "sdk_retries": 0,
+  "order": "Case-alternating arm order; alternating anonymous judge labels",
+  "code_hashes": {
+    "eval\\run_dataset_experiment.py": "619de069974fa3b7676dddc7410378dcbccbf0dc2b8aaafc932d226de3da660c",
+    "eval\\model_comparison.py": "0443b3286d718d639436ebaeba4ad288cdf66ae8f39a86751fd85247cc4dbb30",
+    "eval\\model_scoring.py": "c32892922e081abc9168c7eb8a6fb6c2241057134047fa675a7275ff2be727ff",
+    "backend\\agent\\diagnostic_agents.py": "5920b52db38aa71d7eb7e06b3257c74b38b2a1ef9254047f6967ecb2a058c25a",
+    "backend\\services\\multi_agent_runtime.py": "b8de9797958bff3c344a806b63a48aeb9e0036ea9664aa312f554b75ef9fbaa6",
+    "backend\\services\\multi_agent_service.py": "33a30f56fb9e7e18f6e135c642fc1257c5bcbdf090d07618a5597698af9054be",
+    "backend\\prompts\\service_investigator.txt": "3d4fd775e6e02d137baa451738b6f4db9f3cdcf8687aa2ba2f0ab4178b7eeaa4",
+    "backend\\prompts\\semantic_verifier.txt": "bb0175f6dd05df44ffe79dcd944a09ae2b305daf8a4018b137ff0d81c2ae6998"
+  },
+  "judge_prompt_sha256": "6c3237c0d11d76d53f9f8d514aac8a7894cfb7b4a84ad037da063b1793d1697a",
+  "llm_cost_usd": null,
+  "evaluation_scope": "Exploratory retest on previously inspected synthetic cases, not an unseen holdout."
+}

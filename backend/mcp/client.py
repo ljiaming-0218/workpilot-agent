@@ -25,6 +25,18 @@ class MCPClientError(RuntimeError):
     code = "MCP_CLIENT_ERROR"
 
 
+class MCPTransientConnectionError(MCPClientError):
+    """A confirmed transport connection failure for a read-only request."""
+
+    code = "MCP_TRANSIENT_CONNECTION"
+
+
+class MCPRequestTimeoutError(MCPClientError):
+    """The remote outcome is unknown; callers must not automatically retry."""
+
+    code = "MCP_OUTCOME_UNKNOWN"
+
+
 @dataclass(frozen=True, slots=True)
 class _ClientRequest:
     operation: Literal["list_tools", "call_tool"]
@@ -110,6 +122,8 @@ class WorkPilotMCPClient:
             )
         except MCPClientError:
             raise
+        except (ConnectionError, BrokenPipeError) as exc:
+            raise MCPTransientConnectionError(f"MCP connection failed: {name}") from exc
         except Exception as exc:
             raise MCPClientError(f"MCP tools/call failed: {name}") from exc
         if result.is_error:
@@ -137,7 +151,7 @@ class WorkPilotMCPClient:
         try:
             return request.future.result(CLIENT_CALL_TIMEOUT_SECONDS)
         except TimeoutError as exc:
-            raise MCPClientError("MCP request timed out.") from exc
+            raise MCPRequestTimeoutError("MCP request timed out; remote outcome is unknown.") from exc
 
     def _run_worker(self) -> None:
         asyncio.run(self._serve())

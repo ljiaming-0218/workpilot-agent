@@ -1,0 +1,23 @@
+[
+  {"id":"normal_one","services":["order-service"]},
+  {"id":"normal_two","services":["order-service","inventory-service"]},
+  {"id":"normal_three","services":["order-service","inventory-service","payment-service"]},
+  {"id":"empty_tickets","services":["order-service","inventory-service"],"empty_tools":["search_tickets"]},
+  {"id":"followup_gain","services":["order-service","inventory-service"],"empty_initial_logs":true},
+  {"id":"followup_no_gain","services":["order-service","inventory-service"],"empty_initial_logs":true,"empty_wide_logs":true},
+  {"id":"transient_once","services":["order-service","inventory-service"],"fault":"transient_once"},
+  {"id":"transient_persistent","services":["order-service","inventory-service"],"fault":"transient_persistent"},
+  {"id":"outcome_unknown","services":["order-service","inventory-service"],"fault":"outcome_unknown"},
+  {"id":"ticket_failure","services":["order-service","inventory-service"],"fault":"ticket_failure"},
+  {"id":"knowledge_failure","services":["order-service","inventory-service"],"empty_tools":["search_tickets"],"fault":"knowledge_failure"},
+  {"id":"all_empty","services":["order-service","inventory-service"],"empty_tools":["query_error_logs","search_tickets","search_knowledge"]},
+  {"id":"conflicting_signals","services":["order-service","inventory-service","payment-service"],"conflict":true},
+  {"id":"wrong_service_record","services":["order-service","inventory-service"],"fault":"wrong_service_record"},
+  {"id":"verifier_timeout","services":["order-service","inventory-service"],"fault":"verifier_timeout"},
+  {"id":"verifier_failure","services":["order-service","inventory-service"],"fault":"verifier_failure"},
+  {"id":"non_low_tool","services":["order-service","inventory-service"],"fault":"non_low_tool"},
+  {"id":"budget_competition","services":["order-service","inventory-service","payment-service"],"fault":"transient_once","empty_tools":["search_tickets"]},
+  {"id":"routing_ambiguity","services":["order-service","inventory-service","payment-service"],"query":"调查固定窗口的冲突证据：service: order-service 出现 ORDER_TIMEOUT，inventory-service 返回 504，payment-service 出现 DB_POOL_EXHAUSTED；核对日志、工单和手册，不要强行归因。","expected_intent":"incident_analysis","conflict":true},
+  {"id":"overreach_claim","services":["order-service","inventory-service"],"fault":"overreach_claim"},
+  {"id":"verifier_false_reject","services":["order-service","inventory-service"],"fault":"verifier_false_reject"}
+]

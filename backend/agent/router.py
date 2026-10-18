@@ -25,7 +25,7 @@ PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts" / "router.txt"
 ROUTER_SYSTEM_PROMPT = PROMPT_PATH.read_text(encoding="utf-8").strip()
 
 _INCIDENT_WORDS = (
-    "故障", "异常", "报错", "错误", "失败", "超时", "500",
+    "故障", "异常", "报错", "错误", "失败", "超时", "500", "冲突证据",
     "error", "exception", "failure", "timeout",
 )
 _ANALYSIS_WORDS = ("分析", "原因", "排查", "诊断", "调查")
@@ -81,6 +81,12 @@ def match_rule(query: str) -> RoutingDecision | None:
         word in normalized for word in _HIGH_RISK_ACTION_WORDS
     ):
         return RoutingDecision(intent=INTENT_OPERATION, confidence=0.99, source="rule")
+    # Explicit document/ticket lookup may mention incident-analysis terminology.
+    if re.match(r"^(?:(?:请|帮我|帮忙)\s*)?(?:搜索|检索|查找|查询|查看|search\b|find\b|look up\b)", normalized):
+        if any(word in normalized for word in _KNOWLEDGE_WORDS):
+            return RoutingDecision(intent=INTENT_KNOWLEDGE_SEARCH, confidence=0.95, source="rule")
+        if any(word in normalized for word in _TICKET_WORDS):
+            return RoutingDecision(intent=INTENT_TICKET_SEARCH, confidence=0.95, source="rule")
     if any(word in normalized for word in _INCIDENT_WORDS) and any(
         word in normalized for word in _ANALYSIS_WORDS
     ):

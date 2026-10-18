@@ -1,0 +1,721 @@
+{
+  "summary": {
+    "source_mode": "captured_real_MCP_replay",
+    "live_investigator_source": "20261016T152108Z.json",
+    "live_review_source": "20261016T152303Z-review.json",
+    "current_step": "apply_numeric_bound_constraint",
+    "additional_model_calls": 0,
+    "cause_present": true,
+    "supported_actions": [
+      "建议验证 replay-stock-service 当前的 queue_capacity 配置是否稳定在 32，并监控其队列积压情况以防止复发。"
+    ],
+    "rejected_claims": [
+      "建议检查并监控 replay-stock-service 的队列容量配置，确保其不低于 32，同时建立自动告警机制以预防类似容量耗尽事件。"
+    ],
+    "investigation_status": "partial",
+    "fresh_mysql_validation": "pending_connection_recovery"
+  },
+  "result": {
+    "run_id": 41002,
+    "request_id": "diagnostic-canary-41002",
+    "intent": "incident_analysis",
+    "routing_source": "rule",
+    "routing_confidence": 0.98,
+    "plan": [
+      {
+        "tool": "query_error_logs",
+        "inputs": {
+          "service_name": "replay-edge-service",
+          "minutes": 60,
+          "limit": 20
+        }
+      },
+      {
+        "tool": "search_tickets",
+        "inputs": {
+          "service_name": "replay-edge-service",
+          "limit": 10
+        }
+      },
+      {
+        "tool": "query_error_logs",
+        "inputs": {
+          "service_name": "replay-stock-service",
+          "minutes": 60,
+          "limit": 20
+        }
+      },
+      {
+        "tool": "search_knowledge",
+        "inputs": {
+          "query": "replay-stock-service 故障排查",
+          "limit": 5
+        }
+      }
+    ],
+    "planner_source": "rule",
+    "steps_executed": 4,
+    "selected_tool": "search_knowledge",
+    "final_answer": "服务调查与诊断：\nConclusions reviewed against the cited records.\n服务状态：\n- replay-edge-service: completed，证据 2 条\n- replay-stock-service: partial，证据 1 条；失败 TOOL_EXECUTION_ERROR\n已核验事实：\n- replay-edge-service 在 2026-10-15T16:39:23.377465Z 记录了 UPSTREAM_TIMEOUT 错误，具体消息为 'Request replay-shared-001 waited for replay-stock-service'，且边缘进程本身健康。 [证据 41002:service-1:service-1-1:1]\n- 已存在一个状态为 resolved 的高优先级工单，确认根本原因是 replay-stock-service 的 queue_capacity 被隔离为 0。 [证据 41002:service-1:service-1-2:1]\n- replay-stock-service 在 2026-10-15T16:39:23.377465Z 记录到 ERROR 级别日志，错误类型为 QUEUE_REJECTED，请求 ID 为 replay-shared-001。 [证据 41002:service-2:service-2-1:1]\n- 系统日志明确指出：'Same request replay-shared-001: queue_capacity=0 rejected all reservations.'，表明队列容量为零导致所有预留被拒绝。 [证据 41002:service-2:service-2-1:1]\n- 受控干预措施 'Restoring queue_capacity=32 recovered the upstream and edge together' 成功恢复了上游和边缘服务。 [证据 41002:service-2:service-2-1:1]\n待验证假设：\n- replay-stock-service 的队列容量耗尽导致其无法处理请求，进而引发 replay-edge-service 的等待超时。 [证据 41002:service-1:service-1-2:1]；证据 30002 指出 edge 超时是下游症状，且根本原因是 queue_capacity=0，逻辑上支持队列耗尽导致无法处理请求进而引发超时的假设。\n建议的修复或验证步骤：\n- 建议验证 replay-stock-service 当前的 queue_capacity 配置是否稳定在 32，并监控其队列积压情况以防止复发。 [证据 41002:service-1:service-1-2:1]\n另有 1 条结论缺乏逐条支持，详见核验意见。\n模型核验仍可能有误，请按证据 ID 核对原始记录。",
+    "tool_results": [
+      {
+        "step": 1,
+        "evidence_id": "41002:service-1:service-1-1:1",
+        "agent_id": "investigator-1",
+        "task_id": "service-1",
+        "service": "replay-edge-service",
+        "tool": "query_error_logs",
+        "inputs": {
+          "service_name": "replay-edge-service",
+          "minutes": 60,
+          "limit": 20
+        },
+        "attempt": 1,
+        "attempt_id": "service-1-1-attempt-1",
+        "result_status": "success_with_data",
+        "source": "tool_registry",
+        "source_record_ids": [
+          30002
+        ],
+        "output": {
+          "items": [
+            {
+              "id": 30002,
+              "service_name": "replay-edge-service",
+              "level": "ERROR",
+              "error_type": "UPSTREAM_TIMEOUT",
+              "message": "Request replay-shared-001 waited for replay-stock-service; the edge process was healthy.",
+              "stack_trace": null,
+              "request_id": "replay-shared-001",
+              "created_at": "2026-10-15T16:39:23.377465Z"
+            }
+          ],
+          "total": 1
+        }
+      },
+      {
+        "step": 2,
+        "evidence_id": "41002:service-1:service-1-2:1",
+        "agent_id": "investigator-1",
+        "task_id": "service-1",
+        "service": "replay-edge-service",
+        "tool": "search_tickets",
+        "inputs": {
+          "service_name": "replay-edge-service",
+          "limit": 10
+        },
+        "attempt": 1,
+        "attempt_id": "service-1-2-attempt-1",
+        "result_status": "success_with_data",
+        "source": "tool_registry",
+        "source_record_ids": [
+          30002
+        ],
+        "output": {
+          "items": [
+            {
+              "id": 30002,
+              "title": "[REPLAY] confirmed_dependency replay-edge-service",
+              "content": "The controlled replay isolated queue_capacity=0 in replay-stock-service. Restoring queue_capacity=32 cleared both services; the edge timeout was a downstream symptom.",
+              "category": "incident",
+              "priority": "high",
+              "status": "resolved",
+              "service_name": "replay-edge-service",
+              "resolution": "The controlled replay isolated queue_capacity=0 in replay-stock-service. Restoring queue_capacity=32 cleared both services; the edge timeout was a downstream symptom.",
+              "created_at": "2026-10-15T16:40:23.377465Z",
+              "updated_at": "2026-10-15T16:40:23.377465Z"
+            }
+          ],
+          "total": 1
+        }
+      },
+      {
+        "step": 3,
+        "evidence_id": "41002:service-2:service-2-1:1",
+        "agent_id": "investigator-2",
+        "task_id": "service-2",
+        "service": "replay-stock-service",
+        "tool": "query_error_logs",
+        "inputs": {
+          "service_name": "replay-stock-service",
+          "minutes": 60,
+          "limit": 20
+        },
+        "attempt": 1,
+        "attempt_id": "service-2-1-attempt-1",
+        "result_status": "success_with_data",
+        "source": "tool_registry",
+        "source_record_ids": [
+          30003
+        ],
+        "output": {
+          "items": [
+            {
+              "id": 30003,
+              "service_name": "replay-stock-service",
+              "level": "ERROR",
+              "error_type": "QUEUE_REJECTED",
+              "message": "Same request replay-shared-001: queue_capacity=0 rejected all reservations. Restoring queue_capacity=32 recovered the upstream and edge together in a controlled intervention.",
+              "stack_trace": null,
+              "request_id": "replay-shared-001",
+              "created_at": "2026-10-15T16:39:23.377465Z"
+            }
+          ],
+          "total": 1
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "step": 1,
+        "evidence_id": "41002:service-1:service-1-1:1",
+        "agent_id": "investigator-1",
+        "task_id": "service-1",
+        "service": "replay-edge-service",
+        "tool": "query_error_logs",
+        "inputs": {
+          "service_name": "replay-edge-service",
+          "minutes": 60,
+          "limit": 20
+        },
+        "attempt": 1,
+        "attempt_id": "service-1-1-attempt-1",
+        "result_status": "success_with_data",
+        "source": "tool_registry",
+        "source_record_ids": [
+          30002
+        ],
+        "output": {
+          "items": [
+            {
+              "id": 30002,
+              "service_name": "replay-edge-service",
+              "level": "ERROR",
+              "error_type": "UPSTREAM_TIMEOUT",
+              "message": "Request replay-shared-001 waited for replay-stock-service; the edge process was healthy.",
+              "stack_trace": null,
+              "request_id": "replay-shared-001",
+              "created_at": "2026-10-15T16:39:23.377465Z"
+            }
+          ],
+          "total": 1
+        }
+      },
+      {
+        "step": 2,
+        "evidence_id": "41002:service-1:service-1-2:1",
+        "agent_id": "investigator-1",
+        "task_id": "service-1",
+        "service": "replay-edge-service",
+        "tool": "search_tickets",
+        "inputs": {
+          "service_name": "replay-edge-service",
+          "limit": 10
+        },
+        "attempt": 1,
+        "attempt_id": "service-1-2-attempt-1",
+        "result_status": "success_with_data",
+        "source": "tool_registry",
+        "source_record_ids": [
+          30002
+        ],
+        "output": {
+          "items": [
+            {
+              "id": 30002,
+              "title": "[REPLAY] confirmed_dependency replay-edge-service",
+              "content": "The controlled replay isolated queue_capacity=0 in replay-stock-service. Restoring queue_capacity=32 cleared both services; the edge timeout was a downstream symptom.",
+              "category": "incident",
+              "priority": "high",
+              "status": "resolved",
+              "service_name": "replay-edge-service",
+              "resolution": "The controlled replay isolated queue_capacity=0 in replay-stock-service. Restoring queue_capacity=32 cleared both services; the edge timeout was a downstream symptom.",
+              "created_at": "2026-10-15T16:40:23.377465Z",
+              "updated_at": "2026-10-15T16:40:23.377465Z"
+            }
+          ],
+          "total": 1
+        }
+      },
+      {
+        "step": 3,
+        "evidence_id": "41002:service-2:service-2-1:1",
+        "agent_id": "investigator-2",
+        "task_id": "service-2",
+        "service": "replay-stock-service",
+        "tool": "query_error_logs",
+        "inputs": {
+          "service_name": "replay-stock-service",
+          "minutes": 60,
+          "limit": 20
+        },
+        "attempt": 1,
+        "attempt_id": "service-2-1-attempt-1",
+        "result_status": "success_with_data",
+        "source": "tool_registry",
+        "source_record_ids": [
+          30003
+        ],
+        "output": {
+          "items": [
+            {
+              "id": 30003,
+              "service_name": "replay-stock-service",
+              "level": "ERROR",
+              "error_type": "QUEUE_REJECTED",
+              "message": "Same request replay-shared-001: queue_capacity=0 rejected all reservations. Restoring queue_capacity=32 recovered the upstream and edge together in a controlled intervention.",
+              "stack_trace": null,
+              "request_id": "replay-shared-001",
+              "created_at": "2026-10-15T16:39:23.377465Z"
+            }
+          ],
+          "total": 1
+        }
+      }
+    ],
+    "service_investigations": [
+      {
+        "service": "replay-edge-service",
+        "status": "completed",
+        "evidence": [
+          {
+            "step": 1,
+            "evidence_id": "41002:service-1:service-1-1:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "replay-edge-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "replay-edge-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              30002
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 30002,
+                  "service_name": "replay-edge-service",
+                  "level": "ERROR",
+                  "error_type": "UPSTREAM_TIMEOUT",
+                  "message": "Request replay-shared-001 waited for replay-stock-service; the edge process was healthy.",
+                  "stack_trace": null,
+                  "request_id": "replay-shared-001",
+                  "created_at": "2026-10-15T16:39:23.377465Z"
+                }
+              ],
+              "total": 1
+            }
+          },
+          {
+            "step": 2,
+            "evidence_id": "41002:service-1:service-1-2:1",
+            "agent_id": "investigator-1",
+            "task_id": "service-1",
+            "service": "replay-edge-service",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "replay-edge-service",
+              "limit": 10
+            },
+            "attempt": 1,
+            "attempt_id": "service-1-2-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              30002
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 30002,
+                  "title": "[REPLAY] confirmed_dependency replay-edge-service",
+                  "content": "The controlled replay isolated queue_capacity=0 in replay-stock-service. Restoring queue_capacity=32 cleared both services; the edge timeout was a downstream symptom.",
+                  "category": "incident",
+                  "priority": "high",
+                  "status": "resolved",
+                  "service_name": "replay-edge-service",
+                  "resolution": "The controlled replay isolated queue_capacity=0 in replay-stock-service. Restoring queue_capacity=32 cleared both services; the edge timeout was a downstream symptom.",
+                  "created_at": "2026-10-15T16:40:23.377465Z",
+                  "updated_at": "2026-10-15T16:40:23.377465Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "error": null,
+        "citations": [
+          1,
+          2
+        ]
+      },
+      {
+        "service": "replay-stock-service",
+        "status": "partial",
+        "evidence": [
+          {
+            "step": 3,
+            "evidence_id": "41002:service-2:service-2-1:1",
+            "agent_id": "investigator-2",
+            "task_id": "service-2",
+            "service": "replay-stock-service",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "replay-stock-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "attempt": 1,
+            "attempt_id": "service-2-1-attempt-1",
+            "result_status": "success_with_data",
+            "source": "tool_registry",
+            "source_record_ids": [
+              30003
+            ],
+            "output": {
+              "items": [
+                {
+                  "id": 30003,
+                  "service_name": "replay-stock-service",
+                  "level": "ERROR",
+                  "error_type": "QUEUE_REJECTED",
+                  "message": "Same request replay-shared-001: queue_capacity=0 rejected all reservations. Restoring queue_capacity=32 recovered the upstream and edge together in a controlled intervention.",
+                  "stack_trace": null,
+                  "request_id": "replay-shared-001",
+                  "created_at": "2026-10-15T16:39:23.377465Z"
+                }
+              ],
+              "total": 1
+            }
+          }
+        ],
+        "error": "TOOL_EXECUTION_ERROR",
+        "citations": [
+          3
+        ]
+      }
+    ],
+    "analysis": {
+      "summary": "已合并服务调查；以下结论经过独立模型核验，仍需结合原始记录复核。",
+      "confirmed_facts": [
+        "replay-edge-service 在 2026-10-15T16:39:23.377465Z 记录了 UPSTREAM_TIMEOUT 错误，具体消息为 'Request replay-shared-001 waited for replay-stock-service'，且边缘进程本身健康。",
+        "已存在一个状态为 resolved 的高优先级工单，确认根本原因是 replay-stock-service 的 queue_capacity 被隔离为 0。",
+        "replay-stock-service 在 2026-10-15T16:39:23.377465Z 记录到 ERROR 级别日志，错误类型为 QUEUE_REJECTED，请求 ID 为 replay-shared-001。",
+        "系统日志明确指出：'Same request replay-shared-001: queue_capacity=0 rejected all reservations.'，表明队列容量为零导致所有预留被拒绝。",
+        "受控干预措施 'Restoring queue_capacity=32 recovered the upstream and edge together' 成功恢复了上游和边缘服务。"
+      ],
+      "hypotheses": [
+        "replay-stock-service 的队列容量耗尽导致其无法处理请求，进而引发 replay-edge-service 的等待超时。"
+      ],
+      "recommended_actions": [
+        "建议验证 replay-stock-service 当前的 queue_capacity 配置是否稳定在 32，并监控其队列积压情况以防止复发。"
+      ],
+      "evidence_steps": [
+        1,
+        2,
+        3
+      ]
+    },
+    "analysis_source": "llm",
+    "risk_level": "MEDIUM",
+    "requires_approval": false,
+    "risk_reasons": [
+      "故障分析会生成运维操作建议，执行前需要人工核对。"
+    ],
+    "status": "completed",
+    "approval_status": null,
+    "error": null,
+    "mode": "multi",
+    "agent_tasks": [
+      {
+        "task_id": "service-1",
+        "parent_task_id": "supervisor",
+        "agent_id": "investigator-1",
+        "service": "replay-edge-service",
+        "status": "completed",
+        "decisions": [
+          {
+            "step_id": "service-1-1",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "replay-edge-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "reason": "先检查本服务近期错误日志",
+            "next_tool": "search_tickets",
+            "next_reason": "当前证据仅能确认边缘服务收到上游超时，但无法确定上游具体故障原因。搜索工单可快速判断是否为已知问题或已有修复方案，从而缩小排查范围。"
+          },
+          {
+            "step_id": "service-1-2",
+            "tool": "search_tickets",
+            "inputs": {
+              "service_name": "replay-edge-service",
+              "limit": 10
+            },
+            "reason": "当前证据仅能确认边缘服务收到上游超时，但无法确定上游具体故障原因。搜索工单可快速判断是否为已知问题或已有修复方案，从而缩小排查范围。",
+            "next_tool": "stop",
+            "next_reason": "现有证据（错误日志和已解决的工单）已明确指向下游服务队列容量耗尽为根本原因，且修复方案已知，无需进一步查询知识或工单。"
+          }
+        ],
+        "evidence_ids": [
+          "41002:service-1:service-1-1:1",
+          "41002:service-1:service-1-2:1"
+        ],
+        "errors": [],
+        "gaps": [
+          "缺少 replay-stock-service 在同一时间段的错误日志或性能指标数据以确认上游故障原因。",
+          "未查询相关工单（tickets）以确认是否存在已知问题或正在进行的修复活动。"
+        ],
+        "attempts": [
+          {
+            "step_id": "service-1-1",
+            "attempt_id": "service-1-1-attempt-1",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "step_id": "service-1-2",
+            "attempt_id": "service-1-2-attempt-1",
+            "status": "completed",
+            "error": null
+          }
+        ],
+        "attempts_used": 2,
+        "stop_reason": "investigation_complete",
+        "summary": "replay-edge-service 的超时故障是由下游 replay-stock-service 的队列容量耗尽（queue_capacity=0）引起的。错误日志显示上游请求等待下游响应时发生超时，而工单记录证实了通过恢复下游服务队列容量至32解决了该问题，表明边缘服务的超时是下游症状而非自身故障。",
+        "findings": [
+          {
+            "claim_id": "investigator-1:service-1:claim-1",
+            "claim_type": "fact",
+            "text": "replay-edge-service 在 2026-10-15T16:39:23.377465Z 记录了 UPSTREAM_TIMEOUT 错误，具体消息为 'Request replay-shared-001 waited for replay-stock-service'，且边缘进程本身健康。",
+            "evidence_ids": [
+              "41002:service-1:service-1-1:1"
+            ]
+          },
+          {
+            "claim_id": "investigator-1:service-1:claim-2",
+            "claim_type": "fact",
+            "text": "已存在一个状态为 resolved 的高优先级工单，确认根本原因是 replay-stock-service 的 queue_capacity 被隔离为 0。",
+            "evidence_ids": [
+              "41002:service-1:service-1-2:1"
+            ]
+          },
+          {
+            "claim_id": "investigator-1:service-1:claim-3",
+            "claim_type": "hypothesis",
+            "text": "replay-stock-service 的队列容量耗尽导致其无法处理请求，进而引发 replay-edge-service 的等待超时。",
+            "evidence_ids": [
+              "41002:service-1:service-1-2:1"
+            ]
+          },
+          {
+            "claim_id": "investigator-1:service-1:claim-4",
+            "claim_type": "recommendation",
+            "text": "建议验证 replay-stock-service 当前的 queue_capacity 配置是否稳定在 32，并监控其队列积压情况以防止复发。",
+            "evidence_ids": [
+              "41002:service-1:service-1-2:1"
+            ]
+          }
+        ],
+        "model_source": "llm"
+      },
+      {
+        "task_id": "service-2",
+        "parent_task_id": "supervisor",
+        "agent_id": "investigator-2",
+        "service": "replay-stock-service",
+        "status": "partial",
+        "decisions": [
+          {
+            "step_id": "service-2-1",
+            "tool": "query_error_logs",
+            "inputs": {
+              "service_name": "replay-stock-service",
+              "minutes": 60,
+              "limit": 20
+            },
+            "reason": "先检查本服务近期错误日志",
+            "next_tool": "search_knowledge",
+            "next_reason": "需要查阅知识库以了解队列容量管理的最佳实践及可能的自动化配置方案，从而制定更有效的修复和预防措施。"
+          },
+          {
+            "step_id": "service-2-2",
+            "tool": "search_knowledge",
+            "inputs": {
+              "query": "replay-stock-service 故障排查",
+              "limit": 5
+            },
+            "reason": "需要查阅知识库以了解队列容量管理的最佳实践及可能的自动化配置方案，从而制定更有效的修复和预防措施。",
+            "next_tool": "stop",
+            "next_reason": "已有充分证据表明故障原因为队列容量耗尽且已确认修复方案，无需进一步查询。"
+          }
+        ],
+        "evidence_ids": [
+          "41002:service-2:service-2-1:1"
+        ],
+        "errors": [
+          "TOOL_EXECUTION_ERROR"
+        ],
+        "gaps": [
+          "缺乏对历史流量模式的分析以确认是否为突发流量导致。",
+          "未获取关于当前资源配置的详细快照。"
+        ],
+        "attempts": [
+          {
+            "step_id": "service-2-1",
+            "attempt_id": "service-2-1-attempt-1",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "step_id": "service-2-2",
+            "attempt_id": "service-2-2-attempt-1",
+            "status": "failed",
+            "error": "TOOL_EXECUTION_ERROR"
+          }
+        ],
+        "attempts_used": 2,
+        "stop_reason": "partial_failure",
+        "summary": "replay-stock-service 在 2026-10-15T16:39:23Z 发生超时故障，根本原因是队列容量耗尽（queue_capacity=0）导致请求被拒绝。证据显示该问题通过受控干预恢复上游和边缘服务，将队列容量从 0 恢复到 32 解决了问题。",
+        "findings": [
+          {
+            "claim_id": "investigator-2:service-2:claim-1",
+            "claim_type": "fact",
+            "text": "replay-stock-service 在 2026-10-15T16:39:23.377465Z 记录到 ERROR 级别日志，错误类型为 QUEUE_REJECTED，请求 ID 为 replay-shared-001。",
+            "evidence_ids": [
+              "41002:service-2:service-2-1:1"
+            ]
+          },
+          {
+            "claim_id": "investigator-2:service-2:claim-2",
+            "claim_type": "fact",
+            "text": "系统日志明确指出：'Same request replay-shared-001: queue_capacity=0 rejected all reservations.'，表明队列容量为零导致所有预留被拒绝。",
+            "evidence_ids": [
+              "41002:service-2:service-2-1:1"
+            ]
+          },
+          {
+            "claim_id": "investigator-2:service-2:claim-3",
+            "claim_type": "fact",
+            "text": "受控干预措施 'Restoring queue_capacity=32 recovered the upstream and edge together' 成功恢复了上游和边缘服务。",
+            "evidence_ids": [
+              "41002:service-2:service-2-1:1"
+            ]
+          },
+          {
+            "claim_id": "investigator-2:service-2:claim-4",
+            "claim_type": "recommendation",
+            "text": "建议检查并监控 replay-stock-service 的队列容量配置，确保其不低于 32，同时建立自动告警机制以预防类似容量耗尽事件。",
+            "evidence_ids": [
+              "41002:service-2:service-2-1:1"
+            ]
+          }
+        ],
+        "model_source": "llm"
+      }
+    ],
+    "investigation_status": "partial",
+    "tool_budget": {
+      "used": 4,
+      "limit": 9
+    },
+    "verifier": {
+      "status": "completed",
+      "claims": [
+        {
+          "claim_id": "investigator-1:service-1:claim-1",
+          "claim_type": "fact",
+          "text": "replay-edge-service 在 2026-10-15T16:39:23.377465Z 记录了 UPSTREAM_TIMEOUT 错误，具体消息为 'Request replay-shared-001 waited for replay-stock-service'，且边缘进程本身健康。",
+          "evidence_ids": [
+            "41002:service-1:service-1-1:1"
+          ],
+          "support": "supported",
+          "reason": "证据记录 30002 明确显示 replay-edge-service 在指定时间记录了 UPSTREAM_TIMEOUT 错误，消息包含 'Request replay-shared-001 waited for replay-stock-service' 且注明边缘进程健康。"
+        },
+        {
+          "claim_id": "investigator-1:service-1:claim-2",
+          "claim_type": "fact",
+          "text": "已存在一个状态为 resolved 的高优先级工单，确认根本原因是 replay-stock-service 的 queue_capacity 被隔离为 0。",
+          "evidence_ids": [
+            "41002:service-1:service-1-2:1"
+          ],
+          "support": "supported",
+          "reason": "工单记录 30002 状态为 resolved，优先级 high，内容确认根本原因为 replay-stock-service 的 queue_capacity 被隔离为 0。"
+        },
+        {
+          "claim_id": "investigator-1:service-1:claim-3",
+          "claim_type": "hypothesis",
+          "text": "replay-stock-service 的队列容量耗尽导致其无法处理请求，进而引发 replay-edge-service 的等待超时。",
+          "evidence_ids": [
+            "41002:service-1:service-1-2:1"
+          ],
+          "support": "supported",
+          "reason": "证据 30002 指出 edge 超时是下游症状，且根本原因是 queue_capacity=0，逻辑上支持队列耗尽导致无法处理请求进而引发超时的假设。"
+        },
+        {
+          "claim_id": "investigator-1:service-1:claim-4",
+          "claim_type": "recommendation",
+          "text": "建议验证 replay-stock-service 当前的 queue_capacity 配置是否稳定在 32，并监控其队列积压情况以防止复发。",
+          "evidence_ids": [
+            "41002:service-1:service-1-2:1"
+          ],
+          "support": "supported",
+          "reason": "基于证据中恢复操作将配置设为 32 并成功修复的事实，建议验证该配置值及监控积压情况是合理的后续行动建议。"
+        },
+        {
+          "claim_id": "investigator-2:service-2:claim-1",
+          "claim_type": "fact",
+          "text": "replay-stock-service 在 2026-10-15T16:39:23.377465Z 记录到 ERROR 级别日志，错误类型为 QUEUE_REJECTED，请求 ID 为 replay-shared-001。",
+          "evidence_ids": [
+            "41002:service-2:service-2-1:1"
+          ],
+          "support": "supported",
+          "reason": "证据记录 30003 显示 replay-stock-service 在指定时间记录了 ERROR 级别日志，类型为 QUEUE_REJECTED，请求 ID 为 replay-shared-001。"
+        },
+        {
+          "claim_id": "investigator-2:service-2:claim-2",
+          "claim_type": "fact",
+          "text": "系统日志明确指出：'Same request replay-shared-001: queue_capacity=0 rejected all reservations.'，表明队列容量为零导致所有预留被拒绝。",
+          "evidence_ids": [
+            "41002:service-2:service-2-1:1"
+          ],
+          "support": "supported",
+          "reason": "证据记录 30003 的消息字段直接包含 'queue_capacity=0 rejected all reservations'，证实了队列容量为零导致预留被拒绝。"
+        },
+        {
+          "claim_id": "investigator-2:service-2:claim-3",
+          "claim_type": "fact",
+          "text": "受控干预措施 'Restoring queue_capacity=32 recovered the upstream and edge together' 成功恢复了上游和边缘服务。",
+          "evidence_ids": [
+            "41002:service-2:service-2-1:1"
+          ],
+          "support": "supported",
+          "reason": "证据记录 30003 明确记载受控干预措施 'Restoring queue_capacity=32 recovered the upstream and edge together' 成功恢复了服务。"
+        },
+        {
+          "claim_id": "investigator-2:service-2:claim-4",
+          "claim_type": "recommendation",
+          "text": "建议检查并监控 replay-stock-service 的队列容量配置，确保其不低于 32，同时建立自动告警机制以预防类似容量耗尽事件。",
+          "evidence_ids": [
+            "41002:service-2:service-2-1:1"
+          ],
+          "support": "unsupported",
+          "reason": "引用记录没有支持该数值上下限；已验证的单个工作值不能推出阈值。"
+        }
+      ],
+      "error": null
+    },
+    "model_budget": {
+      "used": 5,
+      "limit": 7
+    }
+  }
+}

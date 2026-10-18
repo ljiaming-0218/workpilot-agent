@@ -1,0 +1,43 @@
+{
+  "reviewer": "Codex assistant; no human adjudication performed",
+  "scope": "Source-based spot checks and execution evidence, not a full regrading of all 36 answers.",
+  "main_batch_status": "36 attempted investigations finished without provider quota interruption; 16 of 18 pairs received parseable automatic judgments.",
+  "confirmed_product_issues": [
+    {
+      "case": "cfg_workers",
+      "variant": "multi",
+      "issue": "An early missing-ticket gap persisted after search_tickets returned ticket 100. The final answer contradicted itself.",
+      "followup": "After freezing this batch, runtime now replaces model gaps on each decision while keeping the initial-window marker. Free-text local gaps remain in structured task output and are not asserted as unresolved global facts in the final answer."
+    },
+    {
+      "case": "empty_tickets",
+      "variant": "enhanced_single_equal",
+      "issue": "The displayed fact says request ID is empty although the actual log carries empty_tickets-request-0. This is a real semantic false acceptance by the app verifier."
+    },
+    {
+      "case": "followup_finds_logs",
+      "variant": "both",
+      "issue": "Initial investigation spent all three per-service attempts, leaving no actual wider-window call.",
+      "followup": "Reserve one of the existing three attempts when initial logs are empty. A separate paired retest is saved in ../20261018T143910Z; do not replace the main-batch records with it."
+    }
+  ],
+  "grading_disagreements": [
+    {
+      "case": "historical_ticket",
+      "variant": "multi",
+      "issue": "The judge treats an explicitly qualified possible memory/configuration hypothesis as a definite causal assertion, despite the rubric allowing uncertain hypotheses. This cause failure is not a reliable semantic verdict."
+    },
+    {
+      "case": "conflict_request_ids",
+      "variant": "multi",
+      "issue": "Judge says verifier failure withheld all retrieved evidence, while the new fallback actually prints raw source records and grounded next checks. Raw preservation is not a verified root-cause answer, but is not complete loss of evidence either."
+    },
+    {
+      "case": "empty_logs",
+      "variant": "enhanced_single_equal",
+      "issue": "Legacy has_displayed_recommendation counts only verifier-accepted model claims. It excludes the new displayed, cited deterministic followup checks. Thus the automatic acceptance gate can reject an answer even when a concrete fallback action is displayed."
+    }
+  ],
+  "conclusion": "Raw automatic passes 5/16 Single and 1/16 Multi are provisional evaluator outcomes, not human accuracy. This batch does not establish Multi quality superiority. Faster observed latency must not be presented as quality-preserving improvement.",
+  "evaluation_scope": "Previously inspected synthetic cases, one repetition; not an untouched holdout or production incidents."
+}

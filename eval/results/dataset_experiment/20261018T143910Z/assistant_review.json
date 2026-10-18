@@ -1,0 +1,28 @@
+{
+  "reviewer": "Codex assistant; not a human adjudicator",
+  "method": "Read both final answers and their actual retrieved ledger against the frozen followup_finds_logs rubric. Preserve failed automatic judge unchanged.",
+  "automatic_judge_status": "judge_failed",
+  "assessments": [
+    {
+      "variant": "enhanced_single_equal",
+      "cause": "fail",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "rubric_pass": false,
+      "reason": "Wider-window logs were actually retrieved. The answer states the initial empty retrievals and recommends checking worker_slots=0/restoring 10, but does not explain the retrieved CONFIG_REJECTED cause as required when wider records exist. The app verifier removed the causal fact. The repair recommendation cites the actual wider-window log."
+    },
+    {
+      "variant": "multi",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "pass",
+      "rubric_pass": true,
+      "reason": "Explicit initial empty-window gap; actual 1440-minute query retrieved the controlled worker_slots=0 CONFIG_REJECTED record. Final facts name that cause and recovery to 10, and the cited recommendation checks/restores 10 and verifies recovery. Current-state uncertainty remains a hypothesis; no invented numerical bound is shown."
+    }
+  ],
+  "limits": "One paired synthetic case, one repetition; this is not a human score or architecture-wide superiority result."
+}

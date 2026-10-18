@@ -1,0 +1,83 @@
+{
+  "raw_sha256": "8d7284b1c5729a96ac05c81e3b5b922c2c6a108cd5076ad0ceb39519628bcb4e",
+  "dataset_hash_matches_manifest": true,
+  "variants": {
+    "enhanced_single_equal": {
+      "runs": 1,
+      "execution_completed": 1,
+      "verifier_completed": 1,
+      "mean_latency_seconds": 24.504,
+      "model_calls": 4,
+      "observed_tokens": 7593,
+      "token_usage_complete": true,
+      "tool_attempts": 3,
+      "model_judge_pass": 0,
+      "model_judged": 0,
+      "ungraded": 1
+    },
+    "multi": {
+      "runs": 1,
+      "execution_completed": 1,
+      "verifier_completed": 1,
+      "mean_latency_seconds": 19.912,
+      "model_calls": 4,
+      "observed_tokens": 7232,
+      "token_usage_complete": true,
+      "tool_attempts": 3,
+      "model_judge_pass": 0,
+      "model_judged": 0,
+      "ungraded": 1
+    }
+  },
+  "paired_fixture_checks": [
+    {
+      "case_id": "followup_finds_logs",
+      "arms": 2,
+      "same_fixture": true,
+      "common_requests": 3,
+      "same_common_responses": true
+    }
+  ],
+  "budget_checks": [
+    {
+      "case_id": "followup_finds_logs",
+      "variant": "enhanced_single_equal",
+      "passed": true
+    },
+    {
+      "case_id": "followup_finds_logs",
+      "variant": "multi",
+      "passed": true
+    }
+  ],
+  "feature_observations": [
+    {
+      "case_id": "followup_finds_logs",
+      "variant": "enhanced_single_equal",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 1,
+      "wider_window_records": 1,
+      "model_errors": {}
+    },
+    {
+      "case_id": "followup_finds_logs",
+      "variant": "multi",
+      "injected_faults": [],
+      "other_service_evidence_retained": null,
+      "wider_window_queries": 1,
+      "wider_window_records": 1,
+      "model_errors": {}
+    }
+  ],
+  "judge_failed_cases": [
+    "followup_finds_logs"
+  ],
+  "judge_tokens": 4677,
+  "limits": [
+    "Synthetic fixture tools and online model; one repetition.",
+    "Model judge verdicts are not human accuracy; schema failures and grading disagreements are retained.",
+    "Code changes after this batch require a separate result directory.",
+    "USD cost unknown; no price assumption."
+  ]
+}

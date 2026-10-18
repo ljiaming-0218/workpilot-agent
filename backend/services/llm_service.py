@@ -2,10 +2,11 @@
 
 import json
 import logging
+from copy import copy
 from time import perf_counter_ns
 from typing import Any, Protocol, TypeVar
 
-from openai import OpenAI, OpenAIError
+from openai import APITimeoutError, OpenAI, OpenAIError
 from pydantic import BaseModel, ValidationError
 
 from backend.config import Settings
@@ -18,6 +19,10 @@ logger = logging.getLogger(__name__)
 
 class LLMServiceError(RuntimeError):
     code = "LLM_ERROR"
+
+
+class LLMRequestTimeoutError(LLMServiceError):
+    code = "LLM_TIMEOUT"
 
 
 class StructuredLLM(Protocol):
@@ -52,6 +57,14 @@ class LLMService:
             max_retries=settings.llm_max_retries,
         )
 
+    def with_request_limits(self, *, timeout: float, max_retries: int,
+                            max_output_tokens: int | None = None) -> "LLMService":
+        """Reuse the HTTP pool with limits specific to bounded investigations."""
+        gateway = copy(self)
+        gateway._client = self._client.with_options(timeout=timeout, max_retries=max_retries)
+        gateway._max_output_tokens = max_output_tokens
+        return gateway
+
     def generate_structured(
         self,
         system_prompt: str,
@@ -70,6 +83,8 @@ class LLMService:
                 response_format={"type": "json_object"},
                 temperature=0,
                 extra_body=self._extra_body,
+                **({"max_completion_tokens": self._max_output_tokens}
+                   if getattr(self, "_max_output_tokens", None) is not None else {}),
             )
             message = completion.choices[0].message
         except (OpenAIError, IndexError, ValueError) as exc:
@@ -79,7 +94,8 @@ class LLMService:
                 status="failed",
                 error=type(exc).__name__,
             )
-            raise LLMServiceError("Structured LLM request failed.") from exc
+            error_class = LLMRequestTimeoutError if isinstance(exc, APITimeoutError) else LLMServiceError
+            raise error_class("Structured LLM request failed.") from exc
 
         if message.refusal:
             self._emit_trace(

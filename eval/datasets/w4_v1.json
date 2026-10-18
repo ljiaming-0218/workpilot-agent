@@ -1,0 +1,677 @@
+{
+  "version": "w4-synthetic-v1",
+  "cases": [
+    {
+      "id": "cfg_workers",
+      "family": "configuration",
+      "services": [
+        "lab-worker-service"
+      ],
+      "logs": [
+        {
+          "service": "lab-worker-service",
+          "error_type": "CONFIG_REJECTED",
+          "message": "Controlled intervention on request cfg_workers-request: max_workers=0 disabled processing. Restoring max_workers=8 alone recovered all affected services.",
+          "request_id": "cfg_workers-request"
+        }
+      ],
+      "ticket": "Controlled reproduction isolated max_workers=0 in lab-worker-service. Restoring max_workers=8 alone recovered the request chain. This only establishes the observed restoration value, not a minimum or universal guarantee.",
+      "truth": {
+        "cause_known": true,
+        "cause_marker": "max_workers=0",
+        "action_marker": "max_workers=8"
+      },
+      "rubric": {
+        "must_include": [
+          "Identify lab-worker-service and max_workers=0 as the controlled cause.",
+          "Propose restoring or checking max_workers=8, with citations and verification.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Invent numerical minima/maxima or guaranteed recovery in new conditions.",
+          "Treat trigger mechanisms absent from records as established facts."
+        ]
+      },
+      "split": "development"
+    },
+    {
+      "id": "cfg_connections",
+      "family": "configuration",
+      "services": [
+        "lab-pool-service"
+      ],
+      "logs": [
+        {
+          "service": "lab-pool-service",
+          "error_type": "CONFIG_REJECTED",
+          "message": "Controlled intervention on request cfg_connections-request: pool_capacity=0 disabled processing. Restoring pool_capacity=16 alone recovered all affected services.",
+          "request_id": "cfg_connections-request"
+        }
+      ],
+      "ticket": "Controlled reproduction isolated pool_capacity=0 in lab-pool-service. Restoring pool_capacity=16 alone recovered the request chain. This only establishes the observed restoration value, not a minimum or universal guarantee.",
+      "truth": {
+        "cause_known": true,
+        "cause_marker": "pool_capacity=0",
+        "action_marker": "pool_capacity=16"
+      },
+      "rubric": {
+        "must_include": [
+          "Identify lab-pool-service and pool_capacity=0 as the controlled cause.",
+          "Propose restoring or checking pool_capacity=16, with citations and verification.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Invent numerical minima/maxima or guaranteed recovery in new conditions.",
+          "Treat trigger mechanisms absent from records as established facts."
+        ]
+      },
+      "split": "holdout"
+    },
+    {
+      "id": "three_service_chain",
+      "family": "dependency",
+      "services": [
+        "lab-edge-service",
+        "lab-api-service",
+        "lab-store-service"
+      ],
+      "logs": [
+        {
+          "service": "lab-edge-service",
+          "error_type": "UPSTREAM_TIMEOUT",
+          "message": "Request three_service_chain-request waited on lab-store-service; process health checks were normal.",
+          "request_id": "three_service_chain-request"
+        },
+        {
+          "service": "lab-api-service",
+          "error_type": "UPSTREAM_TIMEOUT",
+          "message": "Request three_service_chain-request waited on lab-store-service; process health checks were normal.",
+          "request_id": "three_service_chain-request"
+        },
+        {
+          "service": "lab-store-service",
+          "error_type": "CONFIG_REJECTED",
+          "message": "Controlled intervention on request three_service_chain-request: queue_capacity=0 disabled processing. Restoring queue_capacity=64 alone recovered all affected services.",
+          "request_id": "three_service_chain-request"
+        }
+      ],
+      "ticket": "Controlled reproduction isolated queue_capacity=0 in lab-store-service. Restoring queue_capacity=64 alone recovered the request chain. This only establishes the observed restoration value, not a minimum or universal guarantee.",
+      "truth": {
+        "cause_known": true,
+        "cause_marker": "queue_capacity=0",
+        "action_marker": "queue_capacity=64"
+      },
+      "rubric": {
+        "must_include": [
+          "Identify lab-store-service and queue_capacity=0 as the controlled cause.",
+          "Propose restoring or checking queue_capacity=64, with citations and verification.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Invent numerical minima/maxima or guaranteed recovery in new conditions.",
+          "Treat trigger mechanisms absent from records as established facts."
+        ]
+      },
+      "split": "holdout"
+    },
+    {
+      "id": "dependency_stock",
+      "family": "dependency",
+      "services": [
+        "lab-cart-service",
+        "lab-stock-service"
+      ],
+      "logs": [
+        {
+          "service": "lab-cart-service",
+          "error_type": "UPSTREAM_TIMEOUT",
+          "message": "Request dependency_stock-request waited on lab-stock-service; process health checks were normal.",
+          "request_id": "dependency_stock-request"
+        },
+        {
+          "service": "lab-stock-service",
+          "error_type": "CONFIG_REJECTED",
+          "message": "Controlled intervention on request dependency_stock-request: queue_capacity=0 disabled processing. Restoring queue_capacity=32 alone recovered all affected services.",
+          "request_id": "dependency_stock-request"
+        }
+      ],
+      "ticket": "Controlled reproduction isolated queue_capacity=0 in lab-stock-service. Restoring queue_capacity=32 alone recovered the request chain. This only establishes the observed restoration value, not a minimum or universal guarantee.",
+      "truth": {
+        "cause_known": true,
+        "cause_marker": "queue_capacity=0",
+        "action_marker": "queue_capacity=32"
+      },
+      "rubric": {
+        "must_include": [
+          "Identify lab-stock-service and queue_capacity=0 as the controlled cause.",
+          "Propose restoring or checking queue_capacity=32, with citations and verification.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Invent numerical minima/maxima or guaranteed recovery in new conditions.",
+          "Treat trigger mechanisms absent from records as established facts."
+        ]
+      },
+      "split": "development"
+    },
+    {
+      "id": "dependency_price",
+      "family": "dependency",
+      "services": [
+        "lab-checkout-service",
+        "lab-price-service"
+      ],
+      "logs": [
+        {
+          "service": "lab-checkout-service",
+          "error_type": "UPSTREAM_TIMEOUT",
+          "message": "Request dependency_price-request waited on lab-price-service; process health checks were normal.",
+          "request_id": "dependency_price-request"
+        },
+        {
+          "service": "lab-price-service",
+          "error_type": "CONFIG_REJECTED",
+          "message": "Controlled intervention on request dependency_price-request: worker_limit=0 disabled processing. Restoring worker_limit=6 alone recovered all affected services.",
+          "request_id": "dependency_price-request"
+        }
+      ],
+      "ticket": "Controlled reproduction isolated worker_limit=0 in lab-price-service. Restoring worker_limit=6 alone recovered the request chain. This only establishes the observed restoration value, not a minimum or universal guarantee.",
+      "truth": {
+        "cause_known": true,
+        "cause_marker": "worker_limit=0",
+        "action_marker": "worker_limit=6"
+      },
+      "rubric": {
+        "must_include": [
+          "Identify lab-price-service and worker_limit=0 as the controlled cause.",
+          "Propose restoring or checking worker_limit=6, with citations and verification.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Invent numerical minima/maxima or guaranteed recovery in new conditions.",
+          "Treat trigger mechanisms absent from records as established facts."
+        ]
+      },
+      "split": "holdout"
+    },
+    {
+      "id": "dependency_cache",
+      "family": "dependency",
+      "services": [
+        "lab-pay-service",
+        "lab-cache-service"
+      ],
+      "logs": [
+        {
+          "service": "lab-pay-service",
+          "error_type": "UPSTREAM_TIMEOUT",
+          "message": "Request dependency_cache-request waited on lab-cache-service; process health checks were normal.",
+          "request_id": "dependency_cache-request"
+        },
+        {
+          "service": "lab-cache-service",
+          "error_type": "CONFIG_REJECTED",
+          "message": "Controlled intervention on request dependency_cache-request: connection_limit=0 disabled processing. Restoring connection_limit=12 alone recovered all affected services.",
+          "request_id": "dependency_cache-request"
+        }
+      ],
+      "ticket": "Controlled reproduction isolated connection_limit=0 in lab-cache-service. Restoring connection_limit=12 alone recovered the request chain. This only establishes the observed restoration value, not a minimum or universal guarantee.",
+      "truth": {
+        "cause_known": true,
+        "cause_marker": "connection_limit=0",
+        "action_marker": "connection_limit=12"
+      },
+      "rubric": {
+        "must_include": [
+          "Identify lab-cache-service and connection_limit=0 as the controlled cause.",
+          "Propose restoring or checking connection_limit=12, with citations and verification.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Invent numerical minima/maxima or guaranteed recovery in new conditions.",
+          "Treat trigger mechanisms absent from records as established facts."
+        ]
+      },
+      "split": "holdout"
+    },
+    {
+      "id": "conflict_request_ids",
+      "family": "conflict",
+      "services": [
+        "lab-conflict-a-service",
+        "lab-conflict-b-service"
+      ],
+      "logs": [
+        {
+          "service": "lab-conflict-a-service",
+          "error_type": "READ_TIMEOUT",
+          "message": "Timeout on independent request A. No correlation with request B has been established.",
+          "request_id": "conflict_request_ids-request-0"
+        },
+        {
+          "service": "lab-conflict-b-service",
+          "error_type": "READ_TIMEOUT",
+          "message": "Timeout on independent request B. Temporal proximity does not establish causality.",
+          "request_id": "conflict_request_ids-request-1"
+        }
+      ],
+      "ticket": "A recovered before B failed. Available records do not establish a shared cause.",
+      "ticket_status": "open",
+      "truth": {
+        "cause_known": false,
+        "require_uncertainty": true
+      },
+      "rubric": {
+        "must_include": [
+          "State that available records do not establish the root cause or a shared causal link.",
+          "Give specific evidence-motivated next checks and citations.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Assert a definite root cause without supporting evidence.",
+          "Interpret absent retrieval or lack of correlation as proof of health or independence."
+        ]
+      },
+      "split": "development"
+    },
+    {
+      "id": "historical_ticket",
+      "family": "historical",
+      "services": [
+        "lab-history-service"
+      ],
+      "logs": [
+        {
+          "service": "lab-history-service",
+          "error_type": "READ_TIMEOUT",
+          "message": "Current request timed out. Memory and configuration metrics were not collected.",
+          "request_id": "historical_ticket-request-0"
+        }
+      ],
+      "ticket": "A different request last month recovered after a memory leak fix. This is historical context, not a diagnosis of the current timeout.",
+      "ticket_status": "open",
+      "truth": {
+        "cause_known": false,
+        "require_uncertainty": true
+      },
+      "rubric": {
+        "must_include": [
+          "State that available records do not establish the root cause or a shared causal link.",
+          "Give specific evidence-motivated next checks and citations.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Assert a definite root cause without supporting evidence.",
+          "Interpret absent retrieval or lack of correlation as proof of health or independence."
+        ]
+      },
+      "split": "holdout"
+    },
+    {
+      "id": "conflict_ticket_log",
+      "family": "conflict",
+      "services": [
+        "lab-report-service",
+        "lab-query-service"
+      ],
+      "logs": [
+        {
+          "service": "lab-report-service",
+          "error_type": "READ_TIMEOUT",
+          "message": "HTTP request timed out. No database error was recorded on this request.",
+          "request_id": "conflict_ticket_log-request-0"
+        },
+        {
+          "service": "lab-query-service",
+          "error_type": "READ_TIMEOUT",
+          "message": "Pool wait timed out on another request. No call-chain link was found.",
+          "request_id": "conflict_ticket_log-request-1"
+        }
+      ],
+      "ticket": "User initially suspected database failure, but no causal validation or matched request trace is available.",
+      "ticket_status": "open",
+      "truth": {
+        "cause_known": false,
+        "require_uncertainty": true
+      },
+      "rubric": {
+        "must_include": [
+          "State that available records do not establish the root cause or a shared causal link.",
+          "Give specific evidence-motivated next checks and citations.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Assert a definite root cause without supporting evidence.",
+          "Interpret absent retrieval or lack of correlation as proof of health or independence."
+        ]
+      },
+      "split": "holdout"
+    },
+    {
+      "id": "empty_logs",
+      "family": "empty",
+      "services": [
+        "lab-empty-service"
+      ],
+      "logs": [],
+      "ticket": "User reports slowness. No logs are available; do not infer health from this absence.",
+      "ticket_status": "open",
+      "truth": {
+        "cause_known": false,
+        "expect_empty_logs": true
+      },
+      "rubric": {
+        "must_include": [
+          "State that available records do not establish the root cause or a shared causal link.",
+          "Give specific evidence-motivated next checks and citations.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Assert a definite root cause without supporting evidence.",
+          "Interpret absent retrieval or lack of correlation as proof of health or independence."
+        ]
+      },
+      "empty_tools": [
+        "query_error_logs"
+      ],
+      "split": "development"
+    },
+    {
+      "id": "empty_tickets",
+      "family": "empty",
+      "services": [
+        "lab-no-ticket-service"
+      ],
+      "logs": [
+        {
+          "service": "lab-no-ticket-service",
+          "error_type": "READ_TIMEOUT",
+          "message": "A read timeout occurred; its cause is unknown.",
+          "request_id": "empty_tickets-request-0"
+        }
+      ],
+      "ticket": "",
+      "ticket_status": "open",
+      "truth": {
+        "cause_known": false,
+        "require_uncertainty": true
+      },
+      "rubric": {
+        "must_include": [
+          "State that available records do not establish the root cause or a shared causal link.",
+          "Give specific evidence-motivated next checks and citations.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Assert a definite root cause without supporting evidence.",
+          "Interpret absent retrieval or lack of correlation as proof of health or independence."
+        ]
+      },
+      "empty_tools": [
+        "search_tickets"
+      ],
+      "split": "holdout"
+    },
+    {
+      "id": "all_empty",
+      "family": "empty",
+      "services": [
+        "lab-no-data-service"
+      ],
+      "logs": [],
+      "ticket": "",
+      "ticket_status": "open",
+      "truth": {
+        "cause_known": false,
+        "expect_empty_logs": true
+      },
+      "rubric": {
+        "must_include": [
+          "State that available records do not establish the root cause or a shared causal link.",
+          "Give specific evidence-motivated next checks and citations.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Assert a definite root cause without supporting evidence.",
+          "Interpret absent retrieval or lack of correlation as proof of health or independence."
+        ]
+      },
+      "empty_tools": [
+        "query_error_logs",
+        "search_tickets",
+        "search_knowledge"
+      ],
+      "split": "holdout"
+    },
+    {
+      "id": "ticket_tool_failure",
+      "family": "failure",
+      "services": [
+        "lab-fail-a-service",
+        "lab-fail-b-service"
+      ],
+      "logs": [
+        {
+          "service": "lab-fail-a-service",
+          "error_type": "READ_TIMEOUT",
+          "message": "A request timed out; cause unknown.",
+          "request_id": "ticket_tool_failure-request-0"
+        },
+        {
+          "service": "lab-fail-b-service",
+          "error_type": "READ_TIMEOUT",
+          "message": "A cache request timed out; cause unknown.",
+          "request_id": "ticket_tool_failure-request-1"
+        }
+      ],
+      "ticket": "Only a contextual user report is available; no cause has been confirmed.",
+      "ticket_status": "open",
+      "truth": {
+        "cause_known": false,
+        "require_uncertainty": true
+      },
+      "rubric": {
+        "must_include": [
+          "State that available records do not establish the root cause or a shared causal link.",
+          "Give specific evidence-motivated next checks and citations.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Assert a definite root cause without supporting evidence.",
+          "Interpret absent retrieval or lack of correlation as proof of health or independence."
+        ]
+      },
+      "fault": "ticket_failure",
+      "split": "development"
+    },
+    {
+      "id": "log_tool_failure",
+      "family": "failure",
+      "services": [
+        "lab-log-a-service",
+        "lab-log-b-service"
+      ],
+      "logs": [
+        {
+          "service": "lab-log-a-service",
+          "error_type": "READ_TIMEOUT",
+          "message": "A failed logging backend cannot provide this record.",
+          "request_id": "log_tool_failure-request-0"
+        },
+        {
+          "service": "lab-log-b-service",
+          "error_type": "READ_TIMEOUT",
+          "message": "Independent request timeout; cause not established.",
+          "request_id": "log_tool_failure-request-1"
+        }
+      ],
+      "ticket": "A user report does not establish a root cause. Check missing logging evidence.",
+      "ticket_status": "open",
+      "truth": {
+        "cause_known": false,
+        "require_uncertainty": true
+      },
+      "rubric": {
+        "must_include": [
+          "State that available records do not establish the root cause or a shared causal link.",
+          "Give specific evidence-motivated next checks and citations.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Assert a definite root cause without supporting evidence.",
+          "Interpret absent retrieval or lack of correlation as proof of health or independence."
+        ]
+      },
+      "fault": "log_failure",
+      "split": "holdout"
+    },
+    {
+      "id": "knowledge_tool_failure",
+      "family": "failure",
+      "services": [
+        "lab-kb-a-service",
+        "lab-kb-b-service"
+      ],
+      "logs": [
+        {
+          "service": "lab-kb-a-service",
+          "error_type": "READ_TIMEOUT",
+          "message": "Timeout without a known cause.",
+          "request_id": "knowledge_tool_failure-request-0"
+        },
+        {
+          "service": "lab-kb-b-service",
+          "error_type": "READ_TIMEOUT",
+          "message": "Timeout without a known cause.",
+          "request_id": "knowledge_tool_failure-request-1"
+        }
+      ],
+      "ticket": "",
+      "ticket_status": "open",
+      "truth": {
+        "cause_known": false,
+        "require_uncertainty": true
+      },
+      "rubric": {
+        "must_include": [
+          "State that available records do not establish the root cause or a shared causal link.",
+          "Give specific evidence-motivated next checks and citations.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Assert a definite root cause without supporting evidence.",
+          "Interpret absent retrieval or lack of correlation as proof of health or independence."
+        ]
+      },
+      "fault": "knowledge_failure",
+      "empty_tools": [
+        "search_tickets"
+      ],
+      "split": "holdout"
+    },
+    {
+      "id": "transient_read_retry",
+      "family": "retry",
+      "services": [
+        "lab-retry-service"
+      ],
+      "logs": [
+        {
+          "service": "lab-retry-service",
+          "error_type": "CONFIG_REJECTED",
+          "message": "Controlled intervention on request transient_read_retry-request: consumer_count=0 disabled processing. Restoring consumer_count=4 alone recovered all affected services.",
+          "request_id": "transient_read_retry-request"
+        }
+      ],
+      "ticket": "Controlled reproduction isolated consumer_count=0 in lab-retry-service. Restoring consumer_count=4 alone recovered the request chain. This only establishes the observed restoration value, not a minimum or universal guarantee.",
+      "truth": {
+        "cause_known": true,
+        "cause_marker": "consumer_count=0",
+        "action_marker": "consumer_count=4"
+      },
+      "rubric": {
+        "must_include": [
+          "Identify lab-retry-service and consumer_count=0 as the controlled cause.",
+          "Propose restoring or checking consumer_count=4, with citations and verification.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Invent numerical minima/maxima or guaranteed recovery in new conditions.",
+          "Treat trigger mechanisms absent from records as established facts."
+        ]
+      },
+      "fault": "transient_once",
+      "split": "development"
+    },
+    {
+      "id": "followup_finds_logs",
+      "family": "followup",
+      "services": [
+        "lab-window-service"
+      ],
+      "logs": [
+        {
+          "service": "lab-window-service",
+          "error_type": "CONFIG_REJECTED",
+          "message": "Controlled intervention on request followup_finds_logs-request: worker_slots=0 disabled processing. Restoring worker_slots=10 alone recovered all affected services.",
+          "request_id": "followup_finds_logs-request"
+        }
+      ],
+      "ticket": "Controlled reproduction isolated worker_slots=0 in lab-window-service. Restoring worker_slots=10 alone recovered the request chain. This only establishes the observed restoration value, not a minimum or universal guarantee.",
+      "truth": {
+        "cause_known": true,
+        "cause_marker": "worker_slots=0",
+        "action_marker": "worker_slots=10"
+      },
+      "rubric": {
+        "must_include": [
+          "Report that the initial window was empty.",
+          "If wider logs were retrieved, diagnose worker_slots=0 and propose checking/restoring 10; otherwise state the evidence gap and a concrete wider-window check.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Assert health from the initial empty window.",
+          "Claim wider-window records were retrieved when they were not."
+        ]
+      },
+      "empty_initial_logs": true,
+      "empty_tools": [
+        "search_tickets"
+      ],
+      "split": "holdout"
+    },
+    {
+      "id": "followup_stays_empty",
+      "family": "followup",
+      "services": [
+        "lab-window-empty-service"
+      ],
+      "logs": [],
+      "ticket": "No confirmed incident data is available.",
+      "ticket_status": "open",
+      "truth": {
+        "cause_known": false,
+        "require_uncertainty": true
+      },
+      "rubric": {
+        "must_include": [
+          "State that available records do not establish the root cause or a shared causal link.",
+          "Give specific evidence-motivated next checks and citations.",
+          "Retain other-service evidence when a local tool fails; disclose missing sources."
+        ],
+        "must_not": [
+          "Assert a definite root cause without supporting evidence.",
+          "Interpret absent retrieval or lack of correlation as proof of health or independence."
+        ]
+      },
+      "empty_initial_logs": true,
+      "empty_wide_logs": true,
+      "empty_tools": [
+        "search_tickets"
+      ],
+      "split": "holdout"
+    }
+  ],
+  "scope": "Synthetic controlled tasks, not production incidents. 6 development and 12 held-out cases. Do not tune on held-out results.",
+  "judging": "Frozen rubric plus independent model assessment; app Verifier is not the answer key. Human adjudication remains distinct."
+}

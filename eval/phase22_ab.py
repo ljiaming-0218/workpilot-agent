@@ -199,7 +199,10 @@ def _run_case(
         fixture,
     )
     started = perf_counter()
-    response = client.post("/agent/runs", json={"query": case.query})
+    response = client.post(
+        "/agent/runs", json={"query": case.query},
+        headers={"X-WorkPilot-Comparison-Mode": "single"},
+    )
     latency_ms = max(0, int((perf_counter() - started) * 1000))
     raw_response = response.json()
     result = raw_response.get("data") if response.status_code == 200 else None

@@ -1,0 +1,307 @@
+{
+  "provenance": {
+    "suite": "w4_fixture_v1",
+    "git_sha": "e208fad5cfc4d41dd2b859e96ea8fd4e96b93823",
+    "working_tree_dirty": true,
+    "cases_sha256": "90b188dce8f119b141a9d9abb21e504c529cdfb72dc7ea3b4308684a85ed6555",
+    "source_sha256": "947c659e6d1b65d985b57a0b8925517e2960efeb80c05299e30c48f1abed09fa",
+    "historic_a": "eval\\results\\phase22-final-closeout-2026-09-25.json",
+    "comparison_rule": "A historical 5-step Single is separate; B/C use 9 tool attempts and 0 model calls.",
+    "fixture_only": true,
+    "mcp_transport": "direct_fixture_not_production_queue",
+    "latency_inference_allowed": false,
+    "human_review": "pending"
+  },
+  "historic_a": {
+    "baseline_business_success": "0/15",
+    "enhanced_business_success": "15/15",
+    "enhanced_gold_coverage": "15/15",
+    "enhanced_citation_correctness": "15/15",
+    "enhanced_service_completion": "15/15",
+    "safety_boundary": "15/15 in both variants"
+  },
+  "paired_runs": 60,
+  "cases": 20,
+  "variants": {
+    "enhanced_single_equal": {
+      "runs": 60,
+      "budget_violations": 0,
+      "read_only_violations": 0,
+      "scope_violations": 0,
+      "intent_correct": 60,
+      "mean_log_service_coverage": 0.8,
+      "mean_tool_attempts": 4.8,
+      "supported_claims": 222,
+      "unsupported_claims": 3,
+      "model_calls": 0,
+      "tokens": 0
+    },
+    "multi": {
+      "runs": 60,
+      "budget_violations": 0,
+      "read_only_violations": 0,
+      "scope_violations": 0,
+      "intent_correct": 60,
+      "mean_log_service_coverage": 0.8,
+      "mean_tool_attempts": 4.8,
+      "supported_claims": 222,
+      "unsupported_claims": 3,
+      "model_calls": 0,
+      "tokens": 0
+    }
+  },
+  "ablation_runs": 16,
+  "ablation_deltas": [
+    {
+      "case_id": "normal_two",
+      "ablation": "multi_serial",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "normal_two",
+      "ablation": "multi_no_verifier",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "skipped",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "normal_two",
+      "ablation": "multi_no_followup",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "normal_two",
+      "ablation": "multi_no_retry",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "followup_gain",
+      "ablation": "multi_serial",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "followup_gain",
+      "ablation": "multi_no_verifier",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "skipped",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "followup_gain",
+      "ablation": "multi_no_followup",
+      "tool_attempt_delta": -1,
+      "log_coverage_delta": -0.5,
+      "verifier_status": "completed",
+      "followup_delta": -1,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "followup_gain",
+      "ablation": "multi_no_retry",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "transient_once",
+      "ablation": "multi_serial",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "transient_once",
+      "ablation": "multi_no_verifier",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "skipped",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "transient_once",
+      "ablation": "multi_no_followup",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "transient_once",
+      "ablation": "multi_no_retry",
+      "tool_attempt_delta": -1,
+      "log_coverage_delta": -0.5,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": -1
+    },
+    {
+      "case_id": "ticket_failure",
+      "ablation": "multi_serial",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "ticket_failure",
+      "ablation": "multi_no_verifier",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "skipped",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "ticket_failure",
+      "ablation": "multi_no_followup",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    },
+    {
+      "case_id": "ticket_failure",
+      "ablation": "multi_no_retry",
+      "tool_attempt_delta": 0,
+      "log_coverage_delta": 0.0,
+      "verifier_status": "completed",
+      "followup_delta": 0,
+      "retry_delta": 0
+    }
+  ],
+  "human_review_queue": [
+    {
+      "case_id": "normal_one",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "normal_two",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "normal_three",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "empty_tickets",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "followup_gain",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "followup_no_gain",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "transient_once",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "transient_persistent",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "outcome_unknown",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "ticket_failure",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "knowledge_failure",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "all_empty",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "conflicting_signals",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "wrong_service_record",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "verifier_timeout",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "verifier_failure",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "non_low_tool",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "budget_competition",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "routing_ambiguity",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    },
+    {
+      "case_id": "overreach_claim",
+      "status": "pending",
+      "question": "逐条核对支持状态、服务归属和是否越界推断"
+    }
+  ],
+  "interpretation": "Fixture metrics check mechanics only; business success and causal support require human review.",
+  "paired_differences": {
+    "log_coverage_nonzero": 0,
+    "tool_attempt_nonzero": 0
+  }
+}

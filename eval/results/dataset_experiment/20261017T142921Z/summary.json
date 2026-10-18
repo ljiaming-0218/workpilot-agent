@@ -1,0 +1,219 @@
+{
+  "dataset_version": "w4-synthetic-v1",
+  "case_count": 18,
+  "grading": "Independent model judgments plus frozen citation/bound checks; not human accuracy.",
+  "variants": {
+    "enhanced_single_equal": {
+      "runs": 11,
+      "execution_completed": 7,
+      "investigation_completed": 7,
+      "model_graded": 7,
+      "rubric_checked_model_pass": 1,
+      "ungraded": 4,
+      "mean_latency_ms": 24928.33,
+      "median_latency_ms": 23810.34,
+      "model_calls": 46,
+      "tokens": 113375,
+      "tool_attempts": 37,
+      "fault_exercised_runs": 0
+    },
+    "multi": {
+      "runs": 11,
+      "execution_completed": 11,
+      "investigation_completed": 11,
+      "model_graded": 7,
+      "rubric_checked_model_pass": 3,
+      "ungraded": 4,
+      "mean_latency_ms": 20910.12,
+      "median_latency_ms": 20351.51,
+      "model_calls": 52,
+      "tokens": 110952,
+      "tool_attempts": 45,
+      "fault_exercised_runs": 0
+    }
+  },
+  "paired_outcomes": {
+    "multi_only": 3,
+    "single_only": 1,
+    "both_fail": 3
+  },
+  "judge_failed": 4,
+  "failures": [
+    {
+      "case_id": "cfg_workers",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "pass",
+      "unsupported_assertions": [],
+      "reason": "原因识别正确，但建议步骤仅指向审查工单以确认触发源，未包含必须执行的‘恢复或检查 max_workers=8’这一核心验证动作。Rubric 要求提出具体的恢复/检查行动，而 X 仅停留在调查层面，缺乏对当前配置状态的直接核查或恢复指令。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "three_service_chain",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "fail",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [],
+      "reason": "回答声称'核验未完成（VERIFIER_FAILED）；本次不输出已核验事实'，但检索证据中明确包含 ticket 记录（source_record_ids: 100），其中直接陈述了原因（queue_capacity=0）和恢复动作（queue_capacity=64）。根据 rubric 'Retain other-service evidence when a local tool fails; disclose missing sources'，模型应利用现有证据得出结论而非完全拒绝输出。此外，未识别出 lab-store-service 为根本原因，也未提出具体的恢复建议，导致答案不完整且未能履行必须包含的因果识别要求。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "dependency_stock",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "fail",
+      "completeness": "pass",
+      "unsupported_assertions": [],
+      "reason": "答案正确识别了原因和修复建议，但在引用证据时存在严重错误。例如，将工单内容（ID 100）的引用标记为 '800007:service-1:service-1-2:1'，而该证据 ID 在检索记录中实际对应的是 lab-cart-service 的 ticket 搜索，虽然内容匹配，但答案在描述 lab-stock-service 日志（CONFIG_REJECTED）时引用的证据 ID '800007:service-2:service-2-1:1' 是正确的，然而它多次重复使用同一证据 ID 来支持不同的事实陈述，且未区分服务来源的独立性。更关键的是，答案声称 'lab-stock-service 在...记录到 CONFIG_REJECTED 错误' 引用了 '800007:service-2:service-2-1:1'，这是正确的，但它随后在待验证假设部分再次引用该证据来支持 '当前 queue_capacity 可能仍维持为 0' 的推测，这在逻辑上是不严谨的，因为该证据仅记录了历史受控干预，而非当前状态。不过最明显的失败在于：答案在 '已核验事实' 部分引用 '800007:service-1:service-1-2:1' 来证明 'lab-stock-service 的 queue_capacity=0 是隔离点'，但该证据 ID 实际上属于 lab-cart-service 的工单搜索，虽然工单内容提到了 lab-stock-service，但直接作为 lab-stock-service 的事实证据引用略显牵强，且未明确说明跨服务关联。此外，答案未提及 'search_knowledge' 工具返回空结果这一缺失源的情况，违反了 rubric 中 'disclose missing sources' 的要求。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "dependency_price",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "fail",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "fail",
+      "completeness": "fail",
+      "unsupported_assertions": [],
+      "reason": "回答声称'核验未完成（VERIFIER_FAILED）；本次不输出已核验事实'，但检索证据中明确包含日志和工单记录，且无工具调用失败。这直接违反了必须输出已核验事实的要求。此外，未识别出核心原因 worker_limit=0 及恢复动作 worker_limit=6，完全缺失了任务要求的根本原因分析和修复建议。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "conflict_request_ids",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "fail",
+      "action": "fail",
+      "uncertainty": "not_applicable",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [],
+      "reason": "回答为空，未包含任何内容。未能满足必须陈述‘现有记录未建立根本原因或共享因果联系’的要求，也未提供具体的后续检查建议或引用证据。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "empty_logs",
+      "variant": "enhanced_single_equal",
+      "label": "X",
+      "cause": "pass",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [],
+      "reason": "答案正确陈述了无法确定根本原因且未将空日志视为健康证明（符合must_not）。但行动部分失败：它仅建议用户自行核对证据ID，未提供基于证据的具体下一步检查或验证步骤（如检查实时指标），违反了rubric中必须包含“具体证据驱动的后续检查”的要求。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "cfg_connections",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "fail",
+      "action": "pass",
+      "uncertainty": "not_applicable",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [
+        "当前故障可能源于配置管理流程中意外将 pool_capacity 置为 0，或存在未捕获的配置回滚逻辑，导致服务池容量耗尽。"
+      ],
+      "reason": "回答在原因分析部分提出了'配置回滚逻辑'作为假设，但证据仅显示受控干预导致问题，无记录支持回滚逻辑存在；且未像参考场景那样明确声明'非最小阈值'的约束，导致对恢复值的理解不够严谨。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "three_service_chain",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "fail",
+      "action": "fail",
+      "uncertainty": "pass",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [],
+      "reason": "与 X 相同，回答以'核验未完成'为由拒绝输出已核验事实。尽管检索到了包含关键信息的 ticket 记录（如 source_record_ids: 100, 101, 102），明确指出 cause_marker 为 queue_capacity=0 且 action_marker 为 queue_capacity=64，模型却未进行任何分析或建议。这违反了 rubric 中关于在工具失败时保留其他服务证据的要求，导致未能识别根本原因和提供必要的行动建议。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "dependency_price",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "pass",
+      "action": "pass",
+      "uncertainty": "pass",
+      "citations": "fail",
+      "completeness": "pass",
+      "unsupported_assertions": [
+        "引用证据 ID '800009:service-1:service-1-2:1'来支持关于lab-price-service配置被设为0的假设，但该ID实际对应的是lab-checkout-service的工单搜索记录，而非lab-price-service的配置日志。"
+      ],
+      "reason": "回答正确识别了原因（worker_limit=0）和动作（恢复至6），并恰当地区分了历史受控实验与当前状态的不确定性。然而，在引用证据时存在严重错误：将指向lab-checkout-service工单的ID（800009:service-1:service-1-2:1）错误地用于支撑关于lab-price-service具体配置值的陈述，该ID对应的内容并未直接提供lab-price-service的配置日志证据。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    },
+    {
+      "case_id": "conflict_request_ids",
+      "variant": "multi",
+      "label": "Y",
+      "cause": "fail",
+      "action": "fail",
+      "uncertainty": "fail",
+      "citations": "pass",
+      "completeness": "fail",
+      "unsupported_assertions": [
+        "服务状态：lab-conflict-a-service: completed",
+        "服务状态：lab-conflict-b-service: completed"
+      ],
+      "reason": "1. 错误断言：日志明确显示错误类型为'READ_TIMEOUT'且消息指出无相关性，但回答声称服务状态为'completed'，与证据矛盾。2. 缺失不确定性声明：虽然检索到了正确记录（如工单提到'A recovered before B failed'），但未在结论中明确陈述‘现有记录未建立共享原因’这一核心要求。3. 缺乏行动建议：未提供基于证据的具体下一步检查措施。4. 尽管有证据支持，但将超时错误标记为完成是严重的事实性错误。",
+      "rubric_checked_model_pass": false,
+      "fixed_rule_violations": []
+    }
+  ],
+  "by_split": {
+    "development": {
+      "enhanced_single_equal": {
+        "graded": 4,
+        "passed": 0
+      },
+      "multi": {
+        "graded": 4,
+        "passed": 3
+      }
+    },
+    "holdout": {
+      "enhanced_single_equal": {
+        "graded": 3,
+        "passed": 1
+      },
+      "multi": {
+        "graded": 3,
+        "passed": 0
+      }
+    }
+  },
+  "judge_tokens": 35592,
+  "limitations": [
+    "One run per case and arm; no stable P95 or production accuracy claim.",
+    "Synthetic records include explicit controlled interventions in known-cause tasks.",
+    "Same model family used for investigation and independent judging; judging errors/bias remain possible.",
+    "Tool calls and audit sessions are fixtures; only LLM requests are online."
+  ]
+}

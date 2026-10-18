@@ -1,0 +1,67 @@
+{
+  "dataset_version": "w4-synthetic-v1",
+  "case_count": 1,
+  "grading": "Independent model judgments plus frozen citation/bound checks; not human accuracy.",
+  "variants": {
+    "enhanced_single_equal": {
+      "runs": 1,
+      "execution_completed": 1,
+      "investigation_completed": 1,
+      "model_graded": 0,
+      "rubric_checked_model_pass": 0,
+      "ungraded": 1,
+      "mean_latency_ms": 24504.21,
+      "median_latency_ms": 24504.21,
+      "model_calls": 4,
+      "tokens": 7593,
+      "tool_attempts": 3,
+      "fault_exercised_runs": 0
+    },
+    "multi": {
+      "runs": 1,
+      "execution_completed": 1,
+      "investigation_completed": 1,
+      "model_graded": 0,
+      "rubric_checked_model_pass": 0,
+      "ungraded": 1,
+      "mean_latency_ms": 19911.59,
+      "median_latency_ms": 19911.59,
+      "model_calls": 4,
+      "tokens": 7232,
+      "tool_attempts": 3,
+      "fault_exercised_runs": 0
+    }
+  },
+  "paired_outcomes": {},
+  "judge_failed": 1,
+  "failures": [],
+  "by_split": {
+    "development": {
+      "enhanced_single_equal": {
+        "graded": 0,
+        "passed": 0
+      },
+      "multi": {
+        "graded": 0,
+        "passed": 0
+      }
+    },
+    "holdout": {
+      "enhanced_single_equal": {
+        "graded": 0,
+        "passed": 0
+      },
+      "multi": {
+        "graded": 0,
+        "passed": 0
+      }
+    }
+  },
+  "judge_tokens": 4677,
+  "limitations": [
+    "One run per case and arm; no stable P95 or production accuracy claim.",
+    "Synthetic records include explicit controlled interventions in known-cause tasks.",
+    "Same model family used for investigation and independent judging; judging errors/bias remain possible.",
+    "Tool calls and audit sessions are fixtures; only LLM requests are online."
+  ]
+}

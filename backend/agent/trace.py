@@ -160,6 +160,31 @@ class TraceRecorder:
         )
         self._events.clear()
 
+    def record_multi_event(
+        self,
+        *,
+        node: str,
+        event_type: str,
+        input_json: dict[str, Any] | None = None,
+        output_json: dict[str, Any] | None = None,
+        error: str | None = None,
+        model: str | None = None,
+        tokens_json: dict[str, int] | None = None,
+        latency_ms: int = 0,
+    ) -> None:
+        """Record a structured Supervisor or investigator event in run order."""
+        self._append(
+            node=node,
+            event_type=event_type,
+            input_json=input_json,
+            output_json=output_json,
+            latency_ms=latency_ms,
+            model=model,
+            tokens_json=tokens_json,
+            status=TraceStatus.FAILED if error else TraceStatus.SUCCESS,
+            error=error,
+        )
+
     def _record_tool_events(
         self,
         state: AgentState,

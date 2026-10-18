@@ -90,6 +90,64 @@ class AgentRequest(BaseModel):
     query: str = Field(min_length=1, max_length=2_000)
 
 
+class DiagnosticClaim(BaseModel):
+    claim_id: str = ""
+    claim_type: Literal["fact", "hypothesis", "recommendation"]
+    text: str = Field(min_length=1, max_length=700)
+    evidence_ids: list[str] = Field(min_length=1, max_length=6)
+
+
+class InvestigatorDecision(BaseModel):
+    summary: str = Field(max_length=700)
+    claims: list[DiagnosticClaim] = Field(default_factory=list, max_length=4)
+    gaps: list[str] = Field(default_factory=list, max_length=4)
+    next_tool: Literal["search_tickets", "search_knowledge", "stop"]
+    reason: str = Field(min_length=1, max_length=400)
+
+
+class ClaimReview(BaseModel):
+    claim_id: str
+    support: Literal["supported", "unsupported", "unverified"]
+    reason: str = Field(min_length=1, max_length=700)
+
+
+class SemanticReview(BaseModel):
+    claims: list[ClaimReview] = Field(max_length=15)
+
+
+class AgentTaskResult(BaseModel):
+    task_id: str
+    parent_task_id: str
+    agent_id: str
+    service: str
+    status: Literal["completed", "partial", "failed"]
+    decisions: list[dict[str, Any]] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
+    errors: list[str] = Field(default_factory=list)
+    gaps: list[str] = Field(default_factory=list)
+    attempts: list[dict[str, Any]] = Field(default_factory=list)
+    attempts_used: int = 0
+    stop_reason: str
+    summary: str | None = None
+    findings: list[DiagnosticClaim] = Field(default_factory=list)
+    model_source: Literal["llm", "rule", "failed"] = "rule"
+
+
+class VerifiedClaim(BaseModel):
+    claim_id: str
+    claim_type: Literal["fact", "hypothesis", "recommendation"]
+    text: str
+    evidence_ids: list[str] = Field(default_factory=list)
+    support: Literal["supported", "unsupported", "unverified"]
+    reason: str
+
+
+class VerifierReport(BaseModel):
+    status: Literal["completed", "failed", "timeout", "skipped"]
+    claims: list[VerifiedClaim] = Field(default_factory=list)
+    error: str | None = None
+
+
 class AgentRunAccepted(BaseModel):
     run_id: int = Field(ge=1)
     request_id: str
@@ -129,3 +187,9 @@ class AgentResult(BaseModel):
     status: AgentRunStatus
     approval_status: ApprovalStatus | None
     error: str | None
+    mode: Literal["single", "multi"] = "single"
+    agent_tasks: list[AgentTaskResult] = Field(default_factory=list)
+    investigation_status: Literal["completed", "partial", "failed"] | None = None
+    tool_budget: dict[str, int] | None = None
+    verifier: VerifierReport | None = None
+    model_budget: dict[str, int] | None = None

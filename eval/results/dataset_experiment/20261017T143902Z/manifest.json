@@ -1,0 +1,24 @@
+{
+  "dataset_sha256": "518c4dbf640abba9e20915ca3fbd0f33c29ae769d00afdec3ac5e79e88c10e94",
+  "model": "Qwen/Qwen3.5-35B-A3B",
+  "cases": 18,
+  "repeats": 1,
+  "tool_limit": 9,
+  "per_service_tool_limit": 3,
+  "model_call_limit": "3 * number_of_services + 1",
+  "token_reservation_limit": 64000,
+  "input_char_limit": 96000,
+  "max_output_tokens": 2048,
+  "sdk_retries": 0,
+  "order": "Case-alternating arm order; alternating anonymous judge labels",
+  "code_hashes": {
+    "eval\\run_dataset_experiment.py": "ae9a657ff9f070ee2ea18ae0ba9076ee22f6bb6c3aae7b8533842093f8d0cd66",
+    "eval\\model_comparison.py": "87d425bab9af3114130ab7337e9e7d7bd84a45a8f1f2e29d64d92af10f16d1e2",
+    "eval\\model_scoring.py": "c32892922e081abc9168c7eb8a6fb6c2241057134047fa675a7275ff2be727ff",
+    "backend\\agent\\diagnostic_agents.py": "61e0d66e1202b7ac1889ba3ea160ffd0cc6dcbbea319725206b71414be0dba35",
+    "backend\\prompts\\service_investigator.txt": "be72e20927a3e386e8f1ebd75520bd05cf6ae9532ba22d6da4a4adbb77eef336",
+    "backend\\prompts\\semantic_verifier.txt": "c52757b0fea0c902ce2634b9977614f211e1f5985fc70522f25d467618bfb4a1"
+  },
+  "judge_prompt_sha256": "d89d35358216f9deca68f8eec84537e1d523864582914846a1e128c3cc68a370",
+  "llm_cost_usd": null
+}

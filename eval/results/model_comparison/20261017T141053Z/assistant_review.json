@@ -1,0 +1,22 @@
+{
+  "reviewer": "assistant_source_comparison",
+  "human_review": "pending",
+  "source": "raw.jsonl",
+  "scope": "One synthetic two-service case; real online model; no fresh MCP/TiDB integration.",
+  "assessments": [
+    {
+      "variant": "enhanced_single_equal",
+      "cause_and_observed_restoration_present": true,
+      "lexical_score_false_negative": "Action uses Chinese phrasing rather than literal queue_capacity=32.",
+      "remaining_issue": "Unqualified recommendation to stop investigating edge should be reviewed."
+    },
+    {
+      "variant": "multi",
+      "cause_and_observed_restoration_present": true,
+      "lexical_score_false_negative": "Action uses Chinese phrasing rather than literal queue_capacity=32.",
+      "unsupported_recommendation_excerpt": "32 or higher",
+      "remaining_issue": "Observed restoration at 32 does not justify higher values; verifier accepted this."
+    }
+  ],
+  "decision": "Do not count either run as a fully adjudicated business success. Freeze semantic scoring before larger experiments."
+}

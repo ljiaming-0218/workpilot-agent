@@ -10,9 +10,11 @@ from backend.schemas.common import Page
 from backend.schemas.log import LogFilters, LogRead
 
 
-def list_logs(session: Session, filters: LogFilters) -> Page[LogRead]:
+def list_logs(session: Session, filters: LogFilters, *, allowed_services: list[str] | None = None) -> Page[LogRead]:
     """Return a filtered page; time windows include the start and exclude the end."""
     conditions = []
+    if allowed_services is not None:
+        conditions.append(ErrorLog.service_name.in_(allowed_services))
     for name in ("service_name", "level", "error_type", "request_id"):
         value = getattr(filters, name)
         if value is not None:

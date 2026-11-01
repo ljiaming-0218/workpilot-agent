@@ -12,6 +12,10 @@ const state = {
   knowledge: [],
   busy: false,
   importing: false,
+  user: null,
+  teamId: null,
+  collaboration: null,
+  collaborationBusy: false,
 };
 
 const importExamples = {
@@ -71,6 +75,16 @@ const importExamples = {
 };
 
 const ui = {
+  loginScreen: document.querySelector("#login-screen"),
+  loginForm: document.querySelector("#login-form"),
+  loginUsername: document.querySelector("#login-username"),
+  loginPassword: document.querySelector("#login-password"),
+  loginError: document.querySelector("#login-error"),
+  loginSubmit: document.querySelector("#login-submit"),
+  accountControls: document.querySelector("#account-controls"),
+  accountName: document.querySelector("#account-name"),
+  teamSelect: document.querySelector("#team-select"),
+  logout: document.querySelector("#logout"),
   shell: document.querySelector(".app-shell"),
   form: document.querySelector("#agent-form"),
   query: document.querySelector("#agent-query"),
@@ -136,10 +150,17 @@ function createElement(tag, className, text) {
 function setBusy(busy, label = "Run Agent") {
   state.busy = busy;
   ui.runButton.disabled = busy;
+  ui.teamSelect.disabled = busy;
+  ui.logout.disabled = busy;
   ui.runButton.querySelector("span").textContent = busy ? "Running…" : label;
   document.querySelectorAll("[data-approval]").forEach((button) => {
-    button.disabled = busy;
+    button.disabled = busy || !canApprove();
   });
+}
+
+function canApprove() {
+  const team = (state.user?.teams || []).find((item) => String(item.id) === String(state.teamId));
+  return team?.role === "approver" || team?.role === "admin";
 }
 
 async function requestJson(path, options = {}) {
@@ -147,6 +168,7 @@ async function requestJson(path, options = {}) {
     ...options,
     headers: {
       "Content-Type": "application/json",
+      ...(state.teamId ? {"X-WorkPilot-Team-Id": String(state.teamId)} : {}),
       ...(options.headers || {}),
     },
   });
@@ -157,11 +179,103 @@ async function requestJson(path, options = {}) {
     throw new Error(`服务返回了无法解析的响应（HTTP ${response.status}）`);
   }
   if (!response.ok || body.success === false) {
+    if (response.status === 401 && !path.startsWith("/auth/")) showLogin();
     const message = body.error?.message || body.detail || `请求失败（HTTP ${response.status}）`;
     throw new Error(message);
   }
   return body.data ?? body;
 }
+
+function showLogin() {
+  state.user = null;
+  state.teamId = null;
+  ui.loginScreen.hidden = false;
+  ui.accountControls.hidden = true;
+  ui.loginPassword.value = "";
+}
+
+function resetTeamView() {
+  state.result = null;
+  state.collaboration = null;
+  state.runs = [];
+  state.trace = [];
+  ui.runTitle.textContent = "等待执行任务";
+  ui.runStatus.textContent = "IDLE";
+  ui.runStatus.className = "status-badge idle";
+  ui.runRisk.textContent = "—";
+  ui.runId.textContent = ui.runIntent.textContent = ui.runRouting.textContent = ui.runSteps.textContent = "—";
+  ui.planCount.textContent = ui.evidenceCount.textContent = "0";
+  ui.contentView.replaceChildren(createElement("p", "empty-copy", "提交任务后查看调查结果。"));
+  ui.approvalPanel.hidden = true;
+  renderTrace([]);
+  renderRecentRuns();
+}
+
+function acceptUser(user) {
+  state.user = user;
+  ui.accountName.textContent = user.username;
+  ui.teamSelect.replaceChildren();
+  for (const team of user.teams || []) {
+    const option = document.createElement("option");
+    option.value = String(team.id);
+    option.textContent = team.name;
+    ui.teamSelect.append(option);
+  }
+  state.teamId = ui.teamSelect.value || null;
+  ui.accountControls.hidden = false;
+  ui.loginScreen.hidden = true;
+  ui.runButton.disabled = !state.teamId;
+  resetTeamView();
+  if (state.teamId) {
+    loadBusinessData();
+    loadRunHistory();
+  } else {
+    ui.dataList.replaceChildren(createElement("p", "empty-copy", "当前账号尚未加入团队。"));
+    showToast("当前账号尚未加入团队，请联系管理员。", true);
+  }
+}
+
+async function restoreSession() {
+  try {
+    acceptUser(await requestJson("/auth/me"));
+  } catch {
+    showLogin();
+  }
+}
+
+ui.loginForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  ui.loginSubmit.disabled = true;
+  ui.loginError.textContent = "";
+  try {
+    const user = await requestJson("/auth/login", {method: "POST", body: JSON.stringify({
+      username: ui.loginUsername.value.trim(), password: ui.loginPassword.value,
+    })});
+    ui.loginPassword.value = "";
+    acceptUser(user);
+  } catch (error) {
+    ui.loginError.textContent = error.message;
+  } finally {
+    ui.loginSubmit.disabled = false;
+  }
+});
+
+ui.logout.addEventListener("click", async () => {
+  try {
+    await requestJson("/auth/logout", {method: "POST"});
+    resetTeamView();
+    showLogin();
+  } catch (error) {
+    showToast(error.message, true);
+  }
+});
+
+ui.teamSelect.addEventListener("change", () => {
+  state.teamId = ui.teamSelect.value || null;
+  resetTeamView();
+  loadBusinessData();
+  loadRunHistory();
+});
 
 async function checkHealth() {
   try {
@@ -282,16 +396,20 @@ async function runAgent(event) {
   ui.approvalPanel.hidden = true;
   state.trace = [];
   renderTrace([]);
+  let submitted = false;
   try {
     const accepted = await requestJson("/agent/runs/async", {
       method: "POST",
+      headers: { "Idempotency-Key": crypto.randomUUID() },
       body: JSON.stringify({ query }),
     });
+    submitted = true;
     acceptResult({
       run_id: accepted.run_id,
       request_id: accepted.request_id,
       intent: null,
       status: accepted.status,
+      queue_status: accepted.queue_status,
       final_answer: null,
       plan: [],
       evidence: [],
@@ -307,9 +425,9 @@ async function runAgent(event) {
     await loadRunHistory();
     showToast(`Agent Run #${result.run_id} 已返回 ${result.status} 状态。`);
   } catch (error) {
-    ui.runTitle.textContent = "任务执行失败";
-    ui.runStatus.textContent = "ERROR";
-    ui.runStatus.className = "status-badge failed";
+    if (!submitted) ui.runTitle.textContent = "任务提交失败";
+    ui.runStatus.textContent = submitted ? "进度中断 · 请刷新任务" : "提交失败";
+    ui.runStatus.className = "status-badge idle";
     showToast(error.message, true);
   } finally {
     setBusy(false);
@@ -318,8 +436,19 @@ async function runAgent(event) {
 
 function streamAgentRun(accepted, query) {
   return new Promise((resolve, reject) => {
-    const source = new EventSource(accepted.events_url);
+    const eventsUrl = new URL(accepted.events_url, window.location.origin);
+    if (state.teamId) eventsUrl.searchParams.set("team_id", state.teamId);
+    const source = new EventSource(eventsUrl);
     let settled = false;
+
+    if (accepted.queue_status === "queued") {
+      ui.runStatus.textContent = "QUEUED";
+    }
+    source.addEventListener("attempt", () => {
+      if (state.result?.run_id !== accepted.run_id) return;
+      state.trace = [];
+      renderTrace();
+    });
 
     source.addEventListener("progress", (event) => {
       const progress = JSON.parse(event.data);
@@ -361,6 +490,7 @@ function streamAgentRun(accepted, query) {
 
 function acceptResult(result, query) {
   state.result = result;
+  state.collaboration = null;
   state.activeContent = "plan";
   const existing = state.runs.findIndex((item) => (item.result?.run_id || item.summary?.id) === result.run_id);
   const runEntry = { query, result, trace: [], summary: { id: result.run_id, status: result.status, intent: result.intent } };
@@ -381,7 +511,7 @@ function renderResult() {
     ? "REVIEW UNAVAILABLE"
     : result.verifier?.claims?.some((claim) => claim.support === "unsupported")
       ? "REVIEW ISSUES" : null;
-  ui.runStatus.textContent = [result.status, result.investigation_status === "partial" ? "PARTIAL" : null, reviewState]
+  ui.runStatus.textContent = [result.queue_status || result.status, result.investigation_status === "partial" ? "PARTIAL" : null, reviewState]
     .filter(Boolean).join(" · ").replaceAll("_", " ").toUpperCase();
   ui.runStatus.className = `status-badge ${statusClass(result.status)}`;
   ui.runRisk.textContent = `${result.risk_level || "—"} RISK`;
@@ -400,9 +530,14 @@ function renderResult() {
     ui.approvalReason.textContent = reasons.length
       ? reasons.join("；")
       : "高风险计划尚未执行任何工具。";
+    if (!canApprove()) ui.approvalReason.textContent += " 请联系本团队审批人处理。";
+    document.querySelectorAll("[data-approval]").forEach((button) => {
+      button.disabled = state.busy || !canApprove();
+    });
   }
   document.querySelectorAll(".content-tab").forEach((button) => {
     button.classList.toggle("active", button.dataset.content === state.activeContent);
+    button.setAttribute("aria-selected", String(button.dataset.content === state.activeContent));
   });
   renderRunContent();
 }
@@ -416,6 +551,8 @@ function renderRunContent() {
     renderPlan(result.plan || [], result.agent_tasks || [], result.tool_budget, result.verifier);
   } else if (state.activeContent === "evidence") {
     renderEvidence(result.evidence || []);
+  } else if (state.activeContent === "collaboration") {
+    renderCollaboration();
   } else {
     const answer = createElement("div", "answer-content", result.final_answer || "当前没有最终回答。");
     ui.contentView.append(answer);
@@ -447,7 +584,9 @@ function renderPlan(plan, tasks = [], budget = null, verifier = null) {
     ui.contentView.append(section);
   }
   if (!plan.length) {
-    ui.contentView.append(emptyBlock("当前任务不需要调用工具。"));
+    ui.contentView.append(emptyBlock(state.result?.status === "running"
+      ? "任务排队或执行中，计划在结果发布后显示。"
+      : "当前没有已发布的工具计划。"));
     return;
   }
   const list = createElement("ol", "plan-list");
@@ -472,6 +611,8 @@ function renderEvidence(evidence) {
   evidence.forEach((item, index) => {
     const row = createElement("article", "evidence-item");
     row.append(createElement("strong", "", `${item.evidence_id || `Evidence ${index + 1}`} · ${item.service || ""} · ${humanize(item.tool || item.source || "result")}`));
+    const ids = item.source_record_ids || (item.output?.items || []).map((record) => record.id ?? record.document_id).filter((id) => id != null);
+    row.append(createElement("p", "evidence-source", `记录来源：${humanize(item.tool || "unknown")} · 原始记录 ID：${ids.join(", ") || "无"}。空查询仅表示未检索到相关记录。`));
     const pre = createElement("pre", "", prettyJson(item));
     row.append(pre);
     list.append(row);
@@ -524,6 +665,10 @@ async function loadRunHistory() {
       return { query: summary.user_query, summary, result: previous?.result || null, trace: previous?.trace || [] };
     });
     renderRecentRuns();
+    const linkedRun = new URLSearchParams(window.location.search).get("run_id");
+    if (!state.result && /^[1-9]\d*$/.test(linkedRun || "")) {
+      await openHistoricRun({summary: {id: Number(linkedRun)}});
+    }
   } catch (error) {
     renderRecentRuns();
     showToast(`运行历史加载失败：${error.message}`, true);
@@ -538,6 +683,7 @@ async function openHistoricRun(entry) {
     entry.result = result;
     entry.query = detail.user_query;
     state.result = result;
+    state.collaboration = null;
     state.activeContent = "plan";
     renderResult();
     renderRecentRuns();
@@ -554,6 +700,7 @@ function resultFromRunDetail(detail) {
     request_id: detail.request_id,
     intent: detail.intent,
     status: detail.status,
+    queue_status: detail.queue_status,
     final_answer: detail.final_answer,
     plan: detail.plan,
     evidence: detail.evidence,
@@ -569,6 +716,162 @@ function resultFromRunDetail(detail) {
     tool_budget: detail.tool_budget,
     verifier: detail.verifier,
   };
+}
+
+const handlingLabels = {open: "待认领", in_progress: "处理中", resolved: "已处理"};
+const feedbackLabels = {unreviewed: "待人工核实", supported: "人工认为证据支持", needs_correction: "需要修正", inconclusive: "证据不足"};
+const originLabels = {synthetic: "合成案例", local_test: "本地真实测试", external: "外部数据", unspecified: "未标记来源"};
+
+async function loadCollaboration() {
+  const runId = state.result?.run_id;
+  const teamId = state.teamId;
+  if (!runId) return;
+  try {
+    const data = await requestJson(`/agent/runs/${runId}/collaboration`);
+    if (state.teamId !== teamId || state.result?.run_id !== runId) return;
+    state.collaboration = data;
+    if (state.activeContent === "collaboration") renderRunContent();
+  } catch (error) {
+    if (state.teamId !== teamId || state.result?.run_id !== runId) return;
+    if (state.activeContent !== "collaboration") return;
+    ui.contentView.replaceChildren(emptyBlock(`协作记录加载失败：${error.message}`));
+  }
+}
+
+function reviewSelect(id, values, selected) {
+  const select = createElement("select");
+  select.id = id;
+  for (const [value, text] of Object.entries(values)) {
+    const option = createElement("option", "", text);
+    option.value = value;
+    option.selected = String(selected ?? "") === value;
+    select.append(option);
+  }
+  return select;
+}
+
+function renderCollaboration() {
+  const data = state.collaboration;
+  const section = createElement("section", "collaboration");
+  ui.contentView.append(section);
+  section.append(createElement("strong", "", "团队调查与交接"),
+    createElement("p", "review-hint", `执行状态：${state.result.queue_status || state.result.status}。人工处理状态独立保存，任务完成不代表根因已经确认。`));
+  const refresh = createElement("button", "secondary-button", "刷新任务与协作");
+  refresh.type = "button";
+  refresh.addEventListener("click", async () => {
+    const runId = state.result.run_id;
+    const teamId = state.teamId;
+    refresh.disabled = true;
+    try {
+      const detail = await requestJson(`/agent/runs/${runId}`);
+      if (state.teamId !== teamId || state.result?.run_id !== runId) return;
+      state.result = resultFromRunDetail(detail);
+      await loadCollaboration();
+      await loadTrace(runId);
+      await loadRunHistory();
+      renderResult();
+    } catch (error) { showToast(error.message, true); }
+    finally { refresh.disabled = false; }
+  });
+  section.append(refresh);
+  if (!data) {
+    section.append(createElement("p", "", "正在加载负责人、反馈和备注…"));
+    return;
+  }
+  const incident = data.incident;
+  section.append(createElement("p", "review-origin", incident
+    ? `告警来源：${incident.source} / ${incident.event_id} · ${originLabels[incident.source_kind]}（提交方声明） · ${incident.payload.alert_name}`
+    : "此任务没有告警来源标记；不计入真实案例。"));
+
+  const issues = [];
+  if (data.feedback === "unreviewed") issues.push("调查结论尚待人工核实。");
+  for (const task of state.result.agent_tasks || []) {
+    if (task.status !== "completed") issues.push(`${task.service}：${task.status}；${(task.errors || []).join("，") || task.stop_reason || "请核对证据缺口"}`);
+  }
+  if (state.result.verifier?.status !== "completed") issues.push("未取得完整核验结果，请核对原始记录。");
+  for (const claim of state.result.verifier?.claims || []) {
+    if (claim.support !== "supported") issues.push(`${claim.support}：${claim.text}`);
+  }
+  const pending = createElement("div", "review-pending");
+  pending.append(createElement("strong", "", "待确认事项"));
+  for (const issue of issues.length ? issues : ["当前无自动标出的缺口；人工反馈不等于独立根因验证。"]) {
+    pending.append(createElement("p", "", issue));
+  }
+  section.append(pending);
+
+  const form = createElement("form", "review-form");
+  const memberChoices = {"": "未分配"};
+  for (const member of data.members) memberChoices[member.id] = member.username;
+  if (data.owner_user_id && !data.members.some((member) => member.id === data.owner_user_id)) {
+    memberChoices[data.owner_user_id] = `原负责人 #${data.owner_user_id}（已离开团队，请重新分配）`;
+  }
+  const owner = reviewSelect("review-owner", memberChoices, data.owner_user_id);
+  const handling = reviewSelect("review-status", handlingLabels, data.handling_status);
+  const feedback = reviewSelect("review-feedback", feedbackLabels, data.feedback);
+  for (const [title, control] of [["负责人", owner], ["人工处理状态", handling], ["结果反馈", feedback]]) {
+    const label = createElement("label", "", title);
+    label.append(control);
+    form.append(label);
+  }
+  const claim = createElement("button", "secondary-button", "由我认领");
+  claim.type = "button";
+  claim.addEventListener("click", () => { owner.value = String(state.user.id); handling.value = "in_progress"; });
+  const noteLabel = createElement("label", "", "处理说明 / 新备注");
+  const note = createElement("textarea");
+  note.id = "review-note";
+  note.rows = 3;
+  note.maxLength = 4000;
+  note.placeholder = "记录已核对的事实、需要补查的事项或交接说明";
+  noteLabel.append(note);
+  const save = createElement("button", "primary-button", "保存协作记录");
+  save.type = "submit";
+  save.disabled = state.collaborationBusy;
+  form.append(claim, noteLabel, save);
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (state.collaborationBusy) return;
+    const runId = data.run_id;
+    const teamId = state.teamId;
+    state.collaborationBusy = true;
+    save.disabled = true;
+    try {
+      const updated = await requestJson(`/agent/runs/${runId}/collaboration`, {
+        method: "PATCH", body: JSON.stringify({expected_version: data.version,
+          owner_user_id: owner.value ? Number(owner.value) : null, handling_status: handling.value,
+          feedback: feedback.value, note: note.value.trim()}),
+      });
+      if (state.teamId !== teamId || state.result?.run_id !== runId) return;
+      state.collaboration = updated;
+      state.collaborationBusy = false;
+      renderRunContent();
+      showToast("协作记录已保存。");
+    } catch (error) { showToast(error.message, true); }
+    finally { state.collaborationBusy = false; save.disabled = false; }
+  });
+  section.append(form);
+  const history = createElement("div", "review-history");
+  history.append(createElement("strong", "", `交接记录（最近 ${data.notes.length} / ${data.notes_total} 条）`));
+  const nameFor = (id) => data.members.find((member) => member.id === id)?.username || `用户 #${id}`;
+  for (const item of data.notes) {
+    const row = createElement("article");
+    row.append(createElement("small", "", `v${item.version} · ${nameFor(item.actor_user_id)} · ${formatBeijing(item.created_at)}`),
+      createElement("p", "", `${handlingLabels[item.handling_status]} · ${feedbackLabels[item.feedback]} · 负责人：${item.owner_user_id ? nameFor(item.owner_user_id) : "未分配"}`),
+      createElement("p", "review-note", item.note || "（仅更新状态）"));
+    history.append(row);
+  }
+  section.append(history);
+  const stats = createElement("details", "review-statistics");
+  stats.append(createElement("summary", "", "团队案例统计（按提交方声明来源分组）"));
+  stats.addEventListener("toggle", async () => {
+    if (!stats.open || stats.dataset.loaded) return;
+    try {
+      const summary = await requestJson("/investigations/summary");
+      stats.dataset.loaded = "true";
+      stats.append(createElement("p", "review-hint", "仅统计执行状态和人工反馈；不计算根因准确率。未标记任务单独统计。"));
+      for (const group of summary.groups) stats.append(createElement("p", "", `${originLabels[group.source_kind]} · ${group.execution_status} · ${feedbackLabels[group.feedback]}：${group.count}`));
+    } catch (error) { showToast(error.message, true); }
+  });
+  section.append(stats);
 }
 
 function renderTrace(events = state.trace) {
@@ -914,6 +1217,7 @@ document.querySelectorAll(".content-tab").forEach((button) => {
   button.addEventListener("click", () => {
     state.activeContent = button.dataset.content;
     renderResult();
+    if (state.activeContent === "collaboration" && state.result) loadCollaboration();
   });
 });
 document.querySelectorAll("[data-approval]").forEach((button) => {
@@ -925,5 +1229,4 @@ document.querySelectorAll(".mobile-tab").forEach((button) => {
 
 updateQueryCount();
 checkHealth();
-loadBusinessData();
-loadRunHistory();
+restoreSession();

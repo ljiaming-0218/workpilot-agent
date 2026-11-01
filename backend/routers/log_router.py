@@ -9,6 +9,8 @@ from backend.dependencies import get_db
 from backend.schemas.common import ErrorResponse, Page, SuccessResponse
 from backend.schemas.log import LogFilters, LogRead
 from backend.services.log_service import list_logs
+from backend.services.access_service import current_team, granted_services
+from backend.models.team import TeamMember
 
 
 router = APIRouter(
@@ -24,5 +26,6 @@ router = APIRouter(
 @router.get("", response_model=SuccessResponse[Page[LogRead]])
 def get_logs(
     filters: Annotated[LogFilters, Query()], session: Annotated[Session, Depends(get_db)],
+    member: Annotated[TeamMember, Depends(current_team)],
 ) -> SuccessResponse[Page[LogRead]]:
-    return SuccessResponse(data=list_logs(session, filters))
+    return SuccessResponse(data=list_logs(session, filters, allowed_services=granted_services(session, member.team_id)))

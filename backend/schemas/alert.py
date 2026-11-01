@@ -2,9 +2,10 @@
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from backend.schemas.agent import AgentResult
+from backend.schemas.agent import AgentResult, AgentRunAccepted
+from backend.models.enums import AgentRunStatus
 
 
 class IncidentAlertRequest(BaseModel):
@@ -17,7 +18,7 @@ class IncidentAlertRequest(BaseModel):
     service_name: str = Field(
         min_length=1,
         max_length=128,
-        pattern=r"^[a-zA-Z0-9._-]+$",
+        pattern=r"^[a-z][a-z0-9._-]*$",
     )
     alert_name: str = Field(min_length=1, max_length=160, pattern=r"^[^\r\n]+$")
     severity: Literal["warning", "critical"]
@@ -28,9 +29,22 @@ class IncidentAlertRequest(BaseModel):
         pattern=r"^[a-zA-Z0-9._-]+$",
     )
     window_minutes: int = Field(default=60, ge=5, le=10_080)
+    source_kind: Literal["synthetic", "local_test", "external", "unspecified"] = "unspecified"
+
+    @field_validator("service_name", mode="before")
+    @classmethod
+    def canonical_service(cls, value):
+        return value.strip().lower() if isinstance(value, str) else value
 
 
 class IncidentAlertResult(BaseModel):
     source: str
     event_id: str
     agent_run: AgentResult
+
+
+class IncidentAlertAccepted(AgentRunAccepted):
+    status: AgentRunStatus = AgentRunStatus.RUNNING
+    source: str
+    event_id: str
+    source_kind: Literal["synthetic", "local_test", "external", "unspecified"]

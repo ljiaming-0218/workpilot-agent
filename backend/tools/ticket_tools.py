@@ -22,6 +22,8 @@ class SearchTicketsTool(BaseTool[SearchTicketsInput, SearchTicketsOutput]):
     def execute(
         self, context: ToolContext, tool_input: SearchTicketsInput,
     ) -> SearchTicketsOutput:
+        from backend.services.access_service import resolve_run_scope
+        allowed = resolve_run_scope(context.session, context.agent_run_id)[1] if context.agent_run_id else None
         page = list_tickets(
             context.session,
             TicketFilters(
@@ -29,7 +31,7 @@ class SearchTicketsTool(BaseTool[SearchTicketsInput, SearchTicketsOutput]):
                 service_name=tool_input.service_name,
                 page=1,
                 page_size=tool_input.limit,
-            ),
+            ), allowed_services=list(allowed) if allowed is not None else None,
         )
         return SearchTicketsOutput(items=page.items, total=page.total)
 
@@ -44,5 +46,10 @@ class GetTicketDetailTool(BaseTool[GetTicketDetailInput, GetTicketDetailOutput])
     def execute(
         self, context: ToolContext, tool_input: GetTicketDetailInput,
     ) -> GetTicketDetailOutput:
+        from backend.services.access_service import resolve_run_scope
         ticket = get_ticket(context.session, tool_input.ticket_id)
+        if context.agent_run_id is not None:
+            allowed = resolve_run_scope(context.session, context.agent_run_id)[1]
+            if ticket is not None and ticket.service_name not in allowed:
+                ticket = None
         return GetTicketDetailOutput(ticket=ticket)

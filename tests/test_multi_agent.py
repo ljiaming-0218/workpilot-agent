@@ -31,6 +31,13 @@ from backend.services.run_history_service import get_agent_run_detail
 QUERY = "分析 order-service 和 inventory-service 最近的超时故障"
 
 
+@pytest.fixture(autouse=True)
+def investigation_scope(monkeypatch):
+    # These tests isolate scheduler behavior using mocked sessions and tools.
+    monkeypatch.setattr("backend.services.access_service.resolve_run_scope",
+                        lambda session, run_id: (1, {"order-service", "inventory-service"}))
+
+
 class FixtureClient:
     def __init__(self, fail_ticket: bool = False) -> None:
         self.fail_ticket = fail_ticket
@@ -159,6 +166,9 @@ def test_multi_http_sync_and_async_dispatch(monkeypatch):
     assert AgentRequest(query=QUERY).model_dump() == {"query": QUERY}
     app = create_app()
     app.dependency_overrides[get_db] = lambda: MagicMock(spec=Session)
+    from backend.services.access_service import current_team
+    app.dependency_overrides[current_team] = lambda: SimpleNamespace(team_id=7, user_id=9, role="member")
+    monkeypatch.setattr("backend.routers.agent_router.require_requested_services", lambda *args: None)
     app.state.intent_router = IntentRouter(None)
     app.state.planner = Planner(None)
     app.state.tool_registry = MagicMock()
@@ -167,7 +177,11 @@ def test_multi_http_sync_and_async_dispatch(monkeypatch):
     app.state.risk_checker = RiskChecker()
     app.state.run_event_broker = RunEventBroker()
     app.state.session_factory = MagicMock()
-    monkeypatch.setattr("backend.routers.agent_router.prepare_agent_run", lambda session, query: (42, "request-42"))
+    prepared = []
+    def prepare(session, query, **kwargs):
+        prepared.append(kwargs)
+        return 42, "request-42"
+    monkeypatch.setattr("backend.routers.agent_router.prepare_agent_run", prepare)
     executed = []
     monkeypatch.setattr(
         "backend.routers.agent_router.execute_multi_agent_run",
@@ -193,6 +207,7 @@ def test_multi_http_sync_and_async_dispatch(monkeypatch):
     accepted = client.post("/agent/runs/async", json={"query": QUERY})
     assert accepted.status_code == 202
     assert accepted.json()["data"]["run_id"] == 42
+    assert prepared[-1] == {"creator_user_id": 9, "team_id": 7}
     assert background_calls[-1][11] == "multi"
     delegated = client.post(
         "/agent/runs", json={"query": "模拟重启 order-service"},
@@ -209,7 +224,7 @@ def test_multi_http_sync_and_async_dispatch(monkeypatch):
     baseline_calls = []
     monkeypatch.setattr(
         "backend.routers.agent_router.run_agent",
-        lambda *args: baseline_calls.append(args) or result.model_copy(update={
+        lambda *args, **kwargs: baseline_calls.append((args, kwargs)) or result.model_copy(update={
             "mode": "single", "agent_tasks": [],
         }),
     )

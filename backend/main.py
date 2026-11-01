@@ -9,6 +9,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from langgraph.checkpoint.memory import InMemorySaver
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import inspect
 
 from backend.agent import build_agent_graph
 from backend.agent.analyzer import IncidentAnalyzer
@@ -21,9 +22,11 @@ from backend.database import build_engine
 from backend.errors import register_error_handlers
 from backend.mcp import WorkPilotMCPClient
 from backend.routers.alert_router import router as alert_router
+from backend.routers.auth_router import router as auth_router
 from backend.routers.agent_router import router as agent_router
 from backend.routers.health_router import router as health_router
 from backend.routers.ingestion_router import router as ingestion_router
+from backend.routers.investigation_router import router as investigation_router
 from backend.routers.knowledge_router import router as knowledge_router
 from backend.routers.log_router import router as log_router
 from backend.routers.ticket_router import router as ticket_router
@@ -53,7 +56,7 @@ def _mcp_database_environment(settings: Settings) -> dict[str, str]:
     return environment
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+def create_app(settings: Settings | None = None, *, reconcile_approvals: bool = True) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         runtime_settings = settings if settings is not None else Settings()
@@ -64,6 +67,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         )
         try:
             app.state.settings = runtime_settings
+            inspector = inspect(engine)
+            job_table = inspector.has_table("durable_jobs")
+            attempt_table = inspector.has_table("durable_job_attempts")
+            if job_table != attempt_table or (runtime_settings.p3_durable_enabled and not job_table):
+                raise RuntimeError("P3 tables are missing or incomplete; run scripts.migrate_p3 first")
+            app.state.p3_schema_present = job_table and attempt_table
+            app.state.p4_schema_present = app.state.p3_schema_present and all(inspector.has_table(name) for name in (
+                "incident_submissions", "investigation_reviews", "investigation_notes",
+            ))
             if (
                 runtime_settings.llm_api_key is not None
                 and runtime_settings.llm_model is not None
@@ -74,8 +86,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             )
             mcp_client.connect()
             app.state.session_factory = sessionmaker(bind=engine, autoflush=False)
-            with app.state.session_factory() as recovery_session:
-                reconcile_approval_checkpoints(recovery_session)
+            if reconcile_approvals:
+                with app.state.session_factory() as recovery_session:
+                    reconcile_approval_checkpoints(recovery_session)
             app.state.mcp_client = mcp_client
             app.state.tool_registry = create_default_registry(
                 text2sql_service,
@@ -106,11 +119,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application = FastAPI(title="WorkPilot Agent", version="0.1.0", lifespan=lifespan)
     register_error_handlers(application)
     application.include_router(health_router)
+    application.include_router(auth_router)
     application.include_router(ticket_router)
     application.include_router(log_router)
     application.include_router(knowledge_router)
     application.include_router(ingestion_router)
     application.include_router(alert_router)
+    application.include_router(investigation_router)
     application.include_router(agent_router)
     application.include_router(trace_router)
 

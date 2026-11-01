@@ -58,6 +58,7 @@ def import_logs(session: Session, payload: LogImportRequest) -> ImportResult:
 def import_knowledge(
     session: Session,
     payload: KnowledgeImportRequest,
+    *, team_id: int | None = None,
 ) -> ImportResult:
     """Create or update documents by stable source and skip unchanged content."""
     unique_items = {}
@@ -67,7 +68,7 @@ def import_knowledge(
     existing = {
         row.source: row
         for row in session.scalars(
-            select(KnowledgeDoc).where(KnowledgeDoc.source.in_(set(unique_items)))
+            select(KnowledgeDoc).where(KnowledgeDoc.source.in_(set(unique_items)), KnowledgeDoc.team_id == team_id)
         )
     }
     created_rows = []
@@ -75,7 +76,7 @@ def import_knowledge(
     for source, item in unique_items.items():
         row = existing.get(source)
         if row is None:
-            row = KnowledgeDoc(**item.model_dump())
+            row = KnowledgeDoc(**item.model_dump(), team_id=team_id)
             session.add(row)
             created_rows.append(row)
             continue

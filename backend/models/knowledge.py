@@ -1,6 +1,6 @@
 """Plain-text knowledge documents used by the BM25 retrieval pipeline."""
 
-from sqlalchemy import String
+from sqlalchemy import Integer, String
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -13,6 +13,7 @@ class KnowledgeDoc(TimestampMixin, Base):
     __table_args__ = TABLE_OPTIONS.copy()
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    team_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
     title: Mapped[str] = mapped_column(String(255))
     content: Mapped[str] = mapped_column(LONGTEXT)
     category: Mapped[str | None] = mapped_column(String(64))

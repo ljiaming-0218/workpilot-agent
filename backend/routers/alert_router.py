@@ -2,14 +2,17 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from backend.dependencies import get_db
 from backend.routers.ingestion_router import require_ingestion_key
-from backend.schemas.alert import IncidentAlertRequest, IncidentAlertResult
+from backend.schemas.alert import IncidentAlertRequest, IncidentAlertAccepted
 from backend.schemas.common import ErrorResponse, SuccessResponse
-from backend.services.alert_service import process_incident_alert
+from backend.services.alert_service import enqueue_incident_alert
+from backend.services.access_service import current_team
+from backend.models.team import TeamMember
+from backend.routers.investigation_router import require_p4
 
 
 router = APIRouter(
@@ -26,20 +29,15 @@ router = APIRouter(
 DbSession = Annotated[Session, Depends(get_db)]
 
 
-@router.post("/incidents", response_model=SuccessResponse[IncidentAlertResult])
+@router.post("/incidents", response_model=SuccessResponse[IncidentAlertAccepted], status_code=202,
+             dependencies=[Depends(require_p4)])
 def receive_incident_alert(
     payload: IncidentAlertRequest,
     request: Request,
     session: DbSession,
-) -> SuccessResponse[IncidentAlertResult]:
-    result = process_incident_alert(
-        session,
-        request.app.state.agent_graph,
-        request.app.state.tool_registry,
-        request.app.state.intent_router,
-        request.app.state.planner,
-        request.app.state.incident_analyzer,
-        request.app.state.risk_checker,
-        payload,
-    )
+    member: Annotated[TeamMember, Depends(current_team)],
+) -> SuccessResponse[IncidentAlertAccepted]:
+    if not request.app.state.settings.p3_durable_enabled:
+        raise HTTPException(503, "告警接入需要启用 P3 持久队列并启动独立 Worker")
+    result = enqueue_incident_alert(session, member, payload)
     return SuccessResponse(data=result)

@@ -1,4 +1,4 @@
-"""Minimal user identity; authentication is outside Phase 1."""
+"""User identity and password hash."""
 
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -14,4 +14,5 @@ class User(TimestampMixin, Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(String(64), unique=True)
+    password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
     role: Mapped[UserRole] = mapped_column(enum_type(UserRole), default=UserRole.DEVELOPER)

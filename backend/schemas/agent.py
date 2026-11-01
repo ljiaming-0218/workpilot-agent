@@ -152,6 +152,7 @@ class AgentRunAccepted(BaseModel):
     run_id: int = Field(ge=1)
     request_id: str
     status: Literal["running"] = "running"
+    queue_status: str | None = None
     events_url: str
 
 

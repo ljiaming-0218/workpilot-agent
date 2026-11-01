@@ -14,6 +14,8 @@ from backend.schemas.ingestion import (
     LogImportRequest,
 )
 from backend.services.ingestion_service import import_knowledge, import_logs
+from backend.services.access_service import current_team, granted_services
+from backend.models.team import TeamMember
 
 
 def require_ingestion_key(
@@ -52,7 +54,10 @@ DbSession = Annotated[Session, Depends(get_db)]
 def ingest_logs(
     payload: LogImportRequest,
     session: DbSession,
+    member: Annotated[TeamMember, Depends(current_team)],
 ) -> SuccessResponse[ImportResult]:
+    if any(item.service_name not in granted_services(session, member.team_id) for item in payload.items):
+        raise HTTPException(status_code=403, detail="无权导入该服务的日志")
     return SuccessResponse(data=import_logs(session, payload))
 
 
@@ -60,5 +65,6 @@ def ingest_logs(
 def ingest_knowledge(
     payload: KnowledgeImportRequest,
     session: DbSession,
+    member: Annotated[TeamMember, Depends(current_team)],
 ) -> SuccessResponse[ImportResult]:
-    return SuccessResponse(data=import_knowledge(session, payload))
+    return SuccessResponse(data=import_knowledge(session, payload, team_id=member.team_id))

@@ -16,10 +16,13 @@ class SearchKnowledgeTool(BaseTool[SearchKnowledgeInput, SearchKnowledgeOutput])
     def execute(
         self, context: ToolContext, tool_input: SearchKnowledgeInput,
     ) -> SearchKnowledgeOutput:
+        from backend.services.access_service import resolve_run_scope
+        team_id = resolve_run_scope(context.session, context.agent_run_id)[0] if context.agent_run_id else None
         items, total = search_knowledge(
             context.session,
             tool_input.query,
             category=tool_input.category,
             limit=tool_input.limit,
+            team_id=team_id,
         )
         return SearchKnowledgeOutput(items=items, total=total)

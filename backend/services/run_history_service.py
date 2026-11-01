@@ -1,6 +1,6 @@
 """Reopen saved Agent runs using only persisted audit data."""
 
-from sqlalchemy import func, select
+from sqlalchemy import exists, func, select
 from sqlalchemy.orm import Session
 
 from backend.models.agent_run import AgentRun
@@ -10,12 +10,21 @@ from backend.models.trace_event import AgentTraceEvent
 from backend.schemas.common import Page, PaginationParams
 from backend.schemas.run_history import AgentRunDetail, AgentRunSummary
 from backend.services.agent_service import AgentRunNotFoundError
+from backend.services.access_service import run_access_filter
 
 
-def list_agent_runs(session: Session, pagination: PaginationParams) -> Page[AgentRunSummary]:
-    total = session.scalar(select(func.count()).select_from(AgentRun)) or 0
+def list_agent_runs(session: Session, pagination: PaginationParams, *, team_id: int | None = None,
+                    durable: bool = False) -> Page[AgentRunSummary]:
+    scope = run_access_filter(team_id) if team_id is not None else True
+    if durable:
+        from sqlalchemy import and_
+        from backend.models.durable_job import DurableJobAttempt
+        scope = and_(scope, ~exists(select(DurableJobAttempt.id).where(
+            DurableJobAttempt.execution_run_id == AgentRun.id)))
+    total = session.scalar(select(func.count()).select_from(AgentRun).where(scope)) or 0
     runs = session.scalars(
         select(AgentRun)
+        .where(scope)
         .order_by(AgentRun.id.desc())
         .offset(pagination.offset)
         .limit(pagination.page_size)

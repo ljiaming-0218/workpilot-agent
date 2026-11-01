@@ -14,12 +14,15 @@ class AgentRunSummary(BaseModel):
 
     id: int
     request_id: str
+    creator_user_id: int | None = None
+    team_id: int | None = None
     user_query: str
     intent: str | None
     status: AgentRunStatus
     started_at: UtcDatetime
     finished_at: UtcDatetime | None
     latency_ms: int | None
+    queue_status: str | None = None
 
 
 class AgentRunDetail(AgentRunSummary):

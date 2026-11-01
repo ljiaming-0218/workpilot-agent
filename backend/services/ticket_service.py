@@ -26,9 +26,11 @@ def get_ticket(session: Session, ticket_id: int) -> TicketRead | None:
     return TicketRead.model_validate(ticket) if ticket is not None else None
 
 
-def list_tickets(session: Session, filters: TicketFilters) -> Page[TicketRead]:
+def list_tickets(session: Session, filters: TicketFilters, *, allowed_services: list[str] | None = None) -> Page[TicketRead]:
     """Count all matches, then fetch a bounded page ordered by newest time and ID."""
     conditions = []
+    if allowed_services is not None:
+        conditions.append(Ticket.service_name.in_(allowed_services))
     for name in ("service_name", "category", "priority", "status"):
         value = getattr(filters, name)
         if value is not None:

@@ -9,6 +9,8 @@ from backend.dependencies import get_db
 from backend.schemas.common import ErrorResponse, Page, PaginationParams, SuccessResponse
 from backend.schemas.knowledge import KnowledgeRead
 from backend.services.knowledge_service import list_knowledge_page
+from backend.services.access_service import current_team
+from backend.models.team import TeamMember
 
 
 router = APIRouter(
@@ -26,5 +28,6 @@ router = APIRouter(
 def get_knowledge(
     pagination: Annotated[PaginationParams, Query()],
     session: Annotated[Session, Depends(get_db)],
+    member: Annotated[TeamMember, Depends(current_team)],
 ) -> SuccessResponse[Page[KnowledgeRead]]:
-    return SuccessResponse(data=list_knowledge_page(session, pagination))
+    return SuccessResponse(data=list_knowledge_page(session, pagination, team_id=member.team_id))

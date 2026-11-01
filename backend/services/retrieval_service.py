@@ -36,8 +36,17 @@ def search_knowledge(
     *,
     category: str | None = None,
     limit: int = 5,
+    team_id: int | None = None,
 ) -> tuple[list[KnowledgeSearchHit], int]:
-    retriever = _get_retriever(session, category)
+    if team_id is None:
+        retriever = _get_retriever(session, category)
+    else:
+        statement = select(KnowledgeDoc).where(KnowledgeDoc.team_id == team_id)
+        if category is not None:
+            statement = statement.where(KnowledgeDoc.category == category)
+        rows = session.scalars(statement.order_by(KnowledgeDoc.id))
+        retriever = BM25Retriever([RetrievalDocument(id=row.id, title=row.title, content=row.content,
+                                    category=row.category, source=row.source) for row in rows])
     result = retriever.search(query, limit)
     hits = [
         KnowledgeSearchHit(

@@ -13,6 +13,8 @@ from backend.agent.risk import RiskChecker
 from backend.agent.router import IntentRouter
 from backend.database import Base
 from backend.models.agent_run import AgentRun
+from backend.models.user import User
+from backend.models.team import Team, TeamMember, ServiceGrant
 from backend.models.approval_checkpoint import AgentApprovalCheckpoint
 from backend.models.common import utc_now
 from backend.models.enums import AgentRunStatus
@@ -33,13 +35,21 @@ def session(tmp_path):
     engine = create_engine("sqlite:///" + str(tmp_path / "approval.db"))
     Base.metadata.create_all(engine)
     with sessionmaker(bind=engine, expire_on_commit=False)() as db:
+        user = User(username="approval-test")
+        team = Team(name="approval-team")
+        db.add_all([user, team])
+        db.flush()
+        db.add_all([TeamMember(team_id=team.id, user_id=user.id, role="admin"),
+                    ServiceGrant(team_id=team.id, service_name="order-service"),
+                    ServiceGrant(team_id=team.id, service_name="inventory-service")])
+        db.commit()
         yield db
     engine.dispose()
 
 
 def waiting_run(session):
     query = "模拟重启 order-service"
-    run_id, request_id = prepare_agent_run(session, query)
+    run_id, request_id = prepare_agent_run(session, query, creator_user_id=1, team_id=1)
     registry = create_default_registry()
     args = (registry, IntentRouter(None), Planner(None), IncidentAnalyzer(None), RiskChecker())
     result = execute_specialist_run(session, build_agent_graph(), *args, run_id, request_id, query)
@@ -80,7 +90,7 @@ def test_recovery_does_not_replay_expired_or_ambiguous_approval(session, state, 
 
 def test_plain_two_service_restart_waits_for_approval_then_only_simulates(session):
     query = '重启 order-service 和 inventory-service'
-    run_id, request_id = prepare_agent_run(session, query)
+    run_id, request_id = prepare_agent_run(session, query, creator_user_id=1, team_id=1)
     args = (create_default_registry(), IntentRouter(None), Planner(None), IncidentAnalyzer(None), RiskChecker())
     result = execute_specialist_run(session, build_agent_graph(), *args, run_id, request_id, query)
     assert result.intent == 'operation'

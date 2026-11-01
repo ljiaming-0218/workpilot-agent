@@ -76,6 +76,15 @@ class ToolRegistry:
     ) -> BaseModel:
         if context.agent_run_id is None:
             raise ToolExecutionError("Agent tool calls require an AgentRun ID.")
+        from backend.services.access_service import resolve_run_scope
+        try:
+            _team_id, allowed = resolve_run_scope(context.session, context.agent_run_id)
+            if name == "query_database":
+                raise ValueError("Text2SQL 暂不支持团队行级权限")
+            if name in {"query_error_logs", "search_tickets"} and (not isinstance(raw_input, dict) or (raw_input.get("service_name") is not None and raw_input.get("service_name") not in allowed)):
+                raise ValueError("工具查询服务超出任务授权范围")
+        except ValueError as exc:
+            raise ToolExecutionError(str(exc)) from exc
         definition = self.get_tool(name)
         if not definition.enabled:
             self._persist_terminal_log(

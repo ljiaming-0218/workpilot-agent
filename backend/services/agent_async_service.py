@@ -17,6 +17,10 @@ from backend.services.multi_agent_service import execute_multi_agent_run
 from backend.services.specialist_agent_service import execute_specialist_run
 from backend.services.run_event_service import RunEventBroker
 from backend.tools.registry import ToolRegistry
+from backend.services.access_service import resolve_run_scope
+from backend.models.agent_run import AgentRun
+from backend.models.enums import AgentRunStatus
+from backend.models.common import utc_now
 
 
 logger = logging.getLogger(__name__)
@@ -44,6 +48,18 @@ def execute_agent_run_background(
         broker.publish(run_id, event_type, data)
 
     with session_factory() as session:
+        try:
+            resolve_run_scope(session, run_id)
+        except ValueError:
+            session.rollback()
+            run = session.get(AgentRun, run_id)
+            if run is not None:
+                run.status = AgentRunStatus.FAILED
+                run.final_answer = "任务权限已变更，调查未执行。"
+                run.finished_at = utc_now()
+                session.commit()
+            broker.publish(run_id, "terminal", {"run_id": run_id, "status": "failed", "error": "SCOPE_CHANGED"}, terminal=True)
+            return
         try:
             if mode == "multi":
                 if routing is None or planned is None:

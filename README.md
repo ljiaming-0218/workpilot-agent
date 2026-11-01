@@ -14,6 +14,7 @@
 - **工具与审批**：Tool Registry 校验工具输入输出、权限和风险，并记录审计。重启等操作请求进入已有的模拟操作审批流程。
 - **可观测性**：Console 展示任务分派、各服务状态、工具与模型调用、证据来源、核验意见及最终回答；运行历史和 Trace 持久化到数据库。
 - **查询能力**：BM25 知识检索、经 SQLGlot AST 校验的只读 Text2SQL，以及带 API Key 的日志/知识导入和告警入口。
+- **调查协作（P4）**：告警进入持久任务队列；团队认领、反馈、备注和交接历史独立保存。执行完成不代表人工确认根因。启动与验收见 [P4 运行说明](docs/P4-runbook.md)。
 
 ## 架构与工作流
 
@@ -188,9 +189,18 @@ $env:NO_PROXY = "api-inference.modelscope.cn,127.0.0.1,localhost"
 | GET | /agent/runs/{run_id}/trace | 持久化 Trace |
 | GET | /tickets、/logs、/knowledge | 业务数据读取 |
 | POST | /ingestion/logs、/ingestion/knowledge | 受 API Key 保护的批量导入 |
-| POST | /alerts/incidents | 受 API Key 保护的告警入口，当前复用既有 LangGraph 调查工作流 |
+| POST | /alerts/incidents | API Key + 登录会话 + 团队服务授权；返回 202，告警入 P3 持久队列 |
+| GET / PATCH | /agent/runs/{run_id}/collaboration | 查看 / 更新负责人、人工处理状态、结果反馈和备注 |
+| GET | /investigations/summary | 当前团队可访问任务按声明来源、执行状态、人工反馈分组统计 |
 
 导入与告警接口使用 X-Ingestion-Key。同步 /agent/runs 的 X-WorkPilot-Comparison-Mode: single 请求头仅用于历史对照；Console 默认不提供单 / 多 Agent 切换。
+
+P4 告警还要求有效登录 Cookie 和 `X-WorkPilot-Team-Id`，并启用
+`P3_DURABLE_ENABLED=true`、完成 P1–P4 迁移、启动独立 Worker。该入口不再同步
+返回完整报告；调用者使用返回的 `run_id` / `events_url` 读取结果。同团队的
+`source + event_id` 相同且内容相同返回原任务，不同内容返回 409。
+`source_kind` 是提交方的来源声明；合成、本地测试、外部和未标记数据分组统计，
+这些计数及人工反馈均不是根因准确率。详情见 P4 运行说明。
 
 ## 验证与实验
 

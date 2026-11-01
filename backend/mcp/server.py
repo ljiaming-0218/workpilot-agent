@@ -55,11 +55,18 @@ def _call_tool(
     context: Context[MCPRuntime],
     name: str,
     arguments: dict[str, Any],
+    run_id: int,
 ) -> Any:
     runtime = context.request_context.lifespan_context
     with runtime.session_factory() as session:
         try:
-            return execute_mcp_tool(session, name, arguments)
+            from backend.services.access_service import resolve_run_scope
+            _, allowed = resolve_run_scope(session, run_id)
+            if name in {"query_error_logs", "search_tickets"} and arguments.get("service_name") is not None and arguments.get("service_name") not in allowed:
+                raise ValueError("服务不在任务授权范围")
+            return execute_mcp_tool(session, name, arguments, run_id=run_id)
+        except ValueError as exc:
+            raise ToolError(str(exc)) from exc
         except SQLAlchemyError as exc:
             session.rollback()
             raise ToolError("WorkPilot database operation failed.") from exc
@@ -68,6 +75,7 @@ def _call_tool(
 @mcp.tool()
 def search_tickets(
     context: Context[MCPRuntime],
+    run_id: Annotated[int, Field(ge=1)],
     keyword: Annotated[str | None, Field(min_length=1, max_length=100)] = None,
     service_name: Annotated[str | None, Field(min_length=1, max_length=128)] = None,
     limit: Annotated[int, Field(ge=1, le=100)] = 20,
@@ -77,7 +85,7 @@ def search_tickets(
         _call_tool(
             context,
             "search_tickets",
-            {"keyword": keyword, "service_name": service_name, "limit": limit},
+            {"keyword": keyword, "service_name": service_name, "limit": limit}, run_id,
         )
     )
 
@@ -86,6 +94,7 @@ def search_tickets(
 def query_error_logs(
     context: Context[MCPRuntime],
     service_name: Annotated[str, Field(min_length=1, max_length=128)],
+    run_id: Annotated[int, Field(ge=1)],
     minutes: Annotated[int, Field(ge=1, le=10_080)] = 60,
     error_type: Annotated[str | None, Field(min_length=1, max_length=128)] = None,
     limit: Annotated[int, Field(ge=1, le=100)] = 20,
@@ -100,7 +109,7 @@ def query_error_logs(
                 "minutes": minutes,
                 "error_type": error_type,
                 "limit": limit,
-            },
+            }, run_id,
         )
     )
 
@@ -109,6 +118,7 @@ def query_error_logs(
 def search_knowledge(
     context: Context[MCPRuntime],
     query: Annotated[str, Field(min_length=1, max_length=500)],
+    run_id: Annotated[int, Field(ge=1)],
     category: Annotated[str | None, Field(min_length=1, max_length=128)] = None,
     limit: Annotated[int, Field(ge=1, le=20)] = 5,
 ) -> SearchKnowledgeOutput:
@@ -117,7 +127,7 @@ def search_knowledge(
         _call_tool(
             context,
             "search_knowledge",
-            {"query": query, "category": category, "limit": limit},
+            {"query": query, "category": category, "limit": limit}, run_id,
         )
     )
 

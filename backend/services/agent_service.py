@@ -8,7 +8,7 @@ from typing import Any
 from uuid import uuid4
 
 from langgraph.graph.state import CompiledStateGraph
-from sqlalchemy import update
+from sqlalchemy import select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -18,7 +18,9 @@ from backend.agent.risk import RiskChecker
 from backend.agent.router import IntentRouter
 from backend.agent.state import AgentContext, AgentState
 from backend.agent.trace import TraceRecorder
-from backend.models.agent_run import AgentRun
+from backend.models.agent_run import AgentRun, AgentRunService
+from backend.models.team import ServiceGrant
+from backend.agent.planner import _service_names
 from backend.models.approval_checkpoint import AgentApprovalCheckpoint
 from backend.models.common import utc_now
 from backend.models.enums import AgentRunStatus
@@ -57,9 +59,10 @@ def run_agent(
     incident_analyzer: IncidentAnalyzer,
     risk_checker: RiskChecker,
     query: str,
+    *, creator_user_id: int | None = None, team_id: int | None = None,
 ) -> AgentResult:
     """Create a run and either finish it or persist its interrupted state."""
-    run_id, request_id = prepare_agent_run(session, query)
+    run_id, request_id = prepare_agent_run(session, query, creator_user_id=creator_user_id, team_id=team_id)
     return execute_agent_run(
         session,
         graph,
@@ -74,18 +77,29 @@ def run_agent(
     )
 
 
-def prepare_agent_run(session: Session, query: str) -> tuple[int, str]:
+def prepare_agent_run(session: Session, query: str, *, creator_user_id: int | None = None,
+                      team_id: int | None = None, commit: bool = True,
+                      target_services: list[str] | None = None) -> tuple[int, str]:
     """Persist RUNNING before synchronous or background execution begins."""
     request_id = uuid4().hex
     run = AgentRun(
         request_id=request_id,
         user_query=query,
+        creator_user_id=creator_user_id,
+        team_id=team_id,
+        service_scope_recorded=True if team_id is not None else None,
         status=AgentRunStatus.RUNNING,
     )
     session.add(run)
     session.flush()
     run_id = run.id
-    session.commit()
+    if team_id is not None:
+        services = list(dict.fromkeys(target_services)) if target_services is not None else _service_names(query)
+        if not services and target_services is None:
+            services = list(session.scalars(select(ServiceGrant.service_name).where(ServiceGrant.team_id == team_id)))
+        session.add_all(AgentRunService(agent_run_id=run_id, service_name=name) for name in services)
+    if commit:
+        session.commit()
     return run_id, request_id
 
 
@@ -195,6 +209,24 @@ def resume_agent(
     risk_checker: RiskChecker,
     run_id: int,
     action: ApprovalAction,
+) -> AgentResult:
+    from backend.services.approval_lock import approval_lock
+    run = session.get(AgentRun, run_id)
+    if run is None:
+        raise AgentRunNotFoundError("Agent run does not exist.")
+    request_id = run.request_id
+    session.rollback()
+    with approval_lock(session.get_bind(), request_id) as acquired:
+        if not acquired:
+            raise AgentRunStateError("Approval is already being handled.")
+        return _resume_agent_locked(session, graph, registry, intent_router, planner,
+                                    incident_analyzer, risk_checker, run_id, action)
+
+
+def _resume_agent_locked(
+    session: Session, graph: CompiledStateGraph, registry: ToolRegistry,
+    intent_router: IntentRouter, planner: Planner, incident_analyzer: IncidentAnalyzer,
+    risk_checker: RiskChecker, run_id: int, action: ApprovalAction,
 ) -> AgentResult:
     """Atomically claim one waiting run and resume its LangGraph checkpoint."""
     run = session.get(AgentRun, run_id)

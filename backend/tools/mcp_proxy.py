@@ -29,7 +29,7 @@ class MCPProxyTool(BaseTool[BaseModel, BaseModel]):
     def execute(self, context: ToolContext, tool_input: BaseModel) -> BaseModel:
         raw_output = self._client.call_tool(
             self.name,
-            tool_input.model_dump(mode="json"),
+            {**tool_input.model_dump(mode="json"), "run_id": context.agent_run_id},
         )
         return self.output_schema.model_validate(raw_output)
 

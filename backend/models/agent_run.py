@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import CheckConstraint, String
+from sqlalchemy import Boolean, CheckConstraint, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.dialects.mysql import DATETIME, LONGTEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -27,6 +27,9 @@ class AgentRun(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     request_id: Mapped[str] = mapped_column(String(64), index=True)
+    creator_user_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    team_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    service_scope_recorded: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     user_query: Mapped[str] = mapped_column(LONGTEXT)
     intent: Mapped[str | None] = mapped_column(String(64))
     status: Mapped[AgentRunStatus] = mapped_column(
@@ -44,3 +47,12 @@ class AgentRun(Base):
     trace_events: Mapped[list[AgentTraceEvent]] = relationship(
         back_populates="agent_run", passive_deletes="all"
     )
+
+
+class AgentRunService(Base):
+    __tablename__ = "agent_run_services"
+    __table_args__ = (UniqueConstraint("agent_run_id", "service_name", name="uq_run_service"), TABLE_OPTIONS.copy())
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    agent_run_id: Mapped[int] = mapped_column(ForeignKey("agent_runs.id"), index=True)
+    service_name: Mapped[str] = mapped_column(String(128))

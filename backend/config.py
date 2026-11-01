@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     mysql_connect_timeout: int = Field(default=5, ge=1, le=30, description="Seconds to wait for a database connection before timing out.")
     mysql_ssl_ca: str | None = None
     ingestion_api_key: SecretStr | None = Field(default=None, min_length=16)
+    p3_durable_enabled: bool = False
 
     llm_api_key: SecretStr | None = None
     llm_base_url: str | None = None

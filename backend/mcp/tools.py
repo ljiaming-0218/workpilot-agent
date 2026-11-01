@@ -26,6 +26,7 @@ def execute_mcp_tool(
     session: Session,
     name: str,
     arguments: dict[str, Any],
+    run_id: int | None = None,
 ) -> BaseModel:
     """Validate and execute one exposed read-only tool without Agent audit state."""
     try:
@@ -36,7 +37,7 @@ def execute_mcp_tool(
     definition = tool.definition
     tool_input = definition.input_schema.model_validate(arguments)
     raw_output = definition.handler(
-        ToolContext(session=session, agent_run_id=None),
+        ToolContext(session=session, agent_run_id=run_id),
         tool_input,
     )
     return definition.output_schema.model_validate(raw_output)

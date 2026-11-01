@@ -20,12 +20,14 @@ def list_knowledge_documents(
 
 
 def list_knowledge_page(
-    session: Session, pagination: PaginationParams,
+    session: Session, pagination: PaginationParams, *, team_id: int | None = None,
 ) -> Page[KnowledgeRead]:
     """Show newest documents without changing the BM25 corpus query."""
-    total = session.scalar(select(func.count()).select_from(KnowledgeDoc)) or 0
+    scope = KnowledgeDoc.team_id == team_id if team_id is not None else True
+    total = session.scalar(select(func.count()).select_from(KnowledgeDoc).where(scope)) or 0
     statement = (
         select(KnowledgeDoc)
+        .where(scope)
         .order_by(KnowledgeDoc.updated_at.desc(), KnowledgeDoc.id.desc())
         .offset(pagination.offset)
         .limit(pagination.page_size)
